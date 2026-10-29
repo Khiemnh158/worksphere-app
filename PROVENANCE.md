@@ -17,3 +17,5 @@ Không có thay đổi nghiệp vụ/UI mới trong lượt tách repo này. Tà
 ## Thay đổi tổ chức tài liệu
 
 README/AGENTS/10 canonical docs và reports cũ được lưu dưới docs/legacy hoặc reports/legacy. Các comment source tham chiếu tài liệu gốc có thể dùng đường dẫn cũ; tra bản lưu khi cần. Quy tắc cũ “4 môn”, “D:/WorkSphere”, khóa phase và các PASS lịch sử không được dùng như hiện trạng của dự án mới.
+
+Wrapper mobile/android/gradlew được chuẩn hóa CRLF sang LF để chạy trên Linux, không đổi nội dung lệnh; source-manifest ghi hash sau chuẩn hóa.

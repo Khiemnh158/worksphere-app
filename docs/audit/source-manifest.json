@@ -2428,8 +2428,9 @@
     {
       "path": "mobile/android/gradlew",
       "upstream_sha256": "6d342d5765739fc2c34a15759035d0bc5beef0c039b7ddd68b78e7e637b8dd21",
-      "import_sha256": "6d342d5765739fc2c34a15759035d0bc5beef0c039b7ddd68b78e7e637b8dd21",
-      "local_patch": false
+      "import_sha256": "aed171fb114f82e6eaea4970a245a200e0582a7dcc8ec0891ca41b6e4a62b754",
+      "local_patch": false,
+      "normalization": "CRLF to LF for executable wrapper; no behavior change"
     },
     {
       "path": "mobile/android/gradlew.bat",
