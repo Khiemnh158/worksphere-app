@@ -1,0 +1,570 @@
+# WorkSphere Project State
+
+## Git Checkpoint
+
+- Branch: main
+- Phase 12 Completion Checkpoint: `bdd56778c9e64104b47d85a16e61431ccf1ac899` (`docs(agent): checkpoint phase 12 completion`)
+- Phase 13 Final Implementation Checkpoint: `29c68ab9e00fbc3faea52106e182ff9f9905ff01` (`feat(mobile): implement settings and finalize phase 13`)
+- Phase 13 Final Reconciliation Checkpoint: `0f17f6be5ea267518fc66a97631f1b351a430b1a` (`docs(audit): reconcile project state and handoff for phase 13 final audit`)
+- Phase 13 Audit Conclusion: `PHASE_13_FINAL_AUDIT_PASS_WITH_E2E_DEFERRALS`
+- Phase 14 Baseline Checkpoint: `785c155b69309284066252701ec1554d35d4e795` (`docs(phase14): record architecture decision D-061 phase 14 contract freeze`)
+- Phase 14A Implementation Checkpoint: `55cc13e6372ba4374d3533fe3f82f7afcd84dcff` (`feat(mobile): add phase 14 dashboard project contracts`)
+- Phase 15 Baseline Checkpoint: `763b877d1b3e7ecde94f288dd64dea902f193b96` (`docs(mobile): record architecture decision D-064 phase 15 task due-date semantics`)
+- Phase 15 Final Implementation Checkpoint: `597b765296565fceb0c4a88792c8785cbc538ccb` (`test(mobile): validate phase 15 integration`)
+- Phase 15 Final Reconciliation Checkpoint: `eb0c973dfe44fc3a717925a87b8a48f313502575` (`fix(mobile): reconcile phase 15 final audit`)
+- Phase 15 Audit Conclusion: `PHASE_15_FINAL_AUDIT_PASS_WITH_E2E_DEFERRALS`
+- Phase 15 Memory Checkpoint: `reports/PHASE_15_MEMORY_CHECKPOINT.md`
+- Pre-Phase 16 Audit Checkpoint: `reports/PRE_PHASE_16_AUDIT.md`
+- Phase 16 Contract Freeze Checkpoint: `reports/PHASE_16_SERVICE_REQUEST_CONTRACT_FREEZE.md` (Decision D-065)
+- Phase 16A Implementation Checkpoint: `reports/PHASE_16A_SERVICE_REQUEST_CONTRACT_FOUNDATION_REPORT.md`
+- Current Status: Phase 13 Mobile Authentication CLOSED. Phase 14 Mobile Dashboard and Projects CLOSED (MEMORY_CHECKPOINT_CLOSED). Phase 15 Mobile Task Management: CLOSED (MEMORY_CHECKPOINT_CLOSED) (Subphases 15A..15G CLOSED). Phase 16 Mobile Service Requests: IN_PROGRESS (16A IMPLEMENTED / HARDENED PENDING FINAL NARROW VERIFICATION, 16B NOT STARTED). Phase 17 Mobile Asset Management: NOT STARTED.
+- Next Action: FINAL NARROW VERIFY PHASE 16A
+- Working tree at checkpoint: clean
+
+## Latest Implementation & Hardening
+
+- Latest Implementation: Phase 16A Service Request Contract Foundation & Transport Types Hardening
+- Implementation Report: `reports/PHASE_16A_SERVICE_REQUEST_CONTRACT_FOUNDATION_REPORT.md`
+- Delivered Scope:
+  - Transport types & domain enums (`ServiceStatus`, `ServicePriority`, `KNOWN_SERVICE_REQUEST_ACTIONS`, `SERVICE_REQUEST_SORT_PROPERTIES`).
+  - Runtime type guards for all entities, summaries, details, comments, and paginated wrappers.
+  - Complete API adapter implementing all 11 REST client methods matching backend `ServiceRequestController` and `ServiceCategoryController`.
+  - Presentation-safe error mapper (`serviceRequestErrorMapper.ts`) hardened following independent audit finding `SERVICE_REQUEST_ERROR_MAPPING_DRIFT`: removed phantom `SERVICE_RESOLUTION_COMMENT_REQUIRED`, added backend-thrown `SERVICE_RESOLUTION_REQUIRED` (placement `'status'`), `SERVICE_ASSIGNEE_REQUIRED` (placement `'status'`), and `INVALID_REQUEST_STATE` (placement `'banner'`).
+  - StatusBadge extension (`type="serviceRequest"`), canonicalizing all 7 service request statuses and `'ASSIGNED': 'Đã phân công'`.
+  - Typed route contracts added to `mobile/src/app/navigation/types.ts` (`ServiceRequestDetail`, `CreateServiceRequest`, `ServiceRequestComments`, `ServiceRating`).
+  - Validation: 85 test suites, 796 tests PASS (0 failures, 0 skipped); TypeScript 0 errors; ESLint 0 errors (48 pre-existing warnings); Android assembleDebug BUILD SUCCESSFUL.
+- Prior Decision: Phase 16 Mobile Service Request Contract & Scope Freeze (`D-065`)
+- Contract Freeze Report: `reports/PHASE_16_SERVICE_REQUEST_CONTRACT_FREEZE.md`
+- Scope Frozen:
+  - Canonical Scope: Mobile Service Requests (`SCR-SRV-01` .. `SCR-SRV-06`). Asset Management (`SCR-AST-01` .. `SCR-AST-06`) decoupled to Phase 17.
+  - Assignee Candidate Source: Company Directory via `GET /api/v1/directory/users`, reusing `UserPickerModal` from Phase 14.
+  - Category Source: Active categories via public `GET /api/v1/service-categories`. Admin category CRUD deferred.
+  - Asset Policy: Creation without asset supported (`assetId: undefined`). Zero UUID text inputs. In-form asset picker deferred to Phase 17.
+  - Attachment Policy: Display server attachments; native file upload deferred.
+  - Mutation Locks: Synchronous `useRef` locks across all 7 mutation flows.
+  - StatusBadge Extension: `type="serviceRequest"` supporting all 7 canonical statuses, adding `'ASSIGNED': 'Đã phân công'`.
+- Prior Audit: Pre-Phase 16 Mobile Service Request Audit & Contract Reconciliation (`reports/PRE_PHASE_16_AUDIT.md`)
+- Pre-Audit Report: `reports/PRE_PHASE_16_AUDIT.md`
+- Scope Audited & Reconciled:
+  - Canonical Scope: Mobile Service Requests (`SCR-SRV-01` .. `SCR-SRV-06` per `design/02_SCREEN_INVENTORY.md`). Asset Management decoupled to Phase 17 following the proven Phase 14 / Phase 15 precedent.
+  - Backend Readiness: 17 REST endpoints in `ServiceRequestController` and `ServiceCategoryController` 100% verified against `docs/06_API_CONTRACT.md` Section 13.
+  - Concurrency & Optimistic Locking: 7 mutation flows identified; `@Version` required on 4 endpoints (`updateRequest`, `updateStatus`, `rejectResolution`, `updateCategory`); synchronous `useRef` locks planned for all 7 mutation handlers.
+  - Date/Time Semantics: Zero calendar date inputs; all timestamps are server-side UTC `Instant`; Decision `D-064` not applicable.
+  - Identity Model: Complete mapping of `requestId`, `requestNumber`, `categoryId`, `requesterId`, `assigneeId`, `assignmentId`, `assetId`.
+  - Reuse: `UserPickerModal` for company directory assignees (`/directory/users`), `PriorityBadge` (100% match), `StatusBadge` narrow extension (`ASSIGNED`), `useTasks`/`useTaskDetail` patterns.
+  - Test Baseline: Mobile 82 suites / 736 tests PASS; Backend 46 Service Request tests PASS.
+  - Pre-Audit Verdict: `PRE_PHASE_16_AUDIT_PASS_READY_FOR_DECISION_FREEZE`.
+- Prior Reconciliation: Phase 15 Final Reconciliation Post-Independent-Audit
+- Audit Report: `reports/PHASE_15_FINAL_AUDIT_REPORT.md`
+- Integration Report: `reports/PHASE_15G_INTEGRATION_HARDENING_REPORT.md`
+- Scope Reconciled & Validated:
+  - Final Independent Audit Verdict: `PHASE_15_FINAL_AUDIT_PASS_WITH_E2E_DEFERRALS`. Findings: CRITICAL = 0, HIGH = 0, MEDIUM = 0, LOW = 1 (`COMMENT_ADMIN_ROLE_ALIAS_DRIFT`).
+  - Admin Role Alias Debt Reconciled: Removed unsupported fallback `ROLE_ADMIN` from `TaskCommentsScreen.tsx`. Aligned strictly with canonical backend role code `'ADMIN'`. Added regression test ensuring synthetic `ROLE_ADMIN` identity does not reveal edit/delete controls. Finding status: `RESOLVED_DURING_FINAL_RECONCILIATION`.
+  - Phase 15-specific LOW Debt: 0 remaining.
+  - Phase 15 Inventory: Complete validation across all 8 screens/modals (`SCR-TSK-01` .. `SCR-TSK-08`) plus existing-task assign/unassign.
+  - Route Data Minimization: Verified IDs-only navigation parameter contracts across `TaskDetail`, `CreateTask`, `EditTask`, `SubtaskList`, `TaskComments`. Zero security tokens, permissions, `allowedActions`, or version numbers travel via route parameters.
+  - Concurrency & Mutation Locks: Verified synchronous `useRef` locks across all 10 Phase 15 mutation flows, eliminating double-tap duplicate submissions.
+  - Freshness & Version Chaining: Verified continuous version propagation across successive mutations in a single mounted screen lifecycle; verified generation invalidation across `useSubtasks` and `useTaskComments`.
+  - Identity Integrity: Mapped and audited strict separation of `ProjectMember.userId` vs `AssigneeDetail.id` vs `AssigneeDetail.assignmentId`.
+  - Full Mobile Regression: 82 test suites, 736 tests PASS (0 failures, 0 skipped, 0 snapshots); TypeScript 0 errors; ESLint 0 errors (48 pre-existing warnings).
+  - Targeted Backend Task Regression: 47 tests PASS across `TaskTest`, `TaskWorkflowTest`, `TaskMockMvcTest`, `TaskAttachmentMockMvcTest` with 0 Checkstyle violations and `BUILD SUCCESS`.
+  - Android Native Build: `gradlew.bat assembleDebug` -> `BUILD SUCCESSFUL` (203 actionable tasks).
+  - Emulator Smoke: Installed and launched on `emulator-5554`, verified active PID, focused `MainActivity` window, and 0 crashes (`PRE_AUTH_ANDROID_SMOKE_PASS`).
+  - E2E Classifications: Authenticated E2E safely skipped (`PHASE_15_AUTH_E2E_CREDENTIALS_NOT_AVAILABLE_SAFE_SKIP`), Mutation E2E deferred (`PHASE_15_MUTATION_E2E_DEFERRED`), Device Offline E2E deferred (`PHASE_15_OFFLINE_DEVICE_E2E_DEFERRED`).
+  - Status Verdict: `PHASE_15_MEMORY_CHECKPOINT_CLOSED`.
+- Prior Integration: Subphase 15G Mobile Task Integration, Regression & Security Hardening (`reports/PHASE_15G_INTEGRATION_HARDENING_REPORT.md`)
+- Implementation Report: `reports/PHASE_15G_INTEGRATION_HARDENING_REPORT.md`
+- Scope Integrated & Validated:
+  - Phase 15 Inventory: Complete validation across all 8 screens/modals (`SCR-TSK-01` .. `SCR-TSK-08`) plus existing-task assign/unassign.
+  - Route Data Minimization: Verified IDs-only navigation parameter contracts across `TaskDetail`, `CreateTask`, `EditTask`, `SubtaskList`, `TaskComments`. Zero security tokens, permissions, `allowedActions`, or version numbers travel via route parameters.
+  - Concurrency & Mutation Locks: Verified synchronous `useRef` locks across all 10 Phase 15 mutation flows, eliminating double-tap duplicate submissions.
+  - Freshness & Version Chaining: Verified continuous version propagation across successive mutations in a single mounted screen lifecycle; verified generation invalidation across `useSubtasks` and `useTaskComments`.
+  - Identity Integrity: Mapped and audited strict separation of `ProjectMember.userId` vs `AssigneeDetail.id` vs `AssigneeDetail.assignmentId`.
+  - Full Mobile Regression: 82 test suites, 735 tests PASS (0 failures, 0 skipped, 0 snapshots); TypeScript 0 errors; ESLint 0 errors (48 pre-existing warnings).
+  - Targeted Backend Task Regression: 47 tests PASS across `TaskTest`, `TaskWorkflowTest`, `TaskMockMvcTest`, `TaskAttachmentMockMvcTest` with 0 Checkstyle violations and `BUILD SUCCESS`.
+  - Android Clean Native Build: `gradlew.bat clean assembleDebug` -> `BUILD SUCCESSFUL` (213 actionable tasks).
+  - Emulator Smoke: Installed and launched on `emulator-5554`, verified active PID, focused `MainActivity` window, and 0 crashes (`PRE_AUTH_ANDROID_SMOKE_PASS`).
+  - E2E Classifications: Authenticated E2E safely skipped (`PHASE_15_AUTH_E2E_CREDENTIALS_NOT_AVAILABLE_SAFE_SKIP`), Mutation E2E deferred (`PHASE_15_MUTATION_E2E_DEFERRED`), Device Offline E2E deferred (`PHASE_15_OFFLINE_DEVICE_E2E_DEFERRED`).
+  - Status Verdict: `PHASE_15G_PASS_PUSHED_READY_FOR_FINAL_AUDIT`.
+- Prior Implementation: Subphase 15F Mobile Task Subtasks & Comments (`SCR-TSK-05` & `SCR-TSK-06`) Hardening & Version Chaining Test Gap Closure
+- Implementation Report: `reports/PHASE_15F_SUBTASKS_COMMENTS_REPORT.md`
+- Scope Implemented & Hardened:
+  - Subtask List Screen (`SCR-TSK-05`): Implemented `SubtaskListScreen.tsx` with breadcrumb, parent task context, child tasks `FlatList` using `TaskCard`, navigation to `TaskDetail`, empty state, and pull-to-refresh error handling. Hardened with authoritative `useTaskDetail(parentTaskId)` check for `CREATE_SUBTASK` (eliminating `TASK_SUBTASK_CREATE_CAPABILITY_BYPASS`).
+  - Subtask Creation Modal (`CreateSubtaskModal.tsx`): Subtask creation modal gated by authoritative parent task capability, project-member assignee picker, D-064 due-date serialization (`17:00:00Z`), and synchronous `submittingRef` lock.
+  - Task Comments Screen (`SCR-TSK-06`): Implemented `TaskCommentsScreen.tsx` with paginated comments list, author attribution, formatted timestamps, and `(đã chỉnh sửa)` edited indicators. Hardened with authoritative `useTaskDetail(taskId)` check for `ADD_COMMENT` (eliminating `TASK_COMMENT_ADD_CAPABILITY_BYPASS` and `TASK_COMMENT_DIRECT_ROUTE_AUTH_GAP`).
+  - Comment Actions: Create comment with bottom input bar and `addingRef` lock; edit comment restricted to author or system admin (`isAuthor || isSystemAdmin`); delete comment gated to author or users with `ADMIN` role via `ConfirmationDialog`.
+  - Concurrency & Freshness Hardening: Synchronous generation increment on mutations in `useSubtasks` and `useTaskComments` eliminating `TASK_SUBTASK_MUTATION_STALE_OVERWRITE` and `TASK_COMMENT_MUTATION_STALE_OVERWRITE`; request promise ownership prevents older aborted fetches from clearing newer fetch pointers.
+  - Version Chaining Screen Integration Test: Implemented Test 15 in `mobile/__tests__/screens/TaskDetailScreen.test.tsx` proving continuous optimistic lock version propagation (`v1 -> v2 -> v3`) across successive mutations (`updateTaskProgress`) in a single mounted screen lifecycle with real `useTaskDetail` hook state behavior, closing `TASK_MUTATION_VERSION_CHAIN_TEST_GAP`.
+  - Navigation: Auxiliary hidden routes `SubtaskList` and `TaskComments` in `MainTabNavigator.tsx` (`tabBarButton: () => null`, `headerShown: false`) without untrusted permission payload parameters.
+  - Zero Policy Breaches: Zero backend modifications, zero new dependencies, zero file upload UI (deferred per D-063), zero raw UUIDs or unformatted enums.
+  - Validation: 82 test suites, 735 tests PASS (0 failures, 0 skipped); TypeScript 0 errors; ESLint 0 errors (48 preexisting warnings); Android assembleDebug BUILD SUCCESSFUL.
+  - Status Verdict: `PHASE_15F_VERSION_CHAIN_GAP_CLOSED_READY_FOR_15G`. Subphase 15G: `NOT STARTED`.
+- Prior Implementation: Subphase 15E Mobile Task Mutations (`SCR-TSK-07` + `SCR-TSK-08` + Existing-Task Assign/Unassign)
+- Prior Report: `reports/PHASE_15E_TASK_MUTATIONS_REPORT.md`
+- Scope Implemented:
+  - Task Status Update Modal (`SCR-TSK-07`): Pure domain state machine (`taskStatusTransitions.ts`), valid transition radio options, terminal state banner, and mandatory rejection comment when transitioning `IN_REVIEW -> IN_PROGRESS`.
+  - Task Progress Update Modal (`SCR-TSK-08`): Decimal progress support (`0.0..100.0`), quick presets (`0%`, `25%`, `50%`, `75%`, `100%`), input validation.
+  - Existing-Task Assign: Queries eligible project members via `projectApi.listMembers(projectId, { active: true })` (strictly zero calls to `directoryApi`), disables existing assignees, and dispatches `assigneeIds: [userId]` (User UUID).
+  - Existing-Task Unassign: ConfirmationDialog confirmation, dispatches `DELETE /tasks/{taskId}/assignments/{assignmentId}` using `assignmentId` (TaskAssignment UUID, NOT User UUID).
+  - Concurrency & Race Protection: Synchronous `useRef` locks on all 4 mutations; `useTaskDetail.applyTaskUpdate` immediately commits returned `TaskDetail` and invalidates in-flight GETs to eliminate `TASK_DETAIL_MUTATION_STALE_OVERWRITE` race hazards.
+  - Optimistic Locking: Version-backed mutations; on HTTP 409 conflict, displays dialog to reload authoritative server state.
+  - Capabilities Gating: Gated strictly by `task.allowedActions` (`UPDATE_STATUS`, `UPDATE_PROGRESS`, `ASSIGN`, `UNASSIGN`).
+  - Validation: 78 test suites, 692 tests PASS (0 failures, 0 skipped); TypeScript 0 errors; ESLint 0 errors (48 preexisting warnings); Android assembleDebug BUILD SUCCESSFUL.
+  - Next Action: `INDEPENDENT AUDIT PHASE 15E`.
+- Prior Patch: Subphase 15D Mobile Date Policy Patch (D-064 Implementation) (`SCR-TSK-03` & `SCR-TSK-04`)
+- Patch Report: `reports/PHASE_15D_CREATE_EDIT_TASK_REPORT.md`
+- Scope Implemented:
+  - D-064 End-of-Day Boundary Serialization: Updated `mobile/src/features/tasks/utils/taskDate.ts` `serializeTaskDueDate` to serialize calendar dates `YYYY-MM-DD` to `${YYYY-MM-DD}T17:00:00Z` (Vietnam UTC+7 midnight end-of-day boundary) as formally frozen in `D-064`. Resolves `TASK_DUE_DATE_POLICY_UNGROUNDED` and `TASK_DUE_DATE_SERIALIZATION_DRIFT`.
+  - D-064 Exact Server Instant Round-Trip Preservation: In `EditTaskScreen.tsx`, implemented `PRESERVE_EXACT_SERVER_INSTANT_WHEN_DATE_UNCHANGED`. Tracks `originalDueDateInstant` state across authoritative initial load and HTTP 409 conflict reload. If user does not change calendar date (or reverts back to original calendar date), the outgoing PUT preserves the raw server Instant byte-for-byte; if changed, serializes to `${newDate}T17:00:00Z`; if cleared, passes `undefined`. Resolves `TASK_EDIT_DUE_DATE_ROUNDTRIP_DRIFT`.
+  - Validation: 75 test suites, 665 tests PASS (0 failures, 0 skipped); TypeScript 0 errors; ESLint 0 errors; Android assembleDebug BUILD SUCCESSFUL (203 actionable tasks in 28s).
+  - Subphase 15D Status: `IMPLEMENTED / HARDENED / D-064 IMPLEMENTED / PENDING FINAL NARROW VERIFICATION`. Subphase 15E: `NOT STARTED`.
+  - Next Action: `FINAL NARROW VERIFY PHASE 15D DATE POLICY`.
+- Prior Hardening: Subphase 15D Mobile Create & Edit Task Hardening (`SCR-TSK-03` & `SCR-TSK-04`)
+- Hardening Report: `reports/PHASE_15D_CREATE_EDIT_TASK_REPORT.md`
+- Scope Hardened:
+  - Date Validation & ISO Instant Serialization: Implemented `mobile/src/features/tasks/utils/taskDate.ts` with pure calendar date validation (`isValidCalendarDate`) preventing invalid calendar rollovers (e.g. `2026-02-30`), input parsing (`parseTaskDueDateForInput`), and ISO-8601 Instant end-of-day UTC serialization (`serializeTaskDueDate` -> `${YYYY-MM-DD}T23:59:59Z`), resolving finding `TASK_DUE_DATE_SERIALIZATION_DRIFT`.
+  - Direct Route Authorization: Implemented fail-closed permission check in `CreateTaskScreen.tsx` enforcing `currentUser.permissions.includes('TASK_CREATE') === true` with accessible unauthorized error state, resolving finding `TASK_CREATE_DIRECT_ROUTE_UI_AUTH_GAP`.
+  - Validation: 75 test suites, 664 tests PASS (0 failures, 0 skipped); TypeScript 0 errors; ESLint 0 errors; Android assembleDebug BUILD SUCCESSFUL (203 actionable tasks in 38s).
+  - Decision Gate: Architecture Decision `D-064: Phase 15 Task Due-Date Semantics` (Option A approved: UTC+7 end-of-day boundary `T17:00:00Z` and `PRESERVE_EXACT_SERVER_INSTANT_WHEN_DATE_UNCHANGED`).
+  - Subphase 15D Status: `BLOCKED_PENDING_DATE_POLICY_PATCH`. Subphase 15E: `NOT STARTED`.
+  - Next Action: `PHASE 15D DATE POLICY PATCH`.
+- Prior Implementation: Subphase 15D Mobile Create & Edit Task (`SCR-TSK-03` & `SCR-TSK-04`)
+- Implementation Report: `reports/PHASE_15D_CREATE_EDIT_TASK_REPORT.md`
+- Scope Implemented:
+  - Screen Containers: `CreateTaskScreen.tsx` (`SCR-TSK-03`) and `EditTaskScreen.tsx` (`SCR-TSK-04`).
+  - Selection Modals: `ProjectSelectModal.tsx` for human-readable project selection (`[CODE] Name`); `ProjectMemberAssigneePickerModal.tsx` querying exclusively `projectApi.listMembers(projectId, { active: true })` (strictly zero direct `directoryApi` calls).
+  - Concurrency & Race Protection: Generation guard on assignee fetching, synchronous assignee invalidation on project switch, and synchronous submit locks (`submittingRef`) preventing duplicate requests on double-tap across both screens.
+  - Optimistic Locking: `EditTaskScreen` tracks `version` internally without exposing to user; on HTTP 409 conflict, displays `ConfirmationDialog` with "Tải lại dữ liệu" reloading latest authoritative data.
+  - Route Registration & Capability Gating: Registered `CreateTask` and `EditTask` as auxiliary hidden routes in `MainTabNavigator` (`tabBarButton: () => null`), preserving exactly 5 bottom navigation tabs (`Dashboard`, `Projects`, `Tasks`, `ServiceRequests`, `More`). Gated `+ Tạo mới` on `TasksScreen` by `TASK_CREATE`; gated `Chỉnh sửa` on `TaskDetailScreen` by `UPDATE` in `allowedActions` with focus listener refresh.
+  - Validation: 74 test suites, 647 tests PASS; TypeScript 0 errors; ESLint 0 errors; Android assembleDebug BUILD SUCCESSFUL (203 actionable tasks in 58s).
+  - Next Action: `INDEPENDENT AUDIT PHASE 15D` or `PHASE 15E IMPLEMENTATION`.
+- Prior Implementation: Subphase 15C Mobile Task Detail (`SCR-TSK-02`)
+- Prior Report: `reports/PHASE_15C_TASK_DETAIL_REPORT.md`
+- Prior Scope Implemented:
+  - Custom Hook: `useTaskDetail.ts` managing single task query lifecycle with in-flight same-ID deduplication (`inFlightPromiseRef`), monotonic generation supersession (`generationRef`), non-destructive pull-to-refresh data retention with separate `refreshError`, and unmount safety (`isMountedRef`).
+  - Screen Container: `TaskDetailScreen.tsx` (`SCR-TSK-02`) implementing canonical Vietnamese UI: header with project breadcrumb and back button, title, priority badge, status badge, clamped progress bar, formatted dates (start date, due date with overdue warning, completed date), description, hierarchy parent task and milestone, reporter and assignees list, read-only subtask and comment summaries, chronological status history timeline, and friendly 404 Not Found, 403 Forbidden, and retryable network error states.
+  - Navigation Route: Registered auxiliary hidden route `TaskDetail: { taskId: string }` on `MainTabNavigator` using `tabBarButton: () => null`, preserving exactly 5 visible bottom tabs (`Dashboard`, `Projects`, `Tasks`, `ServiceRequests`, `More`).
+  - Interactive Card: Re-enabled `onPress` on `TaskCard.tsx` with `accessibilityRole="button"` and minimum touch target size of 48dp, wired navigation from `TasksScreen.tsx`.
+  - Staged Gating: Staged read-only in Phase 15C. No mutation controls, child screens, or modals active for `CreateTask` (15D), `EditTask` (15E), Status/Progress modals (15E), Assignment (15E), Subtasks (15F), or Comments (15F). Zero raw IDs or unhandled `allowedActions` strings exposed.
+  - Validation: 69 test suites, 627 tests PASS; TypeScript 0 errors; ESLint 0 errors; Android assembleDebug BUILD SUCCESSFUL (203 actionable tasks).
+  - Next Action: `INDEPENDENT AUDIT PHASE 15C` or `PHASE 15D IMPLEMENTATION`.
+- Prior Implementation: Subphase 15B Mobile Task List (`SCR-TSK-01`)
+- Prior Report: `reports/PHASE_15B_TASK_LIST_REPORT.md`
+- Prior Scope Implemented:
+  - Custom Hook: `useTasks.ts` with 300ms search input debouncing, monotonic query generation identity (`queryGenerationRef`) ensuring latest-query-wins concurrency, synchronous append lock (`paginationLockRef`), stale append rejection, in-place deduplication by `task.id`, and pull-to-refresh.
+  - Component: `TaskCard.tsx` presentation card rendering project badge, task title, priority and status badges, clamped progress bar with percentage, formatted due date with overdue highlighting, assignee names/counts, and subtask/comment counts.
+  - Screen Container: `TasksScreen.tsx` production replacement for placeholder screen in `MainTabNavigator`, incorporating search bar, canonical status chip row (`ALL`, `TODO`, `IN_PROGRESS`, `IN_REVIEW`, `COMPLETED`), canonical priority chip row (`ALL`, `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`), `FlatList` with header/footer loaders, pull-to-refresh, empty and error states.
+  - Staged Navigation: Staged capability gating preserves non-clickable TaskCard and deferred CreateTask button until Phase 15C and 15D.
+  - Validation: 67 test suites, 611 tests PASS; TypeScript 0 errors; ESLint 0 errors; Android assembleDebug BUILD SUCCESSFUL (203 actionable tasks).
+- Prior Implementation: Subphase 15A Task Contract Foundation
+- Prior Report: `reports/PHASE_15A_TASK_CONTRACT_FOUNDATION_REPORT.md`
+- Prior Scope Implemented:
+  - Transport Contracts: `taskTypes.ts` with closed unions (`TaskStatus`, `TaskPriority`), runtime type guards (`isTaskSummary`, `isTaskDetail`, `isTaskComment`, page guards), and distinct `assignmentId != userId` semantics.
+  - API Adapter: `taskApi.ts` covering all 15 endpoints with strict query serialization, whitelisted sort, and response validation.
+  - Presentation Error Mapping: `taskErrorMapper.ts` mapping all backend codes safely to Vietnamese user messages with distinguishable `isConflict: true`.
+  - Component Extension: Narrow `StatusBadge.tsx` extension supporting `type="task"` presentation without regression.
+  - Navigation Contracts: Added `TaskDetail`, `CreateTask`, `EditTask`, `SubtaskList`, `TaskComments` to `MainTabParamList` (type contracts only, no runtime screens registered).
+  - Prior Validation: 64 test suites, 579 tests PASS; TypeScript 0 errors; ESLint 0 errors; Android assembleDebug BUILD SUCCESSFUL.
+- Prior Milestone: Phase 15 Mobile Task Management Contract & Decision Freeze (`D-063`)
+- Prior Validated Implementation: Subphase 14F Integration, Regression & Security Hardening
+- Subphase 14F Validations & Invariants:
+  - Phase 14 Inventory: Complete validation of all 10 Phase 14 screens (`SCR-MAIN-01`, `SCR-PRJ-01`..`09`). All routes registered, wired, security gated, and tested.
+  - Navigation: Exactly 5 visible bottom tabs on `MainTabNavigator` (`Dashboard`, `Projects`, `Tasks`, `ServiceRequests`, `More`). All 9 auxiliary routes hidden via `tabBarButton: () => null`.
+  - Session Integration: Phase 13 session handling preserved; all requests via `apiClient`; single-flight refresh; zero direct token storage or manual 401 handling.
+  - Data Persistence: Zero persistent storage of authenticated project/directory data in `AsyncStorage` or `Keychain`. State cleanly destroyed on logout/unmount (`PHASE_14_AUTHENTICATED_DATA_PERSISTENCE_RISK` = ABSENT).
+  - Identifier & Type Safety: Zero raw UUIDs or version numbers leak into user-facing text or accessibility labels. Zero `@ts-ignore`, zero `@ts-expect-error`, zero `eslint-disable`. Single runtime guard in `projectApi.ts`.
+  - Concurrency & Mutation Safety: Submit locks across all 7 mutation flows prevent duplicate submits on rapid taps. Focus lifecycle with initial-mount guard maintains freshness on return from edit.
+  - Mobile Regression: 61/61 test suites, 528/528 tests PASS (0 failures, 0 skipped, 0 snapshots). TypeScript 0 errors. ESLint 0 errors, 48 warnings (`PHASE_14E_LINT_WARNING_DEBT` low/non-blocking).
+  - Backend Regression: 31/31 targeted integration tests PASS (`ProjectMockMvcTest`, `DashboardMockMvcTest`, `UserDirectoryMockMvcTest`), Checkstyle 0 violations, BUILD SUCCESS.
+  - Android Clean Build: `gradlew.bat clean assembleDebug --no-daemon` BUILD SUCCESSFUL in 5m 51s (213 actionable tasks). APK generated at `mobile/android/app/build/outputs/apk/debug/app-debug.apk` (157,662,829 bytes).
+  - Emulator Smoke: Installed and launched on `emulator-5554` (`Window{... MainActivity}` PID 22064, zero crash, `PRE_AUTH_ANDROID_SMOKE_PASS`).
+  - E2E Credentials: E2E environment variables absent (`PHASE_14_AUTH_E2E_CREDENTIALS_NOT_AVAILABLE_SAFE_SKIP`). Mutation E2E safely deferred (`PHASE_14_MUTATION_E2E_DEFERRED`). Offline device E2E deferred (`PHASE_14_OFFLINE_DEVICE_E2E_DEFERRED`).
+  - Next Action: `POST-PHASE-14 / PHASE-15 PRE-IMPLEMENTATION AUDIT`. Phase 15: NOT STARTED.
+- Prior Validated Implementation: Subphase 14E Security Capability & Freshness Hardening (`SCR-PRJ-03` to `SCR-PRJ-09`)
+- Subphase 14E Hardening Invariants:
+  - `ProjectMembersScreen.tsx`: Authoritative `canManageMembers = !!projectDetail?.allowedActions?.includes('MANAGE_MEMBERS')` derived from server `useProjectDetail(projectId)`. Fails closed (false) while loading or on fetch error. When false, mutation controls (`+ Thêm thành viên`, `Đổi vai trò`, `Xóa`) and modals are omitted. Read-only member list remains accessible under `PROJECT_READ`.
+  - `ProjectMilestonesScreen.tsx`: Authoritative `canCreateMilestone = !!projectDetail?.allowedActions?.includes('CREATE_MILESTONE')` derived from server `useProjectDetail(projectId)`. Fails closed (false) while loading or on fetch error. When false, `+ Thêm mốc` action and `CreateMilestoneModal` are omitted. Read-only milestone list remains accessible under `PROJECT_READ`.
+  - `ProjectDetailScreen.tsx`: Integrated focus lifecycle listener (`navigation.addListener('focus')`) with initial-mount guard (`isFirstMountRef`), avoiding duplicate initial GET while refreshing project details upon return from `EditProjectScreen` to replace stale state without manual pull-to-refresh.
+  - Report Reconciliation: Corrected audit metadata in `reports/PHASE_14E_PROJECT_MANAGEMENT_REPORT.md` (exact visible tabs: Dashboard, Projects, Tasks, ServiceRequests, More; DELETE member status: HTTP 200 OK with `ApiResponse.successNoContent`).
+  - ESLint Debt: Recorded `PHASE_14E_LINT_WARNING_DEBT` (48 warnings for react-native/no-inline-styles: 47 from 14E screens, 1 pre-existing; exit code 0, 0 errors, classified LOW / non-blocking).
+  - Mobile Tests: 61 suites, 528 tests PASS (0 failures, 0 skipped, +9 hardening tests).
+  - Static Quality: `eslint .` PASS (0 errors), `tsc --noEmit` PASS (0 errors).
+  - Android Build: `.\gradlew.bat assembleDebug --no-daemon` BUILD SUCCESSFUL (203 actionable tasks, exit code 0).
+  - Next Action: `FINAL NARROW VERIFY PHASE 14E HARDENING`. Phase 14F: NOT STARTED.
+- Subphase 14E Scope & Invariants:
+  - `SCR-PRJ-03`: `CreateProjectScreen.tsx` with department selector adapter (`features/organization/`), initial members multi-picker (`features/directory/`), client-side date range validation (`plannedEndDate >= startDate`), and permission-gating on `ProjectsScreen.tsx` (`+ Tạo mới` button checking `PROJECT_CREATE`).
+  - `SCR-PRJ-04`: `EditProjectScreen.tsx` with authoritative prefill from `GET /projects/{projectId}`, immutable `code` and `department` fields, version-tracking optimistic locking, and HTTP 409 conflict reload prompt ("Tải lại dữ liệu").
+  - `SCR-PRJ-05`: `ChangeStatusModal.tsx` backed by pure transition domain machine (`domain/projectStatusTransitions.ts` enforcing `DRAFT -> ACTIVE, CANCELLED`; `ACTIVE -> ON_HOLD, COMPLETED, CANCELLED`; `ON_HOLD -> ACTIVE, CANCELLED`; terminal states blocked), optimistic locking with `version`.
+  - `SCR-PRJ-06 & SCR-PRJ-07`: `ProjectMembersScreen.tsx` with role filter chips, single-select `UserPickerModal` with `disabledIds` preventing duplicate addition, role selection modal, edit role modal, and remove confirmation dialog. Strictly preserves D-013 last PM invariant (`PROJECT_MANAGER_REQUIRED` surfaces error banner, no local mutation).
+  - `SCR-PRJ-08 & SCR-PRJ-09`: `ProjectMilestonesScreen.tsx` and `CreateMilestoneModal.tsx` with status filtering, date validation, and pull-to-refresh.
+  - Navigation: Registered `CreateProject`, `EditProject`, `ProjectMembers`, and `ProjectMilestones` in `MainTabNavigator.tsx` as hidden auxiliary screens, keeping exactly 5 visible bottom tabs.
+  - Mobile Tests: 7 new suites (36 tests), total mobile baseline: 61 suites, 519 tests PASS (0 failures, 0 skipped).
+  - Static Quality: `eslint .` PASS (0 errors), `tsc --noEmit` PASS (0 errors).
+  - Android Build: `.\gradlew.bat assembleDebug --no-daemon` BUILD SUCCESSFUL (203 actionable tasks, exit code 0).
+  - Dedicated Report: `reports/PHASE_14E_PROJECT_MANAGEMENT_REPORT.md`.
+- Prior Validated Implementation: Subphase 14E-G2 Mobile User Directory Foundation & Picker (`mobile/src/features/directory/`)
+- Subphase 14E-G2 Scope & Invariants:
+  - `directoryTypes.ts`: Full transport interfaces (`UserDirectoryItem`, `UserDirectoryQuery`), constants (`DIRECTORY_DEFAULT_PAGE_SIZE = 20`, `DIRECTORY_ALLOWED_SORT = 'fullName,asc'`), runtime guards (`isUserDirectoryItem`, `isUserDirectoryPage`), and error presentation mapper (`mapDirectoryError`).
+  - `directoryApi.ts`: API client querying `/directory/users` with query param serialization, search trimming, page size clamping, sort whitelisting, and envelope extraction.
+  - `useUserDirectory.ts`: Data hook with 300ms debounce, monotonic generation identity (`queryGenerationRef`) ensuring latest-query-wins concurrency, append locking (`paginationLockRef`) preventing duplicate requests, in-place item deduplication by `user.id`, and lifecycle gating via `enabled` option.
+  - `UserPickerModal.tsx`: Accessible, reusable modal supporting single (radio) and multiple (checkbox) selection modes. Strictly ZERO raw UUIDs rendered in UI. Local draft selection with cancellation safety. Accessible `disabledIds` support with customizable reason badge (`disabledReason="Đã tham gia"`). WCAG touch targets ($\ge 48\,\text{dp}$).
+  - Mobile Tests: 4 new dedicated directory suites (40 tests), total mobile baseline: 54 suites, 483 tests PASS (0 failures, 0 skipped).
+  - Static Quality: `eslint .` PASS (0 errors, 0 warnings), `tsc --noEmit` PASS (0 errors).
+  - Android Build: `.\gradlew.bat assembleDebug --no-daemon` BUILD SUCCESSFUL (203 actionable tasks, exit code 0).
+  - Dedicated Report: `reports/PHASE_14E_G2_MOBILE_DIRECTORY_REPORT.md`.
+- Prior Validated Implementation: Subphase 14E-G1 Backend Directory Contract (`GET /api/v1/directory/users`)
+- Subphase 14E-G1 Scope & Invariants:
+  - `UserDirectoryItemResponse`: Minimized public workplace contact card (`id`, `username`, `fullName`, `email`, `avatarUrl`, `departmentName`) with strict exclusion of sensitive PII, passwords, security metadata, and administrative fields.
+  - `UserManagementApplicationService.searchDirectory`: Reuses existing `UserRepository.searchUsers` query to enforce `deleted = false AND status = 'ACTIVE'`. Batch resolves department names via `departmentRepository.findAllById`.
+  - `UserDirectoryController`: Exposes `GET /api/v1/directory/users` authenticated via Bearer token (`AUTHENTICATED`). Input validation: `page >= 0`, `1 <= size <= 100`, sort whitelist (`fullName`, `username`, `email`).
+  - Backend Tests: `UserDirectoryMockMvcTest` with 11 comprehensive Testcontainers tests passing. Full suite: 318/318 tests PASS, 0 failures, 0 skipped, Checkstyle 0 violations.
+  - Dedicated Report: `reports/PHASE_14E_G1_BACKEND_DIRECTORY_REPORT.md`.
+- Prior Validated Implementation: Subphase 14D Project Detail Screen
+- Prior Validated Implementation: `feat(mobile): implement project detail screen`
+- Subphase 14D Scope:
+  - `mobile/src/features/projects/hooks/useProjectDetail.ts`: Data hook managing project detail query (`GET /projects/{projectId}`), monotonic generation supersession ($A \rightarrow B$), same-resource in-flight deduplication, unmount safety, and non-blocking refresh error handling.
+  - `mobile/src/features/projects/screens/ProjectDetailScreen.tsx`: Complete screen container displaying canonical details (code, name, description, department, manager, status badge, priority badge, clamped progress bar, timeline dates, member count summary, milestone summary list) with back navigation.
+  - `mobile/src/app/navigation/MainTabNavigator.tsx`: Registered `ProjectDetail` with exact `{ projectId: string }` params while preserving the 5-visible-tab invariant.
+  - `mobile/src/features/projects/components/ProjectCard.tsx`: Re-enabled interactive Pressable container with `accessibilityRole="button"`, touch target $\ge 48\,\text{dp}$, and `onPress` callback.
+  - `mobile/src/features/projects/screens/ProjectsScreen.tsx`: Connected `handleCardPress` to navigate to `ProjectDetail` with `{ projectId }`.
+  - Mobile Tests: 50/50 test suites, 437/437 tests PASS (0 failures, 0 skipped).
+  - TypeScript & Lint: `tsc --noEmit` PASS (0 errors), `eslint .` PASS (0 errors, 0 warnings).
+  - Android Build: `.\gradlew.bat assembleDebug --no-daemon` BUILD SUCCESSFUL (203 actionable tasks, exit code 0).
+  - Dedicated Report: `reports/PHASE_14D_PROJECT_DETAIL_REPORT.md`.
+
+
+
+## Validated Progress
+
+- Phase 0: completed
+- Phase 1: completed
+- Phase 2: completed
+- Phase 3: PostgreSQL validation completed
+- Phase 4: Authentication and Authorization completed
+- Phase 5: Organization and User Management completed and independently audited
+- Phase 6: Project Module completed, audited and patched (LAST_PROJECT_MANAGER_INVARIANT_GAP resolved)
+- Mobile UI/UX Specification Baseline: completed and pushed (14 documents in design/)
+- Visual UI Prototype: completed, browser validated on real Microsoft Edge, and pushed
+- Prototype Runtime: HTML5, CSS3, JavaScript, zero third-party dependencies (no npm, no CDN)
+- Validated Viewports: 411 × 914 dp (emulator-5554 / Android 15) and 360 × 800 dp (Android Small)
+- Android Test Lab: verified (emulator-5554, Android 15, API 35, 1080x2400, 420dpi)
+- ADB: verified (D:\AndroidSDK\platform-tools\adb.exe, version 1.0.41)
+- Docker: verified (Docker Desktop 4.94.0, Engine 29.8.2, jenkins-lts running, worksphere-dev-pg available)
+- Tool Installation Authorization: enabled with safeguards (D-019, D-020, D-021, allowlist, user action protection)
+- Web Runtime and Browser Automation Authorization: enabled and active (D-026, D-027, Microsoft Edge headless priority, profile test isolation at D:\AI\Profiles\Edge\WorkSphere)
+- IDE Extension Discovery, Installation and Automation Authorization: enabled and active (D-033, D-034, Antigravity extensions inventory verified at C:\Users\dienm\.antigravity-ide\extensions with 10 verified extension suites, PostgreSQL canonical/default, SQL Server permitted when specifically required)
+- Tool Registry: updated at reports/ENVIRONMENT_TOOL_REGISTRY.md (26 host tools + Section 3 with 10 verified Antigravity IDE extension suites)
+- Phase 7 (Task Management Module): COMPLETED, AUDITED, PATCHED, OPERATIONALLY VALIDATED
+  - Task Core lifecycle, workflow state machine, optimistic locking, allowedActions computation: verified.
+  - Subtask hierarchy and cycle detection via visited set (52 levels tested without recursion overflow): verified.
+  - Task Assignment with partial unique index V012 (concurrency tested 5 times with 4 threads, 1 winner): verified.
+  - Status History and transactional rollback on PostgreSQL engine failure: verified.
+  - Task Comment authorization (author and System Admin only, PM non-admin forbidden): verified.
+  - V012 Operational Runbook created and tracked at reports/runbooks/V012_ACTIVE_TASK_ASSIGNMENT_UNIQUENESS.md.
+- Phase 8 (File Module & Task Attachment Integration): COMPLETED, AUDITED, HARDENED, SECURITY VALIDATED
+  - StoredFile domain entity, status lifecycle (ACTIVE, QUARANTINED, DELETED), purpose enum, and repository: verified.
+  - FileStorageService abstraction and LocalFileSystemStorageService with atomic move, temp staging `.tmp/`, traversal defense, and destination overwrite protection: verified.
+  - Safe validation: basename sanitization (RFC 5987 UTF-8 Content-Disposition), MIME/magic-byte checks (JPEG, PNG, WEBP, PDF), and in-memory ZipInputStream structure inspection for DOCX (`word/`) and XLSX (`xl/`): verified.
+  - ZIP bomb & resource safety: entry count $\le$ 200, entry uncompressed size $\le$ 50MB, total uncompressed size $\le$ 100MB, compression ratio $\le$ 100.0, live ratio tracking via CountingInputStream, and strict traversal blocking (`..`, `\`, leading `/`, drive letter `C:`): verified.
+  - SHA-256 integrity calculation and streaming download with `X-Content-Type-Options: nosniff`: verified.
+  - Upload (`POST /api/v1/files`), Download (`GET /api/v1/files/{fileId}/download`), and Soft Delete (`DELETE /api/v1/files/{fileId}` - returns 200 OK + `ApiResponse<Void>`, correcting prior memory references citing 204): verified.
+  - Access control and authorization: unlinked files restricted to uploader/Admin, task-linked files restricted to active project members of the task's project, cross-project and inactive member downloads rejected: verified.
+  - Linkage protection: files attached to tasks or service requests cannot be deleted via File API (HTTP 422 `FILE_ALREADY_LINKED`): verified.
+  - Compensating cleanup: storage cleanup failure on rollback preserves primary persistence exception: verified.
+  - Task Attachment integration: `TaskAttachment` entity, comment attachment integration (`attachmentFileIds`), atomic transaction, and N+1 safe `attachmentCount` batch query: verified.
+  - Comprehensive report at reports/PHASE_08_REPORT.md.
+- Phase 9 (Service Request Module): COMPLETED, AUDITED, HARDENED, CONCURRENCY AND TRANSACTION VALIDATED
+  - Service Category:
+    - Hierarchical categories with parent-child relationship.
+    - Code normalization (regex `^[A-Z0-9_]{2,50}$`) and uniqueness (`SERVICE_CATEGORY_CODE_ALREADY_EXISTS`, 409).
+    - Active/inactive lifecycle (`SERVICE_CATEGORY_ALREADY_ACTIVE`, `SERVICE_CATEGORY_ALREADY_INACTIVE`).
+    - Parent validation (`SERVICE_CATEGORY_PARENT_INVALID`).
+    - Set<UUID> cycle detection (`SERVICE_CATEGORY_CYCLE_DETECTED`).
+    - Valid depth greater than 50 verified without artificial recursion limit.
+    - Optimistic locking concurrency control.
+    - In-use protection preventing deactivation of categories in active requests (`SERVICE_CATEGORY_IN_USE`, 400).
+  - Service Request Core:
+    - Create, list, detail, and update while in OPEN state.
+    - Soft-delete filtering (`is_deleted = false`).
+    - Query-level authorization scoping via Spring Data JPA Specification (Admin global scope vs non-admin requester/assignee scope).
+    - Pagination, filtering (status, priority, category, search), and sorting with matching countQuery.
+    - Optimistic locking concurrency control via @Version (`OPTIMISTIC_LOCK_CONFLICT`, 409).
+  - Request Number:
+    - Canonical format: `SR-YYYY-NNNNNN` (e.g., `SR-2026-000001`).
+    - Injected `java.time.Clock` with business zone `Asia/Ho_Chi_Minh`.
+    - PostgreSQL two-key transactional advisory lock: `SELECT pg_advisory_xact_lock(1301, :year)` (module key `1301`).
+    - Year-scoped MAX + 1 allocation with automatic reset on new calendar year.
+    - Unique database constraint `uk_service_requests_request_number` as final engine guard.
+    - Allocation series is not guaranteed gapless (strictly not described as PostgreSQL sequence).
+  - Assignment:
+    - Active cardinality strictly 0..1 per Service Request.
+    - Row-level coordination lock via `PESSIMISTIC_WRITE` on `ServiceRequest`.
+    - Idempotent assignment for same active assignee.
+    - Reassignment history with `unassigned_at` timestamp and deactivation flush before new assignment insert.
+    - Partial unique index `uk_service_assignments_one_active` (migration `V013`) as final database guard.
+    - Exception translation mapping SQLState 23505 to `SERVICE_ASSIGNMENT_CONFLICT` (HTTP 409).
+    - Controlled concurrency validation with multiple competing workers (two requests may both succeed with 200 if row lock serializes them, or concurrent race yields 409 SERVICE_ASSIGNMENT_CONFLICT; no HTTP 500; exactly 1 active assignment preserved).
+  - Workflow:
+    - Seven canonical states: `OPEN`, `ASSIGNED`, `IN_PROGRESS`, `WAITING_FOR_USER`, `RESOLVED`, `CLOSED`, `CANCELLED`.
+    - Allowed transitions strictly validated; RESOLVED requires resolution comment; CLOSED records `closed_at`; CANCELLED records `cancelled_at`.
+  - Status History:
+    - Same database transaction as request state mutation.
+    - changedBy from principal, changedAt from injected Clock.
+    - Atomic rollback verified on PostgreSQL via trigger failure injection.
+  - Reject Resolution:
+    - Dedicated endpoint: `POST /api/v1/service-requests/{requestId}/reject-resolution`.
+    - Requester-only access control (non-requester rejected with HTTP 403 Forbidden).
+    - Transitions from `RESOLVED` back to `IN_PROGRESS`.
+    - Resolution rejection reason required and recorded in status history.
+    - Active assignee retained.
+  - Comments:
+    - Public comments accessible to requester, assignee, and Admin.
+    - Internal notes (`is_internal = true`) restricted to active assignee and Admin.
+    - Requester denied from creating or viewing internal notes.
+    - Query-level visibility filtering before pagination and count metadata calculation.
+    - Previous assignee denied access.
+  - Attachments:
+    - Purpose `SERVICE_ATTACHMENT` only and `ACTIVE` StoredFile status.
+    - Ownership validation: must be uploaded by current user or Admin.
+    - Zero cross-request reuse.
+    - Linkage at Service Request level (`service_attachments` table has `request_id`, no `comment_id`).
+    - Download authorization inherited from Service Request relation (requester, active assignee, Admin).
+    - Implementation response projection per D-035 (no storage metadata leakage).
+  - Rating:
+    - Requester-only access control.
+    - Applicable strictly when request is in `CLOSED` state.
+    - Score range 1 to 5 stars.
+    - Single rating per request enforced by unique constraint `service_ratings.request_id`.
+    - Concurrent duplicate mapping to `SERVICE_RATING_ALREADY_EXISTS` (HTTP 409).
+
+- Phase 10 (Asset Management Module): COMPLETED, AUDITED, HARDENED, AUTHORIZATION, CONCURRENCY AND TRANSACTION VALIDATED
+  - Asset Category:
+    - Authenticated active-category list (`GET /api/v1/asset-categories` - requires authentication, returns 401 if unauthorized; strictly not public).
+    - Admin paginated management (`GET /api/v1/admin/asset-categories` with `ASSET_CATEGORY_MANAGE`).
+    - Client-input code with trim + uppercase normalization; regex `^[A-Z0-9_]{2,50}$`; immutable after create; permanent global uniqueness.
+    - Active/deactivate lifecycle; in-use guard blocks deactivation if any non-deleted Asset references the category, including RETIRED assets (`ASSET_CATEGORY_IN_USE`, HTTP 400).
+    - Optimistic locking (`@Version`); V016 database checks and uniqueness (`chk_asset_categories_code_normalized`, `uk_asset_categories_code`).
+  - Asset Core:
+    - Create, List, My Assets, Detail, and Update lifecycle.
+    - Initial status strictly `AVAILABLE`; client-supplied status ignored.
+    - `assetCode` supplied by client, trim + uppercase normalized, regex `^[A-Z0-9][A-Z0-9_-]{1,49}$`, immutable after creation.
+    - Global serial number uniqueness (`uk_assets_serial_number`, `ASSET_SERIAL_ALREADY_EXISTS`, HTTP 409).
+    - Soft-delete filtering (`is_deleted = false`).
+    - Optimistic locking (`@Version`), audit principal and Clock integration.
+    - Five canonical Asset statuses: `AVAILABLE`, `ASSIGNED`, `MAINTENANCE`, `BROKEN`, `RETIRED` (`RETIRED` is terminal state).
+  - V016 Migration & Invariants:
+    - Migration: `V016__add_asset_assignment_and_category_invariants.sql`.
+    - Exact invariants and indexes: `uk_asset_assignments_one_active`, `chk_asset_categories_code_normalized`, `uk_asset_categories_code`, `chk_assets_asset_code_normalized`, `idx_asset_assignments_assigned_to`, `idx_asset_assignments_asset_id`.
+    - Zero data modification; no automatic legacy normalization; no auto-deactivation of duplicate assignments; duplicate/incompatible data causes fail-safe migration abort.
+    - PostgreSQL Testcontainers migration tests: 8/8 PASS; duplicate data preserved on transaction rollback.
+  - Read Authorization & Scoping:
+    - `ADMIN`: can read all non-deleted assets across the system.
+    - Non-admin (`EMPLOYEE`, `TEAM_LEADER`, `PROJECT_MANAGER`): restricted strictly to assets with active assignment to caller principal (`assigned_to = principal.userId AND status = 'ACTIVE'`).
+    - Database query scoping via Spring Data JPA Specification subqueries; count and pagination match scoped dataset; client assignedTo cannot expand scope; previous/returned assignee loses access; unauthorized detail access rejected with `ASSET_ACCESS_DENIED` (HTTP 403).
+  - Assignment & Concurrency:
+    - Active assignment cardinality 0..1.
+    - Row-level coordination lock via `PESSIMISTIC_WRITE` on `Asset`.
+    - V016 partial unique index `uk_asset_assignments_one_active` as final engine guard.
+    - No direct reassignment; same-user repeat assignment rejected (`ASSET_ALREADY_ASSIGNED`, HTTP 400); different-user assignment while active rejected (`ASSET_ALREADY_ASSIGNED`, HTTP 400); must return before assigning again.
+    - `assignedBy` from principal, `assignedAt` from injected Clock.
+    - Concurrency semantics: row lock serializes competing transactions; exactly 1 request succeeds with 201 Created; competing request receives canonical error (`ASSET_NOT_AVAILABLE`, `ASSET_ALREADY_ASSIGNED`, or `ASSET_ASSIGNMENT_CONFLICT` HTTP 409); zero HTTP 500s; exactly 1 ACTIVE assignment row remains; final assigned user matches 201 winner; controlled concurrency verified for 2 workers x 5 rounds on PostgreSQL Testcontainers.
+  - Return Transaction & Rollback:
+    - Canonical endpoint: `PUT /api/v1/assets/{assetId}/assignments/{assignmentId}/return`.
+    - Assignment must belong to Asset, must be in `ACTIVE` status.
+    - Assignment status becomes `RETURNED`; `returnedAt` and `returnCondition` recorded.
+    - Asset status becomes: `AVAILABLE`, `MAINTENANCE`, `BROKEN`, or `RETIRED`; `ASSIGNED` rejected (`ASSET_STATUS_TRANSITION_INVALID`, HTTP 400).
+    - Asset and Assignment mutate in one atomic database transaction.
+    - PostgreSQL failure-injection test proves full ACID rollback: after simulated trigger failure, Asset remains `ASSIGNED`, version unchanged; Assignment remains `ACTIVE`, version unchanged, `returnedAt` remains null.
+    - HTTP 500 test response is safe: returns standardized `INTERNAL_ERROR` payload, does not leak SQL, stack trace, trigger function name (`fail_asset_return_rollback_test`), PSQLException or database internal details.
+  - Assignment Status Scope:
+    - Phase 10 API supported lifecycle: `ACTIVE -> RETURNED`.
+    - Schema-reserved values not exposed by Phase 10 API: `LOST`, `DAMAGED`.
+    - Deferred item: `ASSET_ASSIGNMENT_LOST_DAMAGED_WORKFLOW_DEFERRED` (canonical patch in `docs/06_API_CONTRACT.md` Section 14.7; not an unresolved contract gap).
+  - Repair History:
+    - Immutable audit record; `POST` and `GET` only; `PUT` and `DELETE` return HTTP 405 Method Not Allowed.
+    - Optional `serviceRequestId`; must reference the same Asset when Service Request has `assetId`.
+    - Zero side effects: no Asset status mutation, no Service Request mutation, no auto-creation from Service Request lifecycle.
+    - Created by Admin (`ASSET_MANAGE`); read by Admin or current active Asset assignee (`ASSET_READ`); previous/unrelated users denied (HTTP 403).
+    - Sorted by `startedAt DESC`.
+    - `cost` is optional (`NUMERIC(18,2) NULL`, verified with null-cost test); `completedAt >= startedAt`.
+  - Service Request Integration:
+    - Creating Service Request with `assetId`: Asset must exist and not be soft-deleted; Admin may link any valid Asset; non-admin may link only an Asset actively assigned to requester; previous/returned assignee denied; no auto Asset status update; no auto Repair History creation; null `assetId` backward compatible.
+    - Related Service Requests in Asset Detail: Admin sees all non-deleted related Service Requests; non-admin sees if requester relation OR active Service Request assignee relation (`is_active = true`); previous/inactive assignees, soft-deleted requests, and requests of other assets excluded (verified against exact UUIDs).
+  - Error Semantics & Constraint Extraction:
+    - Canonical duplicate serial error code: `ASSET_SERIAL_ALREADY_EXISTS` (HTTP 409, constraint `uk_assets_serial_number`).
+    - Unique assignment conflict: `uk_asset_assignments_one_active` -> `ASSET_ASSIGNMENT_CONFLICT` (HTTP 409).
+    - Category duplicate: `uk_asset_categories_code` -> `ASSET_CATEGORY_CODE_ALREADY_EXISTS` (HTTP 409).
+    - Asset code duplicate: `uk_assets_asset_code` -> `ASSET_CODE_ALREADY_EXISTS` (HTTP 409).
+    - PostgreSQL dependency has runtime scope; extraction uses constrained reflection to read PostgreSQL server error metadata (`PSQLException.getServerErrorMessage().getConstraint()`) with fallback to message; no broad table-name error mapping.
+
+- Phase 11 (Notification và Personal Dashboard): COMPLETED, AUDITED, HARDENED, IDEMPOTENCY, AUTHORIZATION, SCHEDULER CONCURRENCY AND TRANSACTION ROLLBACK VALIDATED
+  - V017 Migration (`V017__add_notification_idempotency_and_query_indexes.sql`):
+    - Controlled deterministic data backfill: `UPDATE notifications SET event_key = 'LEGACY_MIGRATION:' || id::text WHERE event_key IS NULL`.
+    - Thêm cột `event_key VARCHAR(255) NOT NULL`.
+    - Unique constraint idempotency: `CREATE UNIQUE INDEX uk_notifications_recipient_event ON notifications(recipient_id, event_key)`.
+    - Composite query index: `CREATE INDEX idx_notifications_recipient_created_at ON notifications(recipient_id, created_at DESC)`.
+    - 3 index cũ được giữ nguyên: `idx_notifications_recipient_id`, `idx_notifications_recipient_read`, `idx_notifications_created_at`.
+    - Không có dòng notification nào bị xóa; toàn bộ các cột nghiệp vụ (title, message, reference fields, isRead, readAt, createdAt) được bảo toàn 100%.
+    - Ngữ nghĩa transactional DDL/DML rollback của PostgreSQL được chứng minh bằng test độc lập; lỗi di trú phục hồi schema và data về trạng thái pre-V017.
+  - Notification Domain & Delivery Model:
+    - Thực thể `Notification` và `NotificationPreference`.
+    - 8 loại notification canonical: `PROJECT_MEMBER_ADDED`, `TASK_ASSIGNED`, `TASK_STATUS_CHANGED`, `TASK_DUE_SOON`, `TASK_OVERDUE`, `SERVICE_REQUEST_ASSIGNED`, `SERVICE_REQUEST_UPDATED`, `COMMENT_ADDED`.
+    - Mô hình phân phối: DATABASE IN-APP NOTIFICATION CENTER ONLY.
+    - Không có Push (FCM/APNs), Email delivery, WebSocket/SSE, Kafka/RabbitMQ hay Redis.
+    - Tùy chọn `inAppEnabled` được thực thi nghiêm ngặt; `pushEnabled`/`emailEnabled` chỉ lưu cấu hình; tắt in-app bỏ qua chèn notification an toàn, không tạo pending event, không backfill.
+    - Owner-scoped query: người dùng chỉ xem thông báo của chính mình; truy cập thông báo của người khác trả về HTTP 404 `NOTIFICATION_NOT_FOUND`; ADMIN không bypass quyền sở hữu cá nhân. Không có endpoint xóa, lưu trữ (archive), hay detail riêng lẻ.
+    - Đánh dấu đã đọc lũy đẳng (`PUT /api/v1/notifications/{id}/read`), đánh dấu tất cả đã đọc, đếm số lượng chưa đọc.
+    - Preference API: `GET` / `PUT /api/v1/notification-preferences` với giá trị mặc định cho 8 loại; validate trùng lặp type và type không hợp lệ.
+  - Idempotency & An Toàn Giao Dịch:
+    - Native insert: `ON CONFLICT (recipient_id, event_key) DO NOTHING`.
+    - Trùng lặp (`affectedRows = 0`) là thành công lũy đẳng; không ném lỗi; không đánh dấu giao dịch nguồn rollback-only; giao dịch nguồn commit thành công.
+    - Lỗi CSDL thực sự khác vẫn rollback giao dịch nguồn.
+    - Cùng eventKey có thể gửi cho nhiều recipient khác nhau; các eventKey khác nhau cho cùng một recipient.
+  - Event Integrations & Stable Keys:
+    - Project Member Added: `PROJECT_MEMBER_ADDED:{projectId}:{membershipId}`.
+    - Task Assigned: `TASK_ASSIGNED:{taskId}:{assignmentId}`.
+    - Task Status Changed: `TASK_STATUS_CHANGED:{taskId}:{statusHistoryId}` (sử dụng immutable history ID).
+    - Task Public Comment: `COMMENT_ADDED:TASK:{commentId}`.
+    - Service Request Assigned: `SERVICE_REQUEST_UPDATED:{requestId}:ASSIGNED:{assignmentId}`.
+    - Service Request Status Changed: `SERVICE_REQUEST_UPDATED:{requestId}:{statusHistoryId}` (sử dụng immutable history ID).
+    - Service Request Public Comment: `COMMENT_ADDED:SERVICE_REQUEST:{commentId}`.
+    - Asset Assigned: `ASSET_ASSIGNED:{assetId}:{assignmentId}`.
+    - Task Due Soon: `TASK_DUE_SOON:{taskId}:{dueAtEpochMilli}` (sử dụng epoch millisecond).
+    - Task Overdue: `TASK_OVERDUE:{taskId}:{dueAtEpochMilli}` (sử dụng epoch millisecond).
+    - Danh sách người nhận deduplicate qua Set<UUID>, loại trừ actor, tôn trọng preference; PM/TL xác định theo active project membership role; Service Request internal notes không thông báo cho requester.
+  - Source Transaction Atomicity:
+    - Thay đổi nghiệp vụ + Chèn Notification trong cùng một database transaction.
+    - Kiểm thử failure injection trên Task status change và Asset assignment: giao dịch rollback toàn bộ (status, version, history count, notification count không đổi); response HTTP 500 `INTERNAL_ERROR` an toàn, không rò rỉ SQL/trigger/stack trace/PSQLException.
+  - TaskDeadlineScanner:
+    - Cấu hình: delay `PT15M`, batch size `100`, enabled mặc định.
+    - Điều phối đa instance: PostgreSQL transaction advisory lock `(1101, 1)`; bỏ qua an toàn khi lock bận.
+    - Toàn bộ chu kỳ (lock, tất cả keyset pages, inserts, commit) nằm trong một `@Transactional` duy nhất.
+    - Keyset pagination `(lastDueDate, lastTaskId)` sắp xếp `dueDate ASC, id ASC`; xử lý tuần tự toàn bộ task vượt quá batch size; triệt tiêu nguy cơ starvation.
+    - Ranh giới thời gian nghiêm ngặt: `now <= dueDate < now + 72 hours` với `dueDate.isBefore(threshold)` cho `TASK_DUE_SOON` và `dueDate < now` cho `TASK_OVERDUE`. Loại trừ task đã hoàn thành hoặc bị xóa.
+    - Kiểm thử starvation 25 task với batch size 10 duyệt qua 3 trang; kiểm thử preseed 10 task không chặn 15 task sau; kiểm thử tranh chấp advisory lock trên 2 session độc lập.
+  - Personal Dashboard API:
+    - Endpoint: `GET /api/v1/dashboard/me` (duy nhất; không có endpoint hay stub cho Project Dashboard).
+    - Áp dụng phạm vi cá nhân cho mọi vai trò, kể cả ADMIN.
+    - Thống kê Task theo active assignment (`TODO`, `IN_PROGRESS`, `IN_REVIEW`, `COMPLETED`, `overdue`, `dueSoon`).
+    - Thống kê Service Request theo requester HOẶC active assignee với `COUNT(DISTINCT sr.id)` (`OPEN`, `IN_PROGRESS`, `WAITING_FOR_USER`, `RESOLVED`).
+    - Thống kê Project theo active membership (`ACTIVE`, `ON_HOLD`).
+    - Top 5 Upcoming Tasks (`dueSoon`, sắp xếp `dueDate ASC, id ASC`).
+    - Top 5 Recent Notifications (sắp xếp `createdAt DESC, id DESC`).
+    - Mẫu mốc thời gian `Clock.instant()` đồng nhất một lần duy nhất trong toàn request.
+  - Hạ Tầng Kiểm Thử:
+    - `NotificationTestCleanupListener`: Kiểm tra sự tồn tại của bảng trước khi xóa (`to_regclass` trên PostgreSQL, JDBC metadata trên non-Postgres); chỉ xóa `notifications` và `notification_preferences`; không xóa bảng nghiệp vụ/user/role; không nuốt lỗi SQLException.
+    - `V016MigrationTest`: target `016`, độc lập hoàn toàn với V017, bảo toàn toàn bộ assertions trước đó.
+
+## Latest Evidence
+
+- Host: Windows 11
+- Runtime: Oracle JDK 27
+- Project target: Java 21
+- Maven: 3.9.16
+- Spring Boot: 4.1.1 (verified directly from backend/pom.xml)
+- PostgreSQL: postgres:15-alpine via Testcontainers
+- Full backend suite: 307/307 PASS (including E2eUserProvisionerTest)
+  - 0 failures, 0 errors, 0 skipped
+  - Maven execution: BUILD SUCCESS (exit code 0)
+- Mobile Runtime: React Native 0.88.0, React 19.3.0
+- Mobile Test Suites: 38/38 PASS, 325/325 tests PASS (0 failures, 0 errors, 0 skipped, 0 snapshots)
+- Mobile Lint & Typecheck: 0 errors, 0 warnings
+- Android Build: BUILD SUCCESSFUL (203 actionable tasks, exit code 0)
+- Android Emulator Smoke: verified on emulator-5554 (Android 15, API 35)
+- Targeted Phase 11 test suites (38 tests):
+  - `V017MigrationTest`: 4/4 PASS
+  - `NotificationMockMvcTest`: 8/8 PASS
+  - `NotificationPreferenceMockMvcTest`: 5/5 PASS
+  - `NotificationIdempotencyAndScannerTest`: 6/6 PASS
+  - `SourceNotificationIntegrationTest`: 10/10 PASS
+  - `DashboardMockMvcTest`: 5/5 PASS
+- Targeted Phase 11 suite: 38/38 PASS run twice consecutively, 0 failures, 0 errors, 0 skipped, no observed flakiness
+- Checkstyle: 0 violations
+- Concurrency evidence:
+  - Scanner advisory lock (1101, 1) contention skip verified on independent PostgreSQL sessions
+- Rollback evidence:
+  - Task status change and Asset assignment rollback verified on PostgreSQL via BEFORE INSERT trigger failure injection
+  - V017 preflight rollback verified preserving pre-V017 schema and data
+- Database & Migrations:
+  - V001 to V017 applied and validated on PostgreSQL Testcontainers
+  - Migrations 100% immutable and tracked (V001-V017 intact; zero V018)
+- Working tree: clean
+- HEAD equals origin/main
+
+## Deferred Items & Known Gaps
+
+- RESET_PASSWORD_DEEP_LINK_DEFERRED: Deep link routing cho token reset mật khẩu hoãn lại; token truyền qua typed route param hoặc nhập thủ công.
+- SETTINGS_POLICY_URL_DEFERRED: URL chính sách công khai hoãn đến khi có tài liệu web hosting; hiển thị thông tin nội bộ.
+- MOBILE_APP_VERSION_NATIVE_WIRING_DEFERRED: Native runtime bridge cho app version hoãn để tránh phụ thuộc native bên thứ ba; dùng metadata từ package.json.
+- APP_VERSION_SOURCE_DRIFT_RECONCILED_AS_DEFERRED: Reconciled divergence between package.json (0.0.1), Android build.gradle (1.0), and iOS MARKETING_VERSION; unified native versioning deferred to CI/CD release phase.
+- IOS_BUILD_ON_MACOS_DEFERRED: Biên dịch native iOS hoãn đến khi có môi trường macOS.
+- ANDROID_NATIVE_CI_BUILD_DEFERRED: Biên dịch Android native trên GitHub Actions runner hoãn lại.
+- AUTH_E2E_CREDENTIALS_NOT_AVAILABLE_SAFE_SKIP: Kiểm thử E2E live device tự động bỏ qua an toàn khi không có biến môi trường credentials.
+- AUTH_REFRESH_ROTATION_E2E_DEFERRED: Kiểm thử live token rotation trên thiết bị thật hoãn đến môi trường E2E có tài khoản hoạt động.
+- CHANGE_PASSWORD_REAL_E2E_DEFERRED: Kiểm thử đổi mật khẩu trên thiết bị thật hoãn đến môi trường E2E có tài khoản hoạt động.
+- OFFLINE_BOOTSTRAP_E2E_DEFERRED: Kiểm thử bật tắt airplane mode thủ công trên thiết bị hoãn; kiểm thử đơn vị tự động đã bao phủ đầy đủ.
+- AXIOS_MULTIPART_CONTENT_TYPE_OVERRIDE_REQUIRED: Ghi đè thủ công header Content-Type khi upload tệp nhị phân hoãn đến Phase 15+.
+- FONT_INTER_ASSET_BUNDLING_DEFERRED: Phông chữ Inter asset chưa bundle; mobile sử dụng system font mặc định.
+- MOBILE_ICON_PACKAGE_DEFERRED: Thư viện vector icon bên thứ ba hoãn đến Phase 14+ UI refinement.
+- NOTIFICATION_RETENTION_CLEANUP_DEFERRED: Dọn dẹp thông báo cũ theo thời gian hoãn đến vận hành production.
+- PROJECT_DASHBOARD_PROJECTION_DEFERRED: Endpoint GET /projects/{projectId}/dashboard hoãn lại.
+- SERVICE_REQUEST_INTERNAL_NOTE_NOTIFICATION_DEFERRED: Thông báo nội bộ cho Service Request hoãn lại.
+- PUSH_NOTIFICATION_DELIVERY_DEFERRED: Phân phối Push notification (FCM/APNs) hoãn lại ngoài phạm vi Phase 11.
+- EMAIL_NOTIFICATION_DELIVERY_DEFERRED: Phân phối Email delivery hoãn lại ngoài phạm vi Phase 11.
+- REALTIME_NOTIFICATION_DELIVERY_DEFERRED: Phân phối WebSocket/SSE realtime hoãn lại ngoài phạm vi Phase 11.
+- ASSET_ASSIGNMENT_LOST_DAMAGED_WORKFLOW_DEFERRED: Giá trị enum `LOST` và `DAMAGED` trong `AssetAssignmentStatus` là schema-reserved enum values; `docs/06_API_CONTRACT.md` mục 14.7 đã chuẩn hóa phạm vi vòng đời Phase 10 là `ACTIVE -> RETURNED`; quy trình xử lý phân công thất thoát/hư hỏng hoãn lại rõ ràng, không còn unresolved contract gap.
+- ASSET_ATTACHMENT_DEFERRED: Chưa có liên kết tài liệu/hình ảnh đính kèm cho tài sản; chưa có `ASSET_ATTACHMENT` trong `FilePurpose`.
+- ASSET_BARCODE_QR_DEFERRED: Chưa triển khai sinh Barcode hoặc mã QR cho tài sản ở backend.
+- ASSET_DEPRECIATION_DEFERRED: Chưa triển khai công cụ khấu hao hoặc kế toán tài sản.
+- POSTGRES_CONSTRAINT_METADATA_REFLECTION_LOW: Trích xuất tên ràng buộc CSDL qua reflection do dependency driver PostgreSQL nằm ở scope runtime; fallback qua chuỗi message an toàn, không phải blocker.
+- SERVICE_REQUEST_SLA_DEFERRED: Không có SLA engine, không tính business hours, không escalation, không pause/resume SLA.
+- SERVICE_ATTACHMENT_COMMENT_LINK_GAP: Bảng `service_attachments` chỉ liên kết với `request_id`. File gửi kèm khi tạo comment vẫn là attachment cấp Service Request; không có `comment_id` trong schema và không được mô tả là attachment riêng của comment.
+- FILE_ORPHAN_RECONCILIATION_GAP: Nếu metadata persistence và compensating physical cleanup cùng thất bại, physical file có thể trở thành orphan.
+- FILE_STORAGE_TOCTOU_LOW: Existing symlink escape đã được chặn và kiểm thử thành công trên Linux container. Môi trường production phải bảo vệ storage root bằng phân quyền hệ điều hành phù hợp.
+- FILE_VIRUS_SCANNING_DEFERRED: ClamAV daemon hoãn đến môi trường production; kiểm tra in-flight qua magic bytes và ZIP entry inspection.
+- CLOUD_STORAGE_PROVIDER_DEFERRED: Production provider chưa được chọn. Local filesystem là provider Development/Test.
+- TASK_DETAIL_ATTACHMENT_ITEMS_API_GAP: Canonical API định nghĩa `attachmentCount`; schema chi tiết cho danh sách attachment items trong Task Detail chưa được định nghĩa.
+- TASK_DELETE_RULE_AMBIGUITY_DEFERRED: Định nghĩa “Business history quan trọng” chưa đầy đủ trong canonical docs; giữ logic xét status history.
+- TASK_FLYWAY_CONFIGURATION_MODULE_LOCATION_LOW: TaskFlywayConfiguration hiện ở task.infrastructure. Có thể chuyển sang shared.infrastructure trong đợt refactor riêng.
+- DATA_INTEGRITY_ERROR_MAPPING_FALLBACK_LOW: Exception mapping cho task_assignments có thể nâng cấp sang trích xuất constraint PostgreSQL driver tương tự Asset module.
+- TEMPORARY_PASSWORD_FLOW_GAP: Luồng kích hoạt và endpoint thiết lập mật khẩu lần đầu tiếp tục hoãn; mobile ánh xạ ACCOUNT_PENDING sang thông báo liên hệ admin.
+- TEAM_API_CONTRACT_GAP: Team REST controllers hoãn vì `06_API_CONTRACT.md` chưa định nghĩa endpoints.
+- PUT_ME_PASSWORD_TEST_GAP: Test coverage cho luồng đổi mật khẩu người dùng hiện tại ở backend tiếp tục hoãn.
+
+## Resolved Prerequisites & Readiness Items
+
+- EXTERNAL_RESOURCE_GOVERNANCE_RESOLVED: Thiết lập chính sách tìm kiếm, cách ly (.external/), kiểm thẩm an ninh, cấp phép SPDX và tái sử dụng tài nguyên bên ngoài toàn dự án; ban hành D-057, cập nhật AGENTS.md và thiết lập sổ đăng ký kép.
+- AUTH_TEST_ACCOUNT_PROVISIONING_RESOLVED: Cơ chế E2eUserProvisioner chỉ kích hoạt trên profile dev (@Profile("dev")), cờ worksphere.dev.e2e-user.enabled=true, nạp credential từ bên ngoài Git, trạng thái ACTIVE, role EMPLOYEE, bảo vệ collision và idempotent.
+- PRODUCTION_ENVIRONMENT_WIRING_RESOLVED: Cấu hình API Base URL native & JS hoàn tất qua EnvironmentConfigModule, BuildConfig và Info.plist với kiểm soát nghiêm ngặt HTTPS và fail-fast cho Release build.
+- KEYCHAIN_NATIVE_OPERATION_SMOKE_RESOLVED: Kiểm thử CRUD phần cứng Keystore/Keychain hoàn tất trên emulator-5554 (Android 15, API 35) với dọn dẹp sạch sẽ 100%.
+- ASYNC_STORAGE_NATIVE_OPERATION_SMOKE_RESOLVED: Kiểm thử CRUD ghi đĩa AsyncStorage hoàn tất trên emulator-5554 trên khóa allowlisted @worksphere/theme_preference với dọn dẹp sạch sẽ 100%.
+- PHASE_13_MOBILE_AUTHENTICATION_RESOLVED: Toàn bộ module xác thực di động, điều hướng, quản lý phiên và hồ sơ cá nhân đã hoàn tất và kiểm toán độc lập PASS (`PHASE_13_FINAL_AUDIT_PASS_WITH_E2E_DEFERRALS`).
+- PHASE_14_MOBILE_DASHBOARD_PROJECTS_RESOLVED: Toàn bộ module Personal Dashboard và Project Management (`SCR-MAIN-01`, `SCR-PRJ-01` .. `SCR-PRJ-09`) cùng hạ tầng User Directory & Picker (`D-062`) đã hoàn tất, kiểm toán độc lập PASS (`PHASE_14_FINAL_AUDIT_PASS_WITH_E2E_DEFERRALS`), đối soát báo cáo hoàn tất, và memory checkpoint đã đóng (`PHASE_14_MEMORY_CHECKPOINT_CLOSED`).
+- PHASE_15_MOBILE_TASK_MANAGEMENT_RESOLVED: Toàn bộ module Mobile Task Management (`SCR-TSK-01` .. `SCR-TSK-08`) cùng quy tắc phân công thành viên dự án (`D-063`) và ngữ nghĩa hạn chót múi giờ Việt Nam (`D-064`) đã hoàn tất, kiểm toán độc lập PASS (`PHASE_15_FINAL_AUDIT_PASS_WITH_E2E_DEFERRALS`), đối soát báo cáo hoàn tất, và memory checkpoint đã đóng (`PHASE_15_MEMORY_CHECKPOINT_CLOSED`).
+
+## Next Permitted Phase
+
+- **Giai đoạn 16: Mobile Service Requests** (theo đúng `docs/08_DEVELOPMENT_ROADMAP.md` Mục 19, P0).
+  - Scope: Service Request List (`SCR-SRV-01`), Detail (`SCR-SRV-02`), Reject Resolution Sheet (`SCR-SRV-03`), Create (`SCR-SRV-04`), Comments (`SCR-SRV-05`), Rating (`SCR-SRV-06`).
+  - Contract Freeze Report: `reports/PHASE_16_SERVICE_REQUEST_CONTRACT_FREEZE.md`.
+  - Architecture Decision: `D-065` in `reports/DECISIONS.md`.
+  - Pre-audit Report: `reports/PRE_PHASE_16_AUDIT.md`.
+  - Phụ thuộc: Phase 15 Mobile Task Management đã hoàn tất và memory checkpoint đã đóng (`PHASE_15_MEMORY_CHECKPOINT_CLOSED`).
+  - Next Action: `PHASE 16A CONTRACT FOUNDATION`.
+  - Phase 16 Status: `CONTRACT_FROZEN / IMPLEMENTATION_NOT_STARTED`.
+  - Phase 17 (Asset Management): `NOT STARTED`.
+
+## Trust Rules
+
+- Verify this file against Git at the start of every session.
+- Git history and build/test outputs override stale content in this file.
+- Update this file only after validation evidence exists.
+- Never mark a phase completed based only on model statements.
+
+## Recent Git Log
+
+- 128a8ba docs(mobile): audit phase 16 readiness
+- b49970b docs(mobile): close phase 15 memory checkpoint
+- eb0c973 fix(mobile): reconcile phase 15 final audit
+- 597b765 test(mobile): validate phase 15 integration
+- 7e25d9b test(mobile): close task mutation version chain gap in task detail screen

@@ -1,0 +1,25 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/worksphere_test}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+worksphere:
+  jwt:
+    secret: ${JWT_SECRET:worksphere-test-secret-key-must-be-at-least-32-characters-long}
+    access-token-expiry-seconds: 900
+  storage:
+    path: ${WORKSPHERE_STORAGE_PATH:target/test-uploads}
+  notification:
+    scheduling:
+      enabled: false

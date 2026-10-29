@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkSphere Mobile - Visual Prototype & Review Studio</title>
+  <meta name="description" content="Interactive visual prototype for WorkSphere Mobile application aligned with Material Design 3 and Android 15 specifications.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <main class="prototype-workspace">
+    <!-- Review Controls & Specifications Drawer -->
+    <aside class="review-panel" id="prototype-review-panel" aria-label="Bảng điều khiển đánh giá giao diện"></aside>
+
+    <!-- Mobile Device Simulation Frame -->
+    <section class="device-wrapper">
+      <div class="device-viewport-indicator" id="viewport-indicator-text">
+        Viewport: 411 × 914 dp (emulator-5554 / Android 15)
+      </div>
+
+      <div class="device-frame" id="device-frame">
+        <!-- Android 15 Status Bar & Edge-to-Edge Simulation -->
+        <header class="android-status-bar" aria-label="Thanh trạng thái hệ điều hành">
+          <span>09:41</span>
+          <div class="android-camera-cutout" aria-hidden="true"></div>
+          <div style="display: flex; gap: 6px; align-items: center; font-size: 11px;">
+            <span>5G</span>
+            <span>100%</span>
+          </div>
+        </header>
+
+        <!-- Main Dynamic Screen Content Stage -->
+        <div class="app-screen-container" id="prototype-screen-viewport"></div>
+
+        <!-- Android 15 Gesture Navigation Bar Inset -->
+        <footer class="android-gesture-bar-area" aria-label="Thanh chỉ báo cử chỉ điều hướng">
+          <div class="android-gesture-handle" aria-hidden="true"></div>
+        </footer>
+
+        <!-- Modal & Bottom Sheet Injection Root -->
+        <div id="prototype-modal-root" aria-live="assertive"></div>
+
+        <!-- Floating Feedback Toast / Snackbar -->
+        <div class="snackbar" id="prototype-snackbar" role="status" aria-live="polite">
+          <span id="snackbar-message">Thông báo thành công</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Load Sample Data & Prototype Application Logic -->
+  <script src="data/sample-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

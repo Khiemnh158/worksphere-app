@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WorkSphereExternalResourceRecord",
+  "description": "Schema for tracked external resources (repositories, skills, templates, packages, docs) evaluated for WorkSphere.",
+  "type": "object",
+  "required": [
+    "registryId",
+    "type",
+    "name",
+    "purpose",
+    "officialSourceUrl",
+    "publisher",
+    "license",
+    "versionOrTag",
+    "immutableCommitOrDigest",
+    "retrievalDate",
+    "localPath",
+    "logicalPath",
+    "status",
+    "sha256Checksum",
+    "licenseDecision",
+    "securityScanResult",
+    "secretScanResult",
+    "lastVerifiedDate"
+  ],
+  "properties": {
+    "registryId": {
+      "type": "string",
+      "pattern": "^EXT-RES-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "repository",
+        "skill",
+        "template",
+        "package",
+        "tool",
+        "application",
+        "extension",
+        "documentation",
+        "github_action",
+        "docker_image"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "officialSourceUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX License Identifier (e.g., MIT, Apache-2.0, BSD-3-Clause)"
+    },
+    "licenseEvidence": {
+      "type": "string"
+    },
+    "versionOrTag": {
+      "type": "string"
+    },
+    "immutableCommitOrDigest": {
+      "type": "string",
+      "description": "Full 40-char Git commit SHA, image digest sha256:..., or immutable hash"
+    },
+    "retrievalDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "localPath": {
+      "type": "string",
+      "description": "Absolute Windows path on current machine"
+    },
+    "logicalPath": {
+      "type": "string",
+      "description": "Repository-relative logical path under .external/..."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "CANDIDATE",
+        "QUARANTINED",
+        "REVIEWED",
+        "APPROVED_REFERENCE",
+        "APPROVED_EXECUTION",
+        "APPROVED_INTEGRATION",
+        "REJECTED",
+        "SUPERSEDED",
+        "MISSING_LOCAL_COPY"
+      ]
+    },
+    "sha256Checksum": {
+      "type": "string"
+    },
+    "signatureVerification": {
+      "type": "string"
+    },
+    "scriptsOrHooksPresent": {
+      "type": "boolean"
+    },
+    "nativeBinaryContent": {
+      "type": "boolean"
+    },
+    "networkBehavior": {
+      "type": "string"
+    },
+    "requiredPermissions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "compatibility": {
+      "type": "object",
+      "properties": {
+        "os": { "type": "string" },
+        "node": { "type": "string" },
+        "java": { "type": "string" },
+        "reactNative": { "type": "string" }
+      }
+    },
+    "securityScanResult": {
+      "type": "string",
+      "enum": ["CLEAN", "LOW", "MEDIUM", "HIGH", "CRITICAL", "NOT_SCANNED"]
+    },
+    "secretScanResult": {
+      "type": "string",
+      "enum": ["CLEAN", "LEAK_DETECTED"]
+    },
+    "dependencyVulnerabilityResult": {
+      "type": "string"
+    },
+    "licenseDecision": {
+      "type": "string",
+      "enum": ["PERMISSIBLE", "REVIEW_REQUIRED", "BLOCKED"]
+    },
+    "filesOrPatternsReused": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "modificationsMade": {
+      "type": "string"
+    },
+    "upstreamUpdatePolicy": {
+      "type": "string"
+    },
+    "lastVerifiedDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "responsibleDecision": {
+      "type": "string"
+    },
+    "notesAndRejectionReason": {
+      "type": "string"
+    }
+  }
+}

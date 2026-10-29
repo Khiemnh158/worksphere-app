@@ -1,0 +1,18 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: worksphere-backend
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+worksphere:
+  storage:
+    path: ${WORKSPHERE_STORAGE_PATH:D:/WorkSphereData/uploads}
+  notification:
+    scheduling:
+      enabled: true
+    task-deadline-scan-delay: PT15M
+    task-deadline-batch-size: 100

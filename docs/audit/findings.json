@@ -1,0 +1,656 @@
+[
+  {
+    "id": "F01",
+    "title": "Đăng nhập xong vẫn bị trả về 401",
+    "priority": "P0 - bản gốc",
+    "state": "Đã tái hiện; đã sửa cục bộ",
+    "proof": "JWT filter tải User rồi duyệt roles và permissions ngoài phiên JPA. Bản gốc thiếu fetch graph ở findActiveById; log chạy thật báo không khởi tạo được lazy collection. Login trả 200 nhưng /me trả 401.",
+    "impact": "Ứng dụng quay về đăng nhập dù mật khẩu đúng; đây là lỗi chặn chạy thật, không thể kết luận chỉ từ unit test.",
+    "repair": "Bản local đã thêm EntityGraph tải roles và roles.permissions. Đưa bản vá vào nhánh chính sau review; không bật EAGER cho toàn bộ quan hệ một cách đại trà.",
+    "test": "Đăng nhập bằng tài khoản ACTIVE, gọi /me và API được cấp quyền: đều 200; người thiếu quyền vẫn bị từ chối. Sau sửa đã quan sát /me 200 và Dashboard trên Android.",
+    "refs": [
+      [
+        "UserRepository.java",
+        "Optional<User> findActiveById"
+      ],
+      [
+        "JwtAuthenticationFilter.java",
+        "buildAuthorities(user)"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F02",
+    "title": "Dữ liệu khởi tạo dùng collection bất biến",
+    "priority": "P0 - môi trường dev",
+    "state": "Đã tái hiện; đã sửa cục bộ",
+    "proof": "E2eUserProvisioner gán Collections.singleton(employeeRole) vào roles trước khi lưu. Hibernate merge cố thay đổi collection và ném UnsupportedOperationException khi bật khởi tạo tài khoản demo.",
+    "impact": "Backend có thể dừng trong quá trình khởi động profile dev, làm sai lệch đánh giá rằng ứng dụng hoặc cơ sở dữ liệu không chạy được.",
+    "repair": "Bản local dùng HashSet có thể thay đổi. Giữ provisioner trong dev/test, khóa mặc định ở môi trường public; không đưa mật khẩu demo vào Git.",
+    "test": "9 kiểm thử E2eUserProvisionerTest đã qua ở lượt chạy trước; khởi động lại giữ nguyên dữ liệu, không tạo trùng và không phát sinh lỗi merge.",
+    "refs": [
+      [
+        "E2eUserProvisioner.java",
+        "Collections.singleton(employeeRole)"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F03",
+    "title": "Access token còn hiệu lực sau đăng xuất",
+    "priority": "P1 - cao",
+    "state": "Đã tái hiện qua HTTP",
+    "proof": "Trong phiên kiểm thử riêng: /me 200, logout 204, gọi /me bằng access token cũ vẫn 200. Logout sửa refresh token và login session nhưng JWT filter không kiểm tra sessionId trong cơ sở dữ liệu.",
+    "impact": "Người giữ access token có thể tiếp tục gọi API đến khi token hết hạn, cấu hình mặc định khoảng 15 phút. Không đồng nghĩa logout thất bại hoàn toàn: refresh token đã bị thu hồi.",
+    "repair": "Chọn chính sách rõ: kiểm tra session còn hoạt động trong filter hoặc dùng tokenVersion/cache thu hồi. Với bài An toàn thông tin, đề xuất thu hồi ngay khi logout/reset và ghi kiểm toán.",
+    "test": "Logout phiên A rồi gọi API bằng token A phải 401; phiên B vẫn 200. Kiểm tra riêng logout-all và reset mật khẩu. Nếu chấp nhận độ trễ, phải mô tả công khai giới hạn đó.",
+    "refs": [
+      [
+        "AuthApplicationService.java",
+        "public void logout("
+      ],
+      [
+        "JwtAuthenticationFilter.java",
+        "User user = userRepository.findActiveById"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F04",
+    "title": "Một refresh token được đổi thành hai token mới",
+    "priority": "P1 - cao",
+    "state": "Đã tái hiện bằng 2 yêu cầu đồng thời",
+    "proof": "Hai POST refresh dùng cùng mã và chạy đồng thời đều trả 200. Luồng đọc token, kiểm tra revoked rồi phát hành token mới không có khóa hàng hay trường version để bảo đảm một lần sử dụng.",
+    "impact": "Cơ chế rotation bị phá vỡ; có thể tồn tại nhiều nhánh token hợp lệ từ cùng một mã cũ. Đây là lỗi cạnh tranh dữ liệu, không phải lỗi gửi hai lần ở giao diện.",
+    "repair": "Dùng khóa ghi trên refresh token hoặc UPDATE có điều kiện revoked_at IS NULL và kiểm tra số dòng; phát hành token mới trong cùng giao dịch. Chuẩn hóa xử lý reuse và phiên liên quan.",
+    "test": "Dùng barrier gửi 2 refresh: chỉ một thành công, một bị từ chối theo hợp đồng; không tạo hai token còn hiệu lực. Chạy kiểm thử trên PostgreSQL thật.",
+    "refs": [
+      [
+        "AuthApplicationService.java",
+        "public RefreshResponse refresh("
+      ],
+      [
+        "RefreshTokenRepository.java",
+        "findByTokenHash"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F05",
+    "title": "Quyền quản lý dự án thiếu phạm vi từng dự án",
+    "priority": "P1 - cao",
+    "state": "Xác định qua đường đi controller → service",
+    "proof": "PUT dự án, đổi trạng thái, thêm/sửa/xóa thành viên và tạo milestone chủ yếu kiểm tra authority toàn cục. Các service mutation không xác minh người gọi có quyền quản lý chính dự án đó; có hàm còn không nhận principal.",
+    "impact": "Một PROJECT_MANAGER có quyền toàn cục có thể tác động dự án khác nếu có ID và dữ liệu cần thiết. API đọc có kiểm tra thành viên không bảo vệ được các API ghi độc lập.",
+    "repair": "Tạo ProjectPolicy kiểm tra authority + membership/manager + trạng thái. Truyền principal tới mọi mutation, dùng chung chính sách cho allowedActions; ADMIN ngoại lệ có ghi lý do.",
+    "test": "PM của dự án A thử sửa/thêm mình vào B: 403, dữ liệu B không đổi. PM của B thao tác hợp lệ thành công. Chưa chạy kịch bản thay đổi dữ liệu này trong lượt audit.",
+    "refs": [
+      [
+        "ProjectController.java",
+        "public ResponseEntity<ApiResponse<ProjectDetailResponse>> updateProject("
+      ],
+      [
+        "ProjectApplicationService.java",
+        "public ProjectDetailResponse updateProject("
+      ],
+      [
+        "ProjectMemberApplicationService.java",
+        "public ProjectMemberResponse updateMemberRole("
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F06",
+    "title": "Người gửi bị chặn hủy và xác nhận kết quả",
+    "priority": "P1 - cao",
+    "state": "Mâu thuẫn xác định trong code",
+    "proof": "computeAllowedActions thêm CANCEL cho requester khi OPEN, CONFIRM khi RESOLVED. Tuy nhiên updateStatus chỉ cho ADMIN hoặc active assignee; không có nhánh cho requester để thực hiện hai hành động này.",
+    "impact": "Người gửi không hoàn tất được vòng hỗ trợ đúng hợp đồng. Người xử lý lại có thể đi từ RESOLVED sang CLOSED, làm mất bước nghiệm thu độc lập của người gửi nếu áp dụng luồng đó.",
+    "repair": "Tách quyền theo từng chuyển trạng thái: requester hủy OPEN và xác nhận RESOLVED; assignee bắt đầu/chờ/giải quyết; coordinator phân công. Quy định trường hợp requester đồng thời là assignee.",
+    "test": "Requester thường: OPEN→CANCELLED và RESOLVED→CLOSED thành công; người ngoài bị 403; assignee không tự xác nhận thay requester. allowedActions phải khớp API.",
+    "refs": [
+      [
+        "ServiceRequestApplicationService.java",
+        "if (!isAdmin && !isActiveAssignee)"
+      ],
+      [
+        "ServiceRequestApplicationService.java",
+        "actions.add(\"CONFIRM\")"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F07",
+    "title": "Yêu cầu đã đóng vẫn bị phân công lại",
+    "priority": "P1 - nghiệp vụ",
+    "state": "Xác định qua đọc code",
+    "proof": "assignRequest có khóa hàng và ràng buộc một active assignee, nhưng không từ chối CLOSED/CANCELLED. ADMIN vẫn nhận hành động ASSIGN trong allowedActions bất kể trạng thái.",
+    "impact": "Yêu cầu kết thúc vẫn thay người xử lý và phát sinh thông báo; báo cáo lịch sử trách nhiệm có thể thay đổi sau khi nghiệm thu.",
+    "repair": "Chặn phân công với trạng thái kết thúc trước mọi thay đổi assignment. Quy định rõ tái mở là hành động riêng nếu sau này cần; không lách bằng assign.",
+    "test": "Phân công CLOSED/CANCELLED nhận lỗi trạng thái, không đổi assignment, không thêm thông báo; phân công OPEN vẫn chuyển ASSIGNED.",
+    "refs": [
+      [
+        "ServiceRequestApplicationService.java",
+        "public void assignRequest("
+      ],
+      [
+        "ServiceRequestApplicationService.java",
+        "actions.add(\"ASSIGN\")"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F08",
+    "title": "Sửa yêu cầu bỏ qua kiểm tra tài sản liên kết",
+    "priority": "P1 - toàn vẹn dữ liệu",
+    "state": "Xác định qua so sánh create/update",
+    "proof": "createRequest gọi validateAssetForRequest khi có assetId. updateRequest lại truyền request.assetId() trực tiếp cho updateContent, không áp dụng kiểm tra sở hữu/trạng thái tương đương.",
+    "impact": "Requester có thể gắn yêu cầu OPEN với tài sản không được phép theo chính sách tạo mới. Khóa ngoại chỉ chứng minh tài sản tồn tại, không chứng minh quyền sử dụng.",
+    "repair": "Dùng chung AssetLinkPolicy cho create/update; phân biệt không đổi, xóa liên kết và thay tài sản. Chỉ cho phép tài sản phù hợp requester, trừ ngoại lệ có quyền cụ thể.",
+    "test": "Tạo yêu cầu hợp lệ rồi sửa assetId sang tài sản của người khác phải bị từ chối; không đổi dữ liệu. Chưa kiểm chứng khai thác qua HTTP; không kết luận lộ toàn bộ dữ liệu tài sản.",
+    "refs": [
+      [
+        "ServiceRequestApplicationService.java",
+        "validateAssetForRequest("
+      ],
+      [
+        "ServiceRequestApplicationService.java",
+        "public ServiceRequestDetailResponse updateRequest("
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F09",
+    "title": "Thêm lại thành viên dự án vẫn ở trạng thái nghỉ",
+    "priority": "P2 - trung bình",
+    "state": "Xác định qua code miền dữ liệu",
+    "proof": "addMember tìm thấy membership cũ thì chỉ gọi updateRole. Sau remove, active=false và leftAt đã có giá trị; updateRole không khôi phục hai trường này.",
+    "impact": "API có thể báo thêm thành công nhưng người đó vẫn không được đọc dự án hoặc nhận việc vì các kiểm tra khác yêu cầu membership active.",
+    "repair": "Thêm hành vi reactivate(role, joinedAt, actor), khôi phục active và xóa leftAt; quyết định lưu lịch sử từng đợt tham gia hay tái sử dụng bản ghi.",
+    "test": "Chuỗi add→remove→add cùng user: chỉ một membership hiện hành, active=true, leftAt=null và đọc dự án thành công.",
+    "refs": [
+      [
+        "ProjectMemberApplicationService.java",
+        "existing.updateRole(request.projectRole())"
+      ],
+      [
+        "ProjectMember.java",
+        "public void deactivate("
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F10",
+    "title": "Hai thao tác có thể xóa hết quản lý dự án",
+    "priority": "P2 - rủi ro đồng thời",
+    "state": "Chưa tái hiện; có cửa sổ race trong code",
+    "proof": "Quy tắc không giáng cấp/xóa PM cuối cùng được làm bằng count rồi update. Hai giao dịch tác động hai PM khác nhau có thể cùng đếm được 2; không thấy khóa chung trên project cho phép kiểm tra này.",
+    "impact": "Dự án có thể không còn PROJECT_MANAGER hoạt động, dù từng thao tác riêng đều qua kiểm tra. Mức độ phụ thuộc cách chạy giao dịch thực tế.",
+    "repair": "Khóa aggregate project trước kiểm tra/sửa membership; áp dụng cùng thứ tự khóa ở mọi đường thay đổi PM. Không chỉ thêm version trên hai membership khác nhau.",
+    "test": "Kịch bản hai PM bị giáng cấp đồng thời: tối đa một thao tác thành công, ít nhất một PM còn lại. Dùng PostgreSQL integration test có barrier.",
+    "refs": [
+      [
+        "ProjectMemberApplicationService.java",
+        "long pmCount = projectMemberRepository.countByProjectIdAndProjectRoleAndActiveTrue"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F11",
+    "title": "Quên mật khẩu không có kênh nhận mã",
+    "priority": "P1 - thiếu luồng sử dụng",
+    "state": "Xác định qua implementation",
+    "proof": "forgotPassword tạo rawToken, lưu hash và ghi log rằng đã gửi qua kênh ngoài. Không thấy mail adapter/outbox hay nơi chuyển rawToken tới người dùng trong code hiện hành.",
+    "impact": "Người dùng không có mã để reset mật khẩu dù API có thể trả thông báo thành công. Log mô tả ý định không phải bằng chứng email đã gửi.",
+    "repair": "Thêm email adapter với Mailpit chỉ dùng local, token một lần có TTL; phản hồi chung để tránh dò tài khoản. Nếu chưa đủ thời gian, gắn nhãn chức năng chưa hỗ trợ và dùng seed demo.",
+    "test": "Yêu cầu reset→hộp thư local nhận link→đặt mật khẩu→link cũ vô hiệu. Không ghi rawToken vào log hay ảnh báo cáo.",
+    "refs": [
+      [
+        "AuthApplicationService.java",
+        "public void forgotPassword("
+      ],
+      [
+        "AuthApplicationService.java",
+        "In production: send rawToken via email"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F12",
+    "title": "Tạo người dùng thiếu bước kích hoạt thực tế",
+    "priority": "P1 - thiếu luồng sử dụng",
+    "state": "Xác định qua createUser và kiểm tra login",
+    "proof": "Admin tạo User PENDING với mật khẩu ngẫu nhiên đã hash. Luồng tạo không gửi lời mời/mật khẩu và chưa có luồng kích hoạt hoàn chỉnh cho người nhận; login lại chặn PENDING.",
+    "impact": "Không thể coi API tạo user là onboarding hoàn chỉnh. Provisioner dev giúp demo nhưng không thay thế quy trình cấp tài khoản doanh nghiệp.",
+    "repair": "MVP dùng bộ tài khoản seed riêng, có tài liệu giới hạn. Sau đó thêm lời mời một lần, người nhận tự đặt mật khẩu, chuyển ACTIVE và audit; tránh gửi mật khẩu rõ qua email.",
+    "test": "Người mới nhận lời mời, tự đặt mật khẩu và đăng nhập được; lời mời hết hạn/đã dùng bị từ chối. Seed dev không được bật trên bản public.",
+    "refs": [
+      [
+        "UserManagementApplicationService.java",
+        "String temporaryPassword = generateSecureRandomPassword()"
+      ],
+      [
+        "User.java",
+        "UserStatus.PENDING"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F13",
+    "title": "Lọc vai trò sau phân trang cho kết quả sai",
+    "priority": "P2 - trung bình",
+    "state": "Xác định qua thuật toán",
+    "proof": "searchUsers phân trang ở repository trước, sau đó stream.filter(roleCode) trên trang đã lấy; PagedData.from vẫn sử dụng tổng số bản ghi của truy vấn chưa lọc vai trò.",
+    "impact": "Trang có thể rỗng hoặc ít mục dù còn nhiều người đúng vai trò ở các trang sau; totalElements/totalPages không phản ánh bộ lọc.",
+    "repair": "Đẩy điều kiện roleCode vào truy vấn trước paginate; dùng EXISTS hoặc DISTINCT phù hợp quan hệ nhiều vai trò để không đếm trùng.",
+    "test": "Dữ liệu 30 người, 5 người đúng vai trò nằm cuối: lọc size=2 phải có tổng 5 và 3 trang; không phụ thuộc vị trí trong danh sách gốc.",
+    "refs": [
+      [
+        "UserManagementApplicationService.java",
+        "Page<User> page = userRepository.searchUsers(search, departmentId, status, pageable)"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F14",
+    "title": "Mã HTTP xác thực và phân quyền thiếu nhất quán",
+    "priority": "P2 - hợp đồng API",
+    "state": "Xác định qua exception handler",
+    "proof": "BusinessRuleException mặc định trả 422. Các mã INVALID_CREDENTIALS, REFRESH_TOKEN_* và FORBIDDEN phát sinh theo đường này chưa được ánh xạ 401/403; AccessDeniedException lại trả 403 đúng.",
+    "impact": "Cùng một ý nghĩa lỗi có HTTP status khác nhau, gây khó cho client xử lý phiên hết hạn, kiểm thử và theo dõi sự cố.",
+    "repair": "Tập trung error catalog: 400 validation, 401 credential/token, 403 quyền, 404 tài nguyên theo chính sách, 409 xung đột, 422 quy tắc nghiệp vụ. Giữ mã lỗi ổn định cho client.",
+    "test": "Contract test từng nhánh login/refresh/forbidden và lỗi trạng thái; app không thử refresh vô hạn khi nhận lỗi nghiệp vụ 422.",
+    "refs": [
+      [
+        "GlobalExceptionHandler.java",
+        "default -> HttpStatus.UNPROCESSABLE_ENTITY"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F15",
+    "title": "Phân biệt trạng thái tài khoản trước kiểm tra mật khẩu",
+    "priority": "P2 - rủi ro bảo mật",
+    "state": "Xác định qua thứ tự xử lý",
+    "proof": "login gọi user.validateCanLogin trước passwordEncoder.matches. Tài khoản tồn tại nhưng LOCKED/PENDING có thể trả thông báo khác tài khoản không tồn tại hoặc sai mật khẩu.",
+    "impact": "Kẻ thử đăng nhập có thêm thông tin để dò tài khoản/trạng thái. Chưa đo khác biệt thời gian phản hồi hoặc kiểm thử dò hàng loạt.",
+    "repair": "Trả lỗi ngoài thống nhất, xác minh mật khẩu trước khi lộ trạng thái chi tiết; ghi lý do nội bộ. Bổ sung hạn chế tần suất và theo dõi thất bại theo tài khoản/IP.",
+    "test": "Sai mật khẩu với tài khoản tồn tại, khóa, pending và không tồn tại có phản hồi chung; lỗi chi tiết chỉ xuất hiện ở log nội bộ đã che dữ liệu.",
+    "refs": [
+      [
+        "AuthApplicationService.java",
+        "user.validateCanLogin()"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F16",
+    "title": "Liên kết avatar không kiểm tra file phù hợp",
+    "priority": "P2 - toàn vẹn/phân quyền",
+    "state": "Xác định qua code; chưa thử đổi avatar chéo",
+    "proof": "updateProfile nhận avatarFileId rồi gán trực tiếp; không kiểm tra uploader, purpose, trạng thái file và loại ảnh. Directory trả URL avatar, nhưng download policy hiện chủ yếu dựa task/request/uploader.",
+    "impact": "Có thể tham chiếu nhầm file người khác hoặc file không phải avatar; đồng nghiệp có thể không tải được avatar mà directory cung cấp. Không đủ bằng chứng để khẳng định lộ file trái phép.",
+    "repair": "Thêm AvatarPolicy: file tồn tại, thuộc người cập nhật, ảnh hợp lệ, purpose=AVATAR; quyết định rõ đồng nghiệp nào được xem avatar. Không mở toàn bộ tệp công ty để chữa lỗi ảnh.",
+    "test": "File không thuộc mình/sai purpose bị chặn; avatar hợp lệ hiển thị cho đúng nhóm người xem, tệp task nhạy cảm vẫn được bảo vệ.",
+    "refs": [
+      [
+        "AuthApplicationService.java",
+        "user.updateAvatarFileId(request.avatarFileId())"
+      ],
+      [
+        "FileApplicationService.java",
+        "private void verifyDownloadAccess"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F17",
+    "title": "Tái mở yêu cầu còn giữ resolvedAt cũ",
+    "priority": "P2 - dữ liệu thời gian",
+    "state": "Xác định qua transitionStatus",
+    "proof": "Khi từ chối kết quả, request trở lại IN_PROGRESS. transitionStatus chỉ gán resolvedAt khi vào RESOLVED, không xóa hoặc tách timestamp lần giải quyết trước khi tái mở.",
+    "impact": "resolvedAt hiện hành có thể khác trạng thái hiện hành; thống kê thời gian xử lý dễ tính sai nếu xem đây là mốc kết thúc cuối cùng. Lịch sử vẫn cần giữ lần giải quyết cũ.",
+    "repair": "Chốt nghĩa timestamp: currentResolvedAt được xóa khi reopen; lịch sử giải quyết giữ ở event/history. Nếu muốn firstResolvedAt/lastResolvedAt, đặt tên rõ và tính báo cáo tương ứng.",
+    "test": "IN_PROGRESS→RESOLVED→reject: trạng thái IN_PROGRESS, timestamp hiện hành đúng nghĩa đã chọn; history vẫn ghi đủ hai lần chuyển.",
+    "refs": [
+      [
+        "ServiceRequest.java",
+        "public void transitionStatus("
+      ],
+      [
+        "ServiceRequestApplicationService.java",
+        "public ServiceRequestDetailResponse rejectResolution("
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F18",
+    "title": "Từ chối kết quả chưa thông báo người xử lý",
+    "priority": "P2 - thiếu phản hồi công việc",
+    "state": "Xác định qua nhánh chủ động hoãn",
+    "proof": "rejectResolution cập nhật yêu cầu/lịch sử nhưng chỉ log NOTIFICATION_SIDE_EFFECT_DEFERRED. Khác các nhánh phân công và cập nhật trạng thái có gọi eventDispatcher.",
+    "impact": "Người xử lý có thể không biết việc bị trả lại nếu không mở danh sách thường xuyên; vòng phản hồi khách hàng bị đứt ở thông báo.",
+    "repair": "Phát event có khóa idempotency gắn historyId, gửi đến active assignee; thống nhất giao dịch với notification/outbox theo kiến trúc hiện có.",
+    "test": "Từ chối một lần tạo đúng một thông báo cho assignee; retry không nhân đôi; requester không nhận thông báo trùng do chính mình gây ra.",
+    "refs": [
+      [
+        "ServiceRequestApplicationService.java",
+        "NOTIFICATION_SIDE_EFFECT_DEFERRED"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F19",
+    "title": "Task hiển thị quyền đổi trạng thái quá rộng",
+    "priority": "P2 - hợp đồng giao diện",
+    "state": "Xác định qua allowedActions và authorization",
+    "proof": "computeAllowedActions thêm UPDATE_STATUS cho task chưa kết thúc trong ngữ cảnh đọc được. verifyCanChangeStatus lại chỉ cho assignee hoặc PM/TL theo từng hành động.",
+    "impact": "Thành viên đọc dự án có thể thấy nút đổi trạng thái rồi bị API từ chối. Đây không tự chứng minh vượt quyền, vì server vẫn kiểm tra ở mutation.",
+    "repair": "Tính allowedActions từ cùng TaskPolicy dùng ở API; nếu cần, trả cụ thể allowedTransitions để client không phải tự suy luận cả ma trận vai trò/trạng thái.",
+    "test": "Reader thường không thấy thao tác bị cấm; assignee chỉ thấy chuyển hợp lệ; PM/TL chỉ thấy quyền trong dự án mình quản lý.",
+    "refs": [
+      [
+        "TaskApplicationService.java",
+        "actions.add(\"UPDATE_STATUS\")"
+      ],
+      [
+        "TaskApplicationService.java",
+        "private void verifyCanChangeStatus"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F20",
+    "title": "Không xóa được deadline đã đặt của task",
+    "priority": "P2 - hành vi biểu mẫu",
+    "state": "Xác định qua null semantics",
+    "proof": "Task.updateDetails coi dueDate=null là giữ nguyên và chỉ gán khi khác null. Biểu mẫu mobile cũng bỏ trường khi người dùng xóa nội dung, nên không biểu diễn được yêu cầu gỡ deadline.",
+    "impact": "Người dùng xóa ngày trên màn hình nhưng tải lại vẫn thấy ngày cũ. startDate/estimatedMinutes có vấn đề tương tự nếu cần cho phép xóa giá trị tùy chọn.",
+    "repair": "Quy định PATCH với phân biệt absent và explicit null, hoặc lệnh clearDueDate. Cập nhật DTO, serializer, mobile và tài liệu API đồng bộ.",
+    "test": "Tạo task có hạn, sửa để xóa, tải lại phải null; không gửi trường phải giữ nguyên. Giữ đúng quy ước múi giờ đã chốt, không sửa ngày lệch tùy tiện.",
+    "refs": [
+      [
+        "Task.java",
+        "if (dueDate != null)"
+      ],
+      [
+        "EditTaskScreen.tsx",
+        "payload.dueDate = serializeTaskDueDate"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F21",
+    "title": "Danh sách task còn truy vấn đếm từng dòng",
+    "priority": "P2 - hiệu năng",
+    "state": "Xác định qua code; chưa đo tải",
+    "proof": "Mapper đã batch một số dữ liệu nhưng tiếp tục đếm subtasks và comments riêng cho từng task. Với N mục có thêm nhiều truy vấn phụ thuộc N.",
+    "impact": "Trang lớn tăng tải DB và độ trễ. Chưa có phép đo để khẳng định số mili giây hoặc khả năng chịu tải thực tế.",
+    "repair": "Batch count theo taskIds bằng GROUP BY, dựng map rồi ghép DTO; áp dụng ngân sách truy vấn và index phù hợp điều kiện lọc thực tế.",
+    "test": "Trang 20/50 task có số truy vấn gần như cố định; số đếm đúng khi soft-delete. Đo p95 trên bộ dữ liệu demo trước/sau, ghi điều kiện máy và tải.",
+    "refs": [
+      [
+        "TaskApplicationService.java",
+        "long commentCount = commentRepository.countByTaskIdAndDeletedFalse"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F22",
+    "title": "Xóa thành viên nhóm chưa xử lý trưởng nhóm",
+    "priority": "P2 - quy tắc tổ chức",
+    "state": "Xác định qua service",
+    "proof": "removeMember của TeamApplicationService vô hiệu hóa TeamMember nhưng không đối chiếu hoặc cập nhật Team.leaderId. Chưa có TeamController đầy đủ để vận hành mô hình nhóm qua REST.",
+    "impact": "Nhóm có thể giữ leader là người không còn active membership; các chính sách phân công theo nhóm trong thiết kế mới sẽ dựa dữ liệu không nhất quán.",
+    "repair": "Chặn xóa leader trước khi chuyển giao, hoặc đổi leader cùng giao dịch. Bổ sung API tối thiểu/quy trình seed nhóm nếu chọn dùng team làm hàng đợi hỗ trợ.",
+    "test": "Không xóa được leader cuối khi chưa bàn giao; sau bàn giao, leader mới là thành viên active. Kiểm thử hai thao tác chuyển giao/xóa đồng thời.",
+    "refs": [
+      [
+        "TeamApplicationService.java",
+        "public void removeMember("
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F23",
+    "title": "Có bảng audit nhưng chưa có luồng ghi kiểm toán",
+    "priority": "P1 - thiếu bằng chứng an toàn",
+    "state": "Khoảng trống implementation",
+    "proof": "Migration tạo audit_logs và quyền AUDIT_READ tồn tại, nhưng không tìm thấy entity/service/aspect/writer/API tương ứng trong main code. log.info rải rác không thay thế nhật ký kiểm toán có cấu trúc.",
+    "impact": "Khó trả lời ai đổi quyền, phân công hay đóng yêu cầu nào; môn An toàn thông tin thiếu bằng chứng truy vết và kiểm thử kiểm soát.",
+    "repair": "MVP ghi actor, action, resource, outcome, timestamp, correlationId cho login, quyền và các mutation chính; che dữ liệu nhạy cảm, hạn chế quyền sửa/xóa audit.",
+    "test": "Thao tác thành công/thất bại tạo event đúng nghĩa; không có password/token trong log; nhân viên không được đọc toàn bộ audit. Không gọi đây là audit hoàn chỉnh chỉ vì bảng tồn tại.",
+    "refs": [
+      [
+        "V009__create_audit_tables.sql",
+        "CREATE TABLE"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F24",
+    "title": "Tra cứu quyền file lỗi nhưng vẫn tiếp tục",
+    "priority": "P2 - rủi ro điều kiện lỗi",
+    "state": "Xác định qua catch; chưa khai thác HTTP",
+    "proof": "Các nhánh kiểm tra file đã được liên kết bắt DataAccessException rồi bỏ qua; download có thể quay về kiểm tra uploader. Khi dữ liệu liên kết không đọc được, hệ thống không biết đầy đủ phạm vi quyền.",
+    "impact": "Rủi ro fail-open trong một số cách lỗi DB xuất hiện. Trên PostgreSQL, giao dịch bị abort có thể làm thao tác tiếp theo thất bại; chưa chứng minh tải trái phép trong runtime.",
+    "repair": "Nếu tra cứu dùng để quyết định quyền bị lỗi, dừng và trả lỗi tạm thời/deny; không suy ra file chưa liên kết chỉ vì truy vấn thất bại. Phân biệt lỗi thiếu bảng do migration sai.",
+    "test": "Giả lập repository/JDBC ném lỗi: không trả nội dung file hoặc xóa file; phản hồi 503/deny theo hợp đồng, có log kỹ thuật an toàn.",
+    "refs": [
+      [
+        "FileApplicationService.java",
+        "catch (DataAccessException ex)"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F25",
+    "title": "REQUIRES_NEW ở lời gọi cùng bean không có tác dụng",
+    "priority": "P2 - ranh giới giao dịch",
+    "state": "Xác định theo cơ chế proxy và call site",
+    "proof": "uploadFile gọi saveMetadata trực tiếp trong cùng FileApplicationService, trong khi saveMetadata đánh dấu REQUIRES_NEW. Self-invocation không đi qua transactional proxy như ý định.",
+    "impact": "Ranh giới giao dịch metadata có thể khác thiết kế khi được gọi từ giao dịch ngoài. Repository.save vẫn có giao dịch riêng; không được kết luận mọi lưu file đều không có transaction.",
+    "repair": "Tách MetadataWriter bean hoặc dùng TransactionTemplate; xác định chiến lược bù trừ khi lưu file thành công nhưng DB thất bại, tránh file mồ côi.",
+    "test": "Test rollback caller và lỗi metadata/storage riêng biệt; xác nhận file và bản ghi có trạng thái nhất quán hoặc có cơ chế dọn dẹp rõ ràng.",
+    "refs": [
+      [
+        "FileApplicationService.java",
+        "StoredFile storedFile = saveMetadata("
+      ],
+      [
+        "FileApplicationService.java",
+        "Propagation.REQUIRES_NEW"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F26",
+    "title": "Storage không sẵn sàng chưa làm health phản ánh đúng",
+    "priority": "P2 - vận hành",
+    "state": "Xác định qua constructor storage",
+    "proof": "LocalFileSystemStorageService bắt lỗi tạo thư mục lưu trữ và chỉ ghi log. Backend có thể khởi động dù thư mục không ghi được; health mặc định không kiểm tra khả năng lưu file.",
+    "impact": "Triển khai có thể báo ứng dụng sẵn sàng nhưng upload thất bại. Đây là khoảng trống readiness cần xử lý trước demo Docker có volume.",
+    "repair": "Fail fast khi cấu hình lưu trữ bắt buộc sai; thêm health/readiness phù hợp và quyền volume cho user không phải root. Không đưa đường dẫn cá nhân Windows vào image.",
+    "test": "Mount volume không ghi được: startup/readiness phải báo lỗi rõ; volume đúng thì upload/download và restart vẫn giữ tệp.",
+    "refs": [
+      [
+        "LocalFileSystemStorageService.java",
+        "catch (IOException"
+      ]
+    ],
+    "owner": "C + A"
+  },
+  {
+    "id": "F27",
+    "title": "Cấu hình release Android vẫn dùng khóa debug",
+    "priority": "P1 nếu phát hành; P2 cho demo",
+    "state": "Xác định qua Gradle; chỉ build debug đã xác minh",
+    "proof": "Build type release tham chiếu signingConfigs.debug. APK đã chạy trong phiên trước là bản debug x86_64 phục vụ giả lập, chưa phải gói phát hành cho điện thoại ARM.",
+    "impact": "Không phù hợp ký bản phát hành tin cậy hoặc tuyên bố đã sẵn sàng phân phối công khai. Không suy ra rằng mọi release build đều thất bại.",
+    "repair": "Nếu chỉ thi demo: ghi rõ debug/emulator. Khi phát hành: dùng keystore riêng ngoài Git, quản lý secret CI, cấu hình API HTTPS và kiểm thử trên ABI thiết bị thật.",
+    "test": "Kiểm tra chứng thư APK release không phải debug; cài trên thiết bị mục tiêu, không cần Metro; không lộ signing password trong log.",
+    "refs": [
+      [
+        "mobile/android/app/build.gradle",
+        "release {"
+      ]
+    ],
+    "owner": "B + C"
+  },
+  {
+    "id": "F28",
+    "title": "SCA báo dependency cần phân loại và vá tương thích",
+    "priority": "P2 - chuỗi cung ứng",
+    "state": "Đã chạy npm audit --omit=dev",
+    "proof": "Kết quả ngày 29/10/2026: 5 mục package bị ảnh hưởng, gồm 1 high và 4 low; hai advisory gốc nổi bật là body-parser và deepmerge. Các mục CLI có thể là ảnh hưởng dây chuyền, không phải 5 lỗ hổng độc lập.",
+    "impact": "Cần xác định đường tiếp cận ở công cụ dev/Metro; kết quả audit chưa chứng minh khai thác được APK trên điện thoại. Không có kết quả SCA Maven đầy đủ trong lượt này.",
+    "repair": "Đối chiếu advisory với lockfile, cập nhật bản vá tương thích, giới hạn cổng dev server. Không chạy audit fix --force hoặc hạ CLI 20.2 xuống 11.4.1 chỉ để làm báo cáo xanh.",
+    "test": "Chạy lại npm ci, audit, typecheck, Jest, Android debug sau cập nhật; lưu quyết định ngoại lệ có phạm vi và hạn. Bổ sung Maven/image scan trong repo security.",
+    "refs": [
+      [
+        "mobile/package-lock.json",
+        "\"node_modules/body-parser\""
+      ],
+      [
+        "mobile/package.json",
+        "\"@react-native-community/cli\":"
+      ]
+    ],
+    "owner": "D + B"
+  },
+  {
+    "id": "F29",
+    "title": "Backend CI chỉ kiểm tra thư mục có tồn tại",
+    "priority": "P1 - thiếu cổng chất lượng",
+    "state": "Xác định qua workflow",
+    "proof": "Job backend-ci-skeleton chỉ checkout, cài JDK 21 và test -d backend. Không chạy Maven build/test. Secret audit chỉ tìm tên .env/.key/.pem, không quét nội dung token trong tệp khác.",
+    "impact": "Pipeline xanh không chứng minh backend biên dịch hoặc kiểm thử qua; cũng không đáp ứng Jenkins bắt buộc của mẫu môn Triển khai.",
+    "repair": "Thêm Maven verify, báo cáo test/coverage, secret scan thực chất và SCA. Dùng Jenkins local làm pipeline nộp môn; GitHub Actions có thể giữ làm kiểm tra PR bổ sung.",
+    "test": "Cố ý tạo compile error/test fail trong nhánh thử: pipeline phải đỏ và không deploy. Chạy kiểm thử tích hợp có PostgreSQL/Testcontainers hợp lệ.",
+    "refs": [
+      [
+        ".github/workflows/ci.yml",
+        "backend-ci-skeleton:"
+      ]
+    ],
+    "owner": "C + D"
+  },
+  {
+    "id": "F30",
+    "title": "Thiếu chuỗi triển khai bắt buộc của mẫu môn học",
+    "priority": "P0 - điều kiện nộp môn",
+    "state": "Khoảng trống ở commit được cung cấp",
+    "proof": "Không thấy Dockerfile, compose, Jenkinsfile, SonarQube hay cấu hình Prometheus/Grafana trong tracked source tại SHA này. pom có Actuator nhưng chưa có Prometheus registry; health không đồng nghĩa có metrics scrape.",
+    "impact": "Chạy JAR/APK local chưa đạt yêu cầu đóng gói Docker của mẫu; thiếu Sonar/Jenkins và giám sát có ảnh hưởng điểm được ghi cụ thể trong tài liệu giảng viên.",
+    "repair": "Ưu tiên Jenkins trên máy cá nhân, Docker Compose app+DB, Sonar tích hợp Jenkins và monitoring local. Thêm registry/exposure metrics đúng quyền, lưu cấu hình và ảnh chạy thật.",
+    "test": "Fresh checkout → pipeline local → quality gate → Compose healthy → smoke test; Prometheus target UP và Grafana có dữ liệu. Đây là kế hoạch, chưa được triển khai trong lượt audit.",
+    "refs": [
+      [
+        "backend/pom.xml",
+        "spring-boot-starter-actuator"
+      ]
+    ],
+    "owner": "C chủ trì"
+  },
+  {
+    "id": "F31",
+    "title": "Luồng hỗ trợ trên client chưa được hoàn thành",
+    "priority": "P1 - thiếu chức năng cốt lõi",
+    "state": "Khoảng trống UI; không phải toàn backend vắng mặt",
+    "proof": "Mobile đã có kiểu dữ liệu/API adapter cho service request nhưng màn ServiceRequestsScreen còn placeholder; phần quản trị/More còn giới hạn. Không thấy web frontend vận hành trong source; prototype thiết kế không phải web app hoàn chỉnh.",
+    "impact": "Người dùng chưa thể demo trọn luồng đề tài chính bằng giao diện hiện có, dù backend đã có nhiều endpoint và mobile Project/Task đã phát triển đáng kể.",
+    "repair": "Trong 2 tuần, chọn web tối thiểu cho requester/agent và tận dụng mobile Task hiện có; không làm đồng thời hai client đủ mọi tính năng. Xác nhận yêu cầu môn nâng cao với giảng viên.",
+    "test": "Một request được tạo, phân công, xử lý, từ chối/xác nhận từ UI với tài khoản khác nhau; không phải đổi trạng thái thủ công bằng DB để giả demo.",
+    "refs": [
+      [
+        "ServiceRequestsScreen.tsx",
+        "ServiceRequestsScreen"
+      ],
+      [
+        "MoreScreen.tsx",
+        "MoreScreen"
+      ]
+    ],
+    "owner": "B chủ trì"
+  },
+  {
+    "id": "F32",
+    "title": "Thiếu hàng đợi hỗ trợ theo nhóm/phòng ban",
+    "priority": "P1 - khoảng trống thiết kế",
+    "state": "Thiết kế hiện tại có chủ ý admin phân công",
+    "proof": "Chính sách hiện hành cho ADMIN phân công; danh sách request chủ yếu theo requester/assignee. ServiceCategory chưa gắn nhóm sở hữu, nên trưởng nhóm hỗ trợ không có hàng đợi riêng để triage.",
+    "impact": "Admin trở thành nút thắt nghiệp vụ hàng ngày. Đây là thiếu sót so với mô hình doanh nghiệp đề xuất, không chứng minh mọi module hiện tại chỉ có luồng admin.",
+    "repair": "Bổ sung ownerTeamId cho category và team hàng đợi; TEAM_LEADER chỉ được triage/assign trong team phụ trách, agent nhận việc theo assignment. Sửa canonical docs có phê duyệt phạm vi nhóm trước khi code.",
+    "test": "Trưởng nhóm IT nhìn/phân công ticket IT nhưng không ticket HR; EMPLOYEE không tự cấp quyền bằng cách đổi tham số teamId. Kiểm tra cùng chính sách ở query và mutation.",
+    "refs": [
+      [
+        "ServiceCategory.java",
+        "public class ServiceCategory"
+      ],
+      [
+        "ServiceRequestApplicationService.java",
+        "actions.add(\"ASSIGN\")"
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F33",
+    "title": "Đổi mật khẩu chưa xác định xử lý các phiên khác",
+    "priority": "P2 - quyết định bảo mật",
+    "state": "Xác định qua code; chính sách cần chốt",
+    "proof": "changePassword cập nhật passwordHash nhưng không thu hồi các refresh token/login session khác; resetPassword có nhánh thu hồi. Với F03, access token cũ còn sống đến hết hạn nếu không sửa filter.",
+    "impact": "Nếu đổi mật khẩu do nghi bị lộ, một phiên khác vẫn có thể duy trì truy cập. Một số sản phẩm cố ý giữ phiên; cần ghi rõ lựa chọn thay vì coi đó luôn là lỗi khai thác.",
+    "repair": "Đề xuất tùy chọn thu hồi các phiên khác, mặc định bật khi thay mật khẩu; giữ hoặc cấp lại phiên hiện tại theo hợp đồng. Kết hợp cơ chế revocation F03.",
+    "test": "Hai phiên A/B: đổi mật khẩu tại A và chọn thu hồi B thì access/refresh B đều bị chặn; A tiếp tục theo chính sách. Kiểm tra reset riêng.",
+    "refs": [
+      [
+        "AuthApplicationService.java",
+        "public void changePassword("
+      ]
+    ],
+    "owner": "A + D"
+  },
+  {
+    "id": "F34",
+    "title": "Giới hạn phân trang chưa thống nhất",
+    "priority": "P2 - rủi ro tải và validation",
+    "state": "Xác định tại controller dự án",
+    "proof": "getProjectMembers tạo PageRequest trực tiếp từ page/size do client gửi, không có mức tối đa như một số endpoint directory. Giá trị âm có thể đi vào lỗi kỹ thuật; size rất lớn tăng dữ liệu cần đọc.",
+    "impact": "Người dùng hợp lệ có thể vô tình hoặc cố ý tạo truy vấn/trả payload quá lớn. Chưa chạy thử tải hoặc chứng minh một yêu cầu làm cạn tài nguyên.",
+    "repair": "Chuẩn hóa PageRequest policy: page≥0, size 1..100 (mức đề xuất), whitelist sort; trả lỗi validation có cấu trúc. Không đổi quy ước page index mà không cập nhật client.",
+    "test": "page=-1/size=0 bị 400; size vượt trần bị từ chối hoặc clamp theo hợp đồng; request hợp lệ có kết quả đúng và ổn định.",
+    "refs": [
+      [
+        "ProjectController.java",
+        "getProjectMembers("
+      ]
+    ],
+    "owner": "A + D"
+  }
+]

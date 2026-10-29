@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worksphere.local/schemas/agent-task-result.schema.json",
+  "title": "WorkSphereAgentTaskResult",
+  "description": "Standard output contract for WorkSphere Multi-Agent Orchestration workers",
+  "type": "object",
+  "required": [
+    "role",
+    "taskId",
+    "checkpoint",
+    "readPaths",
+    "writePaths",
+    "filesRead",
+    "filesChanged",
+    "commandsRun",
+    "findings",
+    "testResults",
+    "securityNotes",
+    "openQuestions",
+    "conclusion"
+  ],
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "Coordinator",
+        "Contract Agent",
+        "Implementation Agent",
+        "Test Agent",
+        "Security Agent",
+        "Reviewer Agent",
+        "Git Integrator"
+      ]
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checkpoint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "readPaths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "writePaths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "filesRead": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "filesChanged": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "commandsRun": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "exitCode"],
+        "properties": {
+          "command": { "type": "string" },
+          "exitCode": { "type": "integer" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "testResults": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PASSED", "FAILED", "SKIPPED", "NOT_RUN"]
+        },
+        "suitesPassed": { "type": "integer" },
+        "suitesTotal": { "type": "integer" },
+        "testsPassed": { "type": "integer" },
+        "testsTotal": { "type": "integer" },
+        "details": { "type": "string" }
+      }
+    },
+    "securityNotes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "openQuestions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "conclusion": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "NEEDS_PATCH",
+        "BLOCKED",
+        "CONTRACT_GAP",
+        "SECURITY_RISK",
+        "CAPABILITY_UNAVAILABLE"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,28 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/worksphere
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+worksphere:
+  jwt:
+    # For dev only - use environment variable in production
+    secret: worksphere-dev-secret-key-must-be-at-least-32-characters-long
+    access-token-expiry-seconds: 900
+  dev:
+    e2e-user:
+      enabled: ${WORKSPHERE_DEV_E2E_USER_ENABLED:false}
+      login: ${WORKSPHERE_E2E_LOGIN:}
+      username: ${WORKSPHERE_E2E_USERNAME:}
+      email: ${WORKSPHERE_E2E_EMAIL:}
+      password: ${WORKSPHERE_E2E_PASSWORD:}
+      full-name: ${WORKSPHERE_E2E_FULL_NAME:E2E Test User}

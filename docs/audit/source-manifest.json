@@ -1,0 +1,3461 @@
+{
+  "upstream": "8292d13b5330279c6a3d4ab007eebbff9be4d894",
+  "files": [
+    {
+      "path": "backend/.gitattributes",
+      "upstream_sha256": "18be76f9008af08719be1d98d291e1286907ad6df86e7bd4e2dbed4ce0903fe8",
+      "import_sha256": "18be76f9008af08719be1d98d291e1286907ad6df86e7bd4e2dbed4ce0903fe8",
+      "local_patch": false
+    },
+    {
+      "path": "backend/.gitignore",
+      "upstream_sha256": "9a9e0230c9cb7f94a54a5033d6b204d66287d0c97081ebe4083997670d89398a",
+      "import_sha256": "9a9e0230c9cb7f94a54a5033d6b204d66287d0c97081ebe4083997670d89398a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/.gitkeep",
+      "upstream_sha256": "136b781779b217d1509ccede6247769f2406ca725d10fc0421659f2ed6540527",
+      "import_sha256": "136b781779b217d1509ccede6247769f2406ca725d10fc0421659f2ed6540527",
+      "local_patch": false
+    },
+    {
+      "path": "backend/.mvn/wrapper/maven-wrapper.properties",
+      "upstream_sha256": "1f3cf0a7111d2b54736d1f89d7e93f1f143f8b3d5a58a5bb46e3b60b3eebd931",
+      "import_sha256": "1f3cf0a7111d2b54736d1f89d7e93f1f143f8b3d5a58a5bb46e3b60b3eebd931",
+      "local_patch": false
+    },
+    {
+      "path": "backend/checkstyle.xml",
+      "upstream_sha256": "aec0c111159437c9d3877a11e89998f313e8ff6176740bd8e9893baaa486fc00",
+      "import_sha256": "aec0c111159437c9d3877a11e89998f313e8ff6176740bd8e9893baaa486fc00",
+      "local_patch": false
+    },
+    {
+      "path": "backend/mvnw",
+      "upstream_sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
+      "import_sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
+      "local_patch": false
+    },
+    {
+      "path": "backend/mvnw.cmd",
+      "upstream_sha256": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c",
+      "import_sha256": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/pom.xml",
+      "upstream_sha256": "c88a90390842f8ff5d787fe6c5486f0a4fbdb0f8abf71a69d65448ffb0540816",
+      "import_sha256": "c88a90390842f8ff5d787fe6c5486f0a4fbdb0f8abf71a69d65448ffb0540816",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/BackendApplication.java",
+      "upstream_sha256": "e5b26d37a760d6bf9acc4b8cae4750ae14984fe9d31ae781ce160d086adee108",
+      "import_sha256": "e5b26d37a760d6bf9acc4b8cae4750ae14984fe9d31ae781ce160d086adee108",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/request/AssignAssetRequest.java",
+      "upstream_sha256": "8a3f336bcca41aded007460038a092e5245f66b6674510b239138c9234557c70",
+      "import_sha256": "8a3f336bcca41aded007460038a092e5245f66b6674510b239138c9234557c70",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/request/CreateAssetCategoryRequest.java",
+      "upstream_sha256": "108bb553196ec1e74697757fe983eac78e8180c195606f2f212403543f3a3733",
+      "import_sha256": "108bb553196ec1e74697757fe983eac78e8180c195606f2f212403543f3a3733",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/request/CreateAssetRepairHistoryRequest.java",
+      "upstream_sha256": "1f76666763d0ca24b54259b26e591fabfc114264d6a803bdd484e7035230ba94",
+      "import_sha256": "1f76666763d0ca24b54259b26e591fabfc114264d6a803bdd484e7035230ba94",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/request/CreateAssetRequest.java",
+      "upstream_sha256": "382a31e028fcb59c01b86f91f09833e7edd4b5e2f3605d9d00dad503edbbe068",
+      "import_sha256": "382a31e028fcb59c01b86f91f09833e7edd4b5e2f3605d9d00dad503edbbe068",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/request/ReturnAssetRequest.java",
+      "upstream_sha256": "affeace81f36b939167f04463c2bbb31a31982ef63933bca1a0fdc52d9d090ac",
+      "import_sha256": "affeace81f36b939167f04463c2bbb31a31982ef63933bca1a0fdc52d9d090ac",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/request/UpdateAssetCategoryRequest.java",
+      "upstream_sha256": "58a6bbc82866b5ced1e280b27a99efc3db6db642979e6495991d6aff77dd5f98",
+      "import_sha256": "58a6bbc82866b5ced1e280b27a99efc3db6db642979e6495991d6aff77dd5f98",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/request/UpdateAssetRequest.java",
+      "upstream_sha256": "d6255d2bbe4a62c6edb7de8927faf1d9d91651caf87138a478e9a6d0ca61acdc",
+      "import_sha256": "d6255d2bbe4a62c6edb7de8927faf1d9d91651caf87138a478e9a6d0ca61acdc",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/response/AssetAssignmentResponse.java",
+      "upstream_sha256": "e2b519f470d27a6f4ef68f3f04139a4e43601a92a604be0898388157050f7cdb",
+      "import_sha256": "e2b519f470d27a6f4ef68f3f04139a4e43601a92a604be0898388157050f7cdb",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/response/AssetCategoryResponse.java",
+      "upstream_sha256": "d27b83c21130d0da8a0ee3bdd42cb079c19ab9789f6f7d3628be0dd56bcd3db6",
+      "import_sha256": "d27b83c21130d0da8a0ee3bdd42cb079c19ab9789f6f7d3628be0dd56bcd3db6",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/response/AssetDetailResponse.java",
+      "upstream_sha256": "f6bf2cbecc48ba10a929e2c06bc651a096fa3cfdcf58977fd7a843bfbd2b4630",
+      "import_sha256": "f6bf2cbecc48ba10a929e2c06bc651a096fa3cfdcf58977fd7a843bfbd2b4630",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/response/AssetRepairHistoryResponse.java",
+      "upstream_sha256": "14de5583d54a31e1b4a14a2f0c558c691f7cf31507514b5c427ccaade53cc93c",
+      "import_sha256": "14de5583d54a31e1b4a14a2f0c558c691f7cf31507514b5c427ccaade53cc93c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/api/response/AssetSummaryResponse.java",
+      "upstream_sha256": "7145e576edad1f34ade0ce969ad8654d73ca4e34ffc84e301d1ecb33bf75395e",
+      "import_sha256": "7145e576edad1f34ade0ce969ad8654d73ca4e34ffc84e301d1ecb33bf75395e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/application/AssetApplicationService.java",
+      "upstream_sha256": "69b4a13f2a6d2ae643879929b1c3cf3c73f0a5027f7ea87ed85cbf5ce0e46044",
+      "import_sha256": "69b4a13f2a6d2ae643879929b1c3cf3c73f0a5027f7ea87ed85cbf5ce0e46044",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/application/AssetCategoryApplicationService.java",
+      "upstream_sha256": "e7d664ecf641f929c2b96c99f463657c2822ae6ca6832a768c7fb80d37a051cb",
+      "import_sha256": "e7d664ecf641f929c2b96c99f463657c2822ae6ca6832a768c7fb80d37a051cb",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/domain/Asset.java",
+      "upstream_sha256": "1df7e9b3164f16d919fb4dacd34c7ddc4e2d676215315a2c429685aca372311f",
+      "import_sha256": "1df7e9b3164f16d919fb4dacd34c7ddc4e2d676215315a2c429685aca372311f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/domain/AssetAssignment.java",
+      "upstream_sha256": "d88bb8761786970e8fbfd6fda94ea33cc90802a6ace22fa7ce9b6ae2fdfbb8f0",
+      "import_sha256": "d88bb8761786970e8fbfd6fda94ea33cc90802a6ace22fa7ce9b6ae2fdfbb8f0",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/domain/AssetAssignmentStatus.java",
+      "upstream_sha256": "ebd8e534176b10cf1d83d9b5ac68c12fa3b3cb5473936506d81e2e4a2971eea6",
+      "import_sha256": "ebd8e534176b10cf1d83d9b5ac68c12fa3b3cb5473936506d81e2e4a2971eea6",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/domain/AssetCategory.java",
+      "upstream_sha256": "d70871a15282ffcf4785c43db995a8036838b29a3b3ebd64c5433395db9b2c1a",
+      "import_sha256": "d70871a15282ffcf4785c43db995a8036838b29a3b3ebd64c5433395db9b2c1a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/domain/AssetRepairHistory.java",
+      "upstream_sha256": "d4940c5e5f5474e075da3d853def805885c3c3eecdb82ab52a5015670d1ad6c6",
+      "import_sha256": "d4940c5e5f5474e075da3d853def805885c3c3eecdb82ab52a5015670d1ad6c6",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/domain/AssetRepairType.java",
+      "upstream_sha256": "4381acd6340813028131b9bb80a1c4d26588104b206ffecf9b2fb57e74fdf593",
+      "import_sha256": "4381acd6340813028131b9bb80a1c4d26588104b206ffecf9b2fb57e74fdf593",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/domain/AssetStatus.java",
+      "upstream_sha256": "2d3e2250c2343e007c7118406729c7066b079816606f892e112f43757f7aa998",
+      "import_sha256": "2d3e2250c2343e007c7118406729c7066b079816606f892e112f43757f7aa998",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/infrastructure/persistence/AssetAssignmentRepository.java",
+      "upstream_sha256": "b3748eade4ff919059b99eb48b271d12f0d7c9926231c2f6c8b018980ec74f96",
+      "import_sha256": "b3748eade4ff919059b99eb48b271d12f0d7c9926231c2f6c8b018980ec74f96",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/infrastructure/persistence/AssetCategoryRepository.java",
+      "upstream_sha256": "dfcd7f700e10709e6c3d096c175e0d9aaef6910d1c4d874cb5dafd2eda31b4d6",
+      "import_sha256": "dfcd7f700e10709e6c3d096c175e0d9aaef6910d1c4d874cb5dafd2eda31b4d6",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/infrastructure/persistence/AssetRepairHistoryRepository.java",
+      "upstream_sha256": "06eee51c809d1f01f0b26b082d6e8f2dfe4e6eaa0065c2a5315d8e4d75142576",
+      "import_sha256": "06eee51c809d1f01f0b26b082d6e8f2dfe4e6eaa0065c2a5315d8e4d75142576",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/infrastructure/persistence/AssetRepository.java",
+      "upstream_sha256": "5e7bde7687139d21edc7b08dd8f9c4491a1cb2af36f6523dcd45f524b54ce156",
+      "import_sha256": "5e7bde7687139d21edc7b08dd8f9c4491a1cb2af36f6523dcd45f524b54ce156",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/web/AssetCategoryController.java",
+      "upstream_sha256": "b667fea4e9bb61d1966667c1f470a40dd175a878764528abf6743f1d24caded2",
+      "import_sha256": "b667fea4e9bb61d1966667c1f470a40dd175a878764528abf6743f1d24caded2",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/asset/web/AssetController.java",
+      "upstream_sha256": "3268591debe02280c351bacc830bf08dce1b0a8e7b8665b70ae01099179c095e",
+      "import_sha256": "3268591debe02280c351bacc830bf08dce1b0a8e7b8665b70ae01099179c095e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/api/response/PersonalDashboardResponse.java",
+      "upstream_sha256": "ae3d9957fc8366d43e75c800501a2852f104f7fcf483080c3a3ca5c6d4c50c44",
+      "import_sha256": "ae3d9957fc8366d43e75c800501a2852f104f7fcf483080c3a3ca5c6d4c50c44",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/api/response/ProjectDashboardSummaryResponse.java",
+      "upstream_sha256": "d7cd4b0efdc058f2f0ee6a6be56d68cfdf04965ff2b8031289ea53939b93e932",
+      "import_sha256": "d7cd4b0efdc058f2f0ee6a6be56d68cfdf04965ff2b8031289ea53939b93e932",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/api/response/RecentNotificationItemResponse.java",
+      "upstream_sha256": "92104f61881b31f03d003629e8e0c0533862cab1f558d9c0f0b16162882c027c",
+      "import_sha256": "92104f61881b31f03d003629e8e0c0533862cab1f558d9c0f0b16162882c027c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/api/response/ServiceRequestDashboardSummaryResponse.java",
+      "upstream_sha256": "6c55ff53bb91338029b990863fa1593d9d04d02f21de0bb25a83add1fc1ade08",
+      "import_sha256": "6c55ff53bb91338029b990863fa1593d9d04d02f21de0bb25a83add1fc1ade08",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/api/response/TaskDashboardSummaryResponse.java",
+      "upstream_sha256": "74390c228841ffb3ccf9d780ab21f08960f3717142eccae92a3057c26016b9e3",
+      "import_sha256": "74390c228841ffb3ccf9d780ab21f08960f3717142eccae92a3057c26016b9e3",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/api/response/UpcomingTaskItemResponse.java",
+      "upstream_sha256": "96b2000fc61a0a3e9494d92327b0ad176702ca608685060d72c0e01c8d72f2f6",
+      "import_sha256": "96b2000fc61a0a3e9494d92327b0ad176702ca608685060d72c0e01c8d72f2f6",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/application/DashboardApplicationService.java",
+      "upstream_sha256": "8babbb6e825ab695c38c5df32891b770663ee731eee43a1c3688f177203cf226",
+      "import_sha256": "8babbb6e825ab695c38c5df32891b770663ee731eee43a1c3688f177203cf226",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/infrastructure/persistence/DashboardQueryRepository.java",
+      "upstream_sha256": "fb1f7ee7c4b846a937e2894de7f206cc682ef61583ceaf06be5b7eaec8e05450",
+      "import_sha256": "fb1f7ee7c4b846a937e2894de7f206cc682ef61583ceaf06be5b7eaec8e05450",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/dashboard/web/DashboardController.java",
+      "upstream_sha256": "195f4be585485cb620d111b9a3a1933ef492d95e563b4c83c9717b5fcf913a8f",
+      "import_sha256": "195f4be585485cb620d111b9a3a1933ef492d95e563b4c83c9717b5fcf913a8f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/api/response/FileUploadResponse.java",
+      "upstream_sha256": "ed4875686cc9f9a8e3c6ad5555446ef7493c03f6e9229617543803fb9b015319",
+      "import_sha256": "ed4875686cc9f9a8e3c6ad5555446ef7493c03f6e9229617543803fb9b015319",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/application/FileApplicationService.java",
+      "upstream_sha256": "247b6267ac4e61f83b601de429652fe15b95abd222069fb227b7a38b48583e0e",
+      "import_sha256": "247b6267ac4e61f83b601de429652fe15b95abd222069fb227b7a38b48583e0e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/application/FileValidationService.java",
+      "upstream_sha256": "5dbaad5185fb33273e0eb13c9adc209391c95c749c2637d7543ba8ae5886bc57",
+      "import_sha256": "5dbaad5185fb33273e0eb13c9adc209391c95c749c2637d7543ba8ae5886bc57",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/application/FilenameSanitizer.java",
+      "upstream_sha256": "75581c0fe6535a86150c36c95b3d6232e79aa637057ab19ceffee84352ecef15",
+      "import_sha256": "75581c0fe6535a86150c36c95b3d6232e79aa637057ab19ceffee84352ecef15",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/domain/FilePurpose.java",
+      "upstream_sha256": "3cd2425944286de6a51ade3867a6709bf4013171fbe33572c3150f865c9bf90b",
+      "import_sha256": "3cd2425944286de6a51ade3867a6709bf4013171fbe33572c3150f865c9bf90b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/domain/FileStorageService.java",
+      "upstream_sha256": "3a10f11dfaab99bec47e7e5922b06dc9dc0e98483b9758dce54e0b1f48f35f6f",
+      "import_sha256": "3a10f11dfaab99bec47e7e5922b06dc9dc0e98483b9758dce54e0b1f48f35f6f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/domain/StoredFile.java",
+      "upstream_sha256": "cb058680d449acc701224a1882fb7f5bda63b22c057dcacd1bbde718123c52cd",
+      "import_sha256": "cb058680d449acc701224a1882fb7f5bda63b22c057dcacd1bbde718123c52cd",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/domain/StoredFileStatus.java",
+      "upstream_sha256": "02980f2dc263425a96f9e73331c75a69794b3a6972a76468c435dfbc57cb6bba",
+      "import_sha256": "02980f2dc263425a96f9e73331c75a69794b3a6972a76468c435dfbc57cb6bba",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/infrastructure/persistence/StoredFileRepository.java",
+      "upstream_sha256": "a642bc52e73729106f6ee7111797cecf29af0bcf6fd69cbe849623ba355b0c45",
+      "import_sha256": "a642bc52e73729106f6ee7111797cecf29af0bcf6fd69cbe849623ba355b0c45",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/infrastructure/storage/LocalFileSystemStorageService.java",
+      "upstream_sha256": "d59ac56cc1bd15d908a3ed2416e1eb6ebfbd671be6c23e74a6e3261ba25446e2",
+      "import_sha256": "d59ac56cc1bd15d908a3ed2416e1eb6ebfbd671be6c23e74a6e3261ba25446e2",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/file/web/FileController.java",
+      "upstream_sha256": "319fa842cf602bf34c2d98c5f235274417d46e1696b1434c118b7d5a5d570460",
+      "import_sha256": "319fa842cf602bf34c2d98c5f235274417d46e1696b1434c118b7d5a5d570460",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/AuthController.java",
+      "upstream_sha256": "ccaac461ee94787ec91f395d7c8bf83ebdde0211998fbb9bfbf950e475d69411",
+      "import_sha256": "ccaac461ee94787ec91f395d7c8bf83ebdde0211998fbb9bfbf950e475d69411",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/MeController.java",
+      "upstream_sha256": "b54b3137b00d6b2574716b9ec89c49a0932487763b233ffd43bbfcc89e3cc38c",
+      "import_sha256": "b54b3137b00d6b2574716b9ec89c49a0932487763b233ffd43bbfcc89e3cc38c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/AdminUpdateUserRequest.java",
+      "upstream_sha256": "15305a2ee462812df1237d8f5679c7658635bbfcee5b8cdc193a7a67b76f381a",
+      "import_sha256": "15305a2ee462812df1237d8f5679c7658635bbfcee5b8cdc193a7a67b76f381a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/ChangePasswordRequest.java",
+      "upstream_sha256": "1adfe9771f590c0634f8e43a13a73a3d1cd45d8e568e314c3b4935d3beb7894b",
+      "import_sha256": "1adfe9771f590c0634f8e43a13a73a3d1cd45d8e568e314c3b4935d3beb7894b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/CreateUserRequest.java",
+      "upstream_sha256": "4cd68de1a909680734e9e117587cf138f33f4a7e4655c091958900faf5d23244",
+      "import_sha256": "4cd68de1a909680734e9e117587cf138f33f4a7e4655c091958900faf5d23244",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/ForgotPasswordRequest.java",
+      "upstream_sha256": "b3d4dfad640cc2f3e1d5568f08f784885ef0fe8fe36672a82d60904d1ce59756",
+      "import_sha256": "b3d4dfad640cc2f3e1d5568f08f784885ef0fe8fe36672a82d60904d1ce59756",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/LockUserRequest.java",
+      "upstream_sha256": "98c476f3952a222d35c4533e7be17faf8a166babc882263dbd57b0a621ae4839",
+      "import_sha256": "98c476f3952a222d35c4533e7be17faf8a166babc882263dbd57b0a621ae4839",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/LoginRequest.java",
+      "upstream_sha256": "bc530feb904b36b707c4388df0040f040d8c70093b18c6416ba05e92a15dbe06",
+      "import_sha256": "bc530feb904b36b707c4388df0040f040d8c70093b18c6416ba05e92a15dbe06",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/LogoutRequest.java",
+      "upstream_sha256": "5ddd9006abd29a5b81a37618d3f3216b49d9a262171e4bdcddc0f3eb94c29e01",
+      "import_sha256": "5ddd9006abd29a5b81a37618d3f3216b49d9a262171e4bdcddc0f3eb94c29e01",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/RefreshTokenRequest.java",
+      "upstream_sha256": "cce102767a8035cd8a11041b6182b8d10c8c38924ada681bd0015f320d05961f",
+      "import_sha256": "cce102767a8035cd8a11041b6182b8d10c8c38924ada681bd0015f320d05961f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/ResetPasswordRequest.java",
+      "upstream_sha256": "fbf4f9bcd2818a458f26281182d0d2490eb17a86561c28973373f40be4144a23",
+      "import_sha256": "fbf4f9bcd2818a458f26281182d0d2490eb17a86561c28973373f40be4144a23",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/request/UpdateProfileRequest.java",
+      "upstream_sha256": "3b371a14c5e045b4e8e1b29efe4a9be39417c13df7590ce28f091fadebd1dc7b",
+      "import_sha256": "3b371a14c5e045b4e8e1b29efe4a9be39417c13df7590ce28f091fadebd1dc7b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/response/AuthResponse.java",
+      "upstream_sha256": "3d6dfef4225a71821f1ce7ce35c8275c09442947d75d8d29ffd94a2ed4b09b3c",
+      "import_sha256": "3d6dfef4225a71821f1ce7ce35c8275c09442947d75d8d29ffd94a2ed4b09b3c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/response/RefreshResponse.java",
+      "upstream_sha256": "6b1902ff1d468dc74ea7807296f859b093400d0bda9603d9f094e4c3671da2c9",
+      "import_sha256": "6b1902ff1d468dc74ea7807296f859b093400d0bda9603d9f094e4c3671da2c9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/response/UserDirectoryItemResponse.java",
+      "upstream_sha256": "4b6b0def6dc2bcf59843664551b8831da03ec230ed13bfcb638f874c9ee3c51e",
+      "import_sha256": "4b6b0def6dc2bcf59843664551b8831da03ec230ed13bfcb638f874c9ee3c51e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/response/UserProfileResponse.java",
+      "upstream_sha256": "9dd4096db50e3a921cc3c05fed3aa8f1dd80854187c14c5f88077a02807b4361",
+      "import_sha256": "9dd4096db50e3a921cc3c05fed3aa8f1dd80854187c14c5f88077a02807b4361",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/api/response/UserSummaryResponse.java",
+      "upstream_sha256": "6462f3189ead6a58353b47b47eaef94e044f9e793f160499c3cc8617000a532e",
+      "import_sha256": "6462f3189ead6a58353b47b47eaef94e044f9e793f160499c3cc8617000a532e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/application/AuthApplicationService.java",
+      "upstream_sha256": "3bf925b543c7ba976b1798bc5f1bae99f5d4bf122b9f39aca306b237df5805d9",
+      "import_sha256": "3bf925b543c7ba976b1798bc5f1bae99f5d4bf122b9f39aca306b237df5805d9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/application/UserManagementApplicationService.java",
+      "upstream_sha256": "948145853207f0b123408b41388cba9e5b0062f1d551cc6e1d191e8fadbc6bea",
+      "import_sha256": "948145853207f0b123408b41388cba9e5b0062f1d551cc6e1d191e8fadbc6bea",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/dev/E2eUserProvisioner.java",
+      "upstream_sha256": "e1de9a407f7f7e7af30a51122e2f7ad8af473512379180650e97e7aad7d0574d",
+      "import_sha256": "9d77461562ccf680e6107975982cc1b78e8e2d75fd92ed67764c4ad92ae0a1b4",
+      "local_patch": true
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/LoginSession.java",
+      "upstream_sha256": "7632dca51035cbc9ea0ba299f86ba3c70143deee40544215c8105679084cec59",
+      "import_sha256": "7632dca51035cbc9ea0ba299f86ba3c70143deee40544215c8105679084cec59",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/PasswordResetToken.java",
+      "upstream_sha256": "b8d435704d9a8588890c9f34278071c0f91f68c4304793ff672442c30d21e343",
+      "import_sha256": "b8d435704d9a8588890c9f34278071c0f91f68c4304793ff672442c30d21e343",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/Permission.java",
+      "upstream_sha256": "2cb41396ff74e578472cea294ac55d673899e2e4ef5d312ebb1f6a0384b1b79b",
+      "import_sha256": "2cb41396ff74e578472cea294ac55d673899e2e4ef5d312ebb1f6a0384b1b79b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/RefreshToken.java",
+      "upstream_sha256": "c474423dff04938153f61f5474d53cab077eaaf045fe0110aa1e2da9b6383ab1",
+      "import_sha256": "c474423dff04938153f61f5474d53cab077eaaf045fe0110aa1e2da9b6383ab1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/Role.java",
+      "upstream_sha256": "d5d9d6cc7243fefc9ae03751497ce54dc5e5631ce4e807a9a14389498ae33631",
+      "import_sha256": "d5d9d6cc7243fefc9ae03751497ce54dc5e5631ce4e807a9a14389498ae33631",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/User.java",
+      "upstream_sha256": "74fe5bfa8cc2b8e1acfba9abd7572dfb960760ddd3a2bef5c1a2cfba1d6252bc",
+      "import_sha256": "74fe5bfa8cc2b8e1acfba9abd7572dfb960760ddd3a2bef5c1a2cfba1d6252bc",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/UserRole.java",
+      "upstream_sha256": "097230e7fd5a159f8ee3d83647751cd3fee68ddf71f041ba86f122785e9667fc",
+      "import_sha256": "097230e7fd5a159f8ee3d83647751cd3fee68ddf71f041ba86f122785e9667fc",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/domain/UserStatus.java",
+      "upstream_sha256": "6427767bb403d4c5ee1ad5e1c38a6953ce2884866d00a62562ddbcb7e545fac9",
+      "import_sha256": "6427767bb403d4c5ee1ad5e1c38a6953ce2884866d00a62562ddbcb7e545fac9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/infrastructure/persistence/LoginSessionRepository.java",
+      "upstream_sha256": "36e78c5f465eb026cbf424123a7bf4609dfd556361f0cb535ad51a51aec612b2",
+      "import_sha256": "36e78c5f465eb026cbf424123a7bf4609dfd556361f0cb535ad51a51aec612b2",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/infrastructure/persistence/PasswordResetTokenRepository.java",
+      "upstream_sha256": "29a8204efface74f252742ba5568554640cccbe80f456a371bec7d1710bb1fe1",
+      "import_sha256": "29a8204efface74f252742ba5568554640cccbe80f456a371bec7d1710bb1fe1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/infrastructure/persistence/RefreshTokenRepository.java",
+      "upstream_sha256": "1c51b2bf5b196311218b11632ad7cc41334b84c016c0e3b0ca9fb04bb11c3f2c",
+      "import_sha256": "1c51b2bf5b196311218b11632ad7cc41334b84c016c0e3b0ca9fb04bb11c3f2c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/infrastructure/persistence/RoleRepository.java",
+      "upstream_sha256": "25fba5b859fa6eb616d08e657c3ff313880a50a3426fb0b044594ff457fda95c",
+      "import_sha256": "25fba5b859fa6eb616d08e657c3ff313880a50a3426fb0b044594ff457fda95c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/infrastructure/persistence/UserRepository.java",
+      "upstream_sha256": "4360404ef37737512330a863301eb7e440dd7a1090f1226d56b914aaede3366f",
+      "import_sha256": "1a2fb51d21135adebc4dd0f00afdbde9bd2882ce8b5a3c150837b5c5e0d70ea5",
+      "local_patch": true
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/infrastructure/persistence/UserRoleRepository.java",
+      "upstream_sha256": "5cae1be061a0bb8de7bc3033e7325f65a314f8784562f576515f3f7fe204ea04",
+      "import_sha256": "5cae1be061a0bb8de7bc3033e7325f65a314f8784562f576515f3f7fe204ea04",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/web/AdminUserController.java",
+      "upstream_sha256": "a5a05200f07da42d792a3fca35b103635148aa222e292b674d1c4f13b3b97da4",
+      "import_sha256": "a5a05200f07da42d792a3fca35b103635148aa222e292b674d1c4f13b3b97da4",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/identity/web/UserDirectoryController.java",
+      "upstream_sha256": "29aa2012aff54a09eea03eb9c3a68614ed4ce9e31e4391578bf6955ccb084283",
+      "import_sha256": "29aa2012aff54a09eea03eb9c3a68614ed4ce9e31e4391578bf6955ccb084283",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/api/request/UpdateNotificationPreferenceItemRequest.java",
+      "upstream_sha256": "3a976d48f3efeb97a5991077882bdd39bd80e21b5b94e63ced77f2a438b9b917",
+      "import_sha256": "3a976d48f3efeb97a5991077882bdd39bd80e21b5b94e63ced77f2a438b9b917",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/api/request/UpdateNotificationPreferencesRequest.java",
+      "upstream_sha256": "92ef7c60712760fff3ee1360bf1c1dc6c8faa89609b7c3f8302680d7087d7ad0",
+      "import_sha256": "92ef7c60712760fff3ee1360bf1c1dc6c8faa89609b7c3f8302680d7087d7ad0",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/api/response/NotificationPreferenceItemResponse.java",
+      "upstream_sha256": "1d18f26bfbf5189993a8592b46f4489bb1303a9325a1813245819bdbf7734016",
+      "import_sha256": "1d18f26bfbf5189993a8592b46f4489bb1303a9325a1813245819bdbf7734016",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/api/response/NotificationPreferencesResponse.java",
+      "upstream_sha256": "0cd3c52184e92df92d1ee52e767796e27e6fa7caf957a4b1b299c83f736b12fa",
+      "import_sha256": "0cd3c52184e92df92d1ee52e767796e27e6fa7caf957a4b1b299c83f736b12fa",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/api/response/NotificationResponse.java",
+      "upstream_sha256": "4147eec7826548e64029b9a6bd8ac5da16edce689308c162812b0681974f2831",
+      "import_sha256": "4147eec7826548e64029b9a6bd8ac5da16edce689308c162812b0681974f2831",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/api/response/ReadAllNotificationsResponse.java",
+      "upstream_sha256": "21c457304f20587cf6dad2a2f3fafcb24bc9945fcbd93d78aaf0744d014e358c",
+      "import_sha256": "21c457304f20587cf6dad2a2f3fafcb24bc9945fcbd93d78aaf0744d014e358c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/api/response/UnreadCountResponse.java",
+      "upstream_sha256": "7943e19fbd1eb4c05634fb119b512d36742fc05494314350ddaa61b165a2c337",
+      "import_sha256": "7943e19fbd1eb4c05634fb119b512d36742fc05494314350ddaa61b165a2c337",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/application/NotificationApplicationService.java",
+      "upstream_sha256": "9ad8e0bd05bf1d0da042ee9c4e21060b9da4e23f590d636701e3daa2a5def24d",
+      "import_sha256": "9ad8e0bd05bf1d0da042ee9c4e21060b9da4e23f590d636701e3daa2a5def24d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/application/NotificationEventDispatcher.java",
+      "upstream_sha256": "6862f65bb8cbfddb642e7348eea1156c723d5e5758bf42fcc63640bec30b1d13",
+      "import_sha256": "6862f65bb8cbfddb642e7348eea1156c723d5e5758bf42fcc63640bec30b1d13",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/application/TaskDeadlineScanner.java",
+      "upstream_sha256": "8be35167d75a07291db07542d9b080daf949eea78ce523922dde4248417023f3",
+      "import_sha256": "8be35167d75a07291db07542d9b080daf949eea78ce523922dde4248417023f3",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/domain/Notification.java",
+      "upstream_sha256": "df8de347fd47ec1076c7789c91cdb6fd17b560214661cf505e9828a584e07164",
+      "import_sha256": "df8de347fd47ec1076c7789c91cdb6fd17b560214661cf505e9828a584e07164",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/domain/NotificationPreference.java",
+      "upstream_sha256": "836825af3b5681af6ce091f6d7ff070419296d9f30274790653ed3ab0073d4c7",
+      "import_sha256": "836825af3b5681af6ce091f6d7ff070419296d9f30274790653ed3ab0073d4c7",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/domain/NotificationReferenceType.java",
+      "upstream_sha256": "77864517037567592a573f0bfe74038a9f60660cc209560e3284b008fb01636a",
+      "import_sha256": "77864517037567592a573f0bfe74038a9f60660cc209560e3284b008fb01636a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/domain/NotificationType.java",
+      "upstream_sha256": "4a5a7ade4ec293f4438f5af3f448049807fea541d40aed0186a6b416bbe02019",
+      "import_sha256": "4a5a7ade4ec293f4438f5af3f448049807fea541d40aed0186a6b416bbe02019",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/infrastructure/persistence/NotificationPreferenceRepository.java",
+      "upstream_sha256": "eb317d44cb021f4b6741b223092e6b9465f235c349e7f89634b463338423909e",
+      "import_sha256": "eb317d44cb021f4b6741b223092e6b9465f235c349e7f89634b463338423909e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/infrastructure/persistence/NotificationRepository.java",
+      "upstream_sha256": "d48f6202afbee46428459e471270ed42cfda65b38101b8dcb24e9d5aab589bc8",
+      "import_sha256": "d48f6202afbee46428459e471270ed42cfda65b38101b8dcb24e9d5aab589bc8",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/notification/web/NotificationController.java",
+      "upstream_sha256": "888cc47c5e101af3baa87ae0d2e69d01247cc7ffa14864687c13b01d462e760b",
+      "import_sha256": "888cc47c5e101af3baa87ae0d2e69d01247cc7ffa14864687c13b01d462e760b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/api/request/CreateDepartmentRequest.java",
+      "upstream_sha256": "4bfbaa38d80984d9657844c9aef40947fd08dd74b0436ba9b4a4284d8b1bffe5",
+      "import_sha256": "4bfbaa38d80984d9657844c9aef40947fd08dd74b0436ba9b4a4284d8b1bffe5",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/api/request/UpdateDepartmentRequest.java",
+      "upstream_sha256": "2f1b7349cacf2bb2d2abb442c20d4d9c7ff2b07f2f6f9d5b0b222d89b3967f03",
+      "import_sha256": "2f1b7349cacf2bb2d2abb442c20d4d9c7ff2b07f2f6f9d5b0b222d89b3967f03",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/api/response/DepartmentResponse.java",
+      "upstream_sha256": "a3e228e7b6fa5b907b5ab0c347ae272cfa2b5f28d3f8a7e53e20e2718f0403d8",
+      "import_sha256": "a3e228e7b6fa5b907b5ab0c347ae272cfa2b5f28d3f8a7e53e20e2718f0403d8",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/application/DepartmentApplicationService.java",
+      "upstream_sha256": "a39605996a1a090a84f619ff6c0fcfef646dce28990e5d56b450b771efadc70a",
+      "import_sha256": "a39605996a1a090a84f619ff6c0fcfef646dce28990e5d56b450b771efadc70a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/application/TeamApplicationService.java",
+      "upstream_sha256": "a1ef464b018b6d944948c7e1ed1d36d6d94aef86a6d718b824991c0daa264473",
+      "import_sha256": "a1ef464b018b6d944948c7e1ed1d36d6d94aef86a6d718b824991c0daa264473",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/domain/Department.java",
+      "upstream_sha256": "5aea68dc750c0f27602928c19094bcbc4f3984888dbc5b4f8b76417f133f6f68",
+      "import_sha256": "5aea68dc750c0f27602928c19094bcbc4f3984888dbc5b4f8b76417f133f6f68",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/domain/Team.java",
+      "upstream_sha256": "293eca22147ca1d6d2a6382438149d1183afbb5727e48029d33068fa2ccf8e37",
+      "import_sha256": "293eca22147ca1d6d2a6382438149d1183afbb5727e48029d33068fa2ccf8e37",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/domain/TeamMember.java",
+      "upstream_sha256": "f3763aa3d8692cd8df3165a4ce7010a2b4df74adab07bc7762afcb60c757b66b",
+      "import_sha256": "f3763aa3d8692cd8df3165a4ce7010a2b4df74adab07bc7762afcb60c757b66b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/infrastructure/persistence/DepartmentRepository.java",
+      "upstream_sha256": "61409f60f7d2dd03af499ed8139e0592719334989e275b474f1eb04bf66d2d3d",
+      "import_sha256": "61409f60f7d2dd03af499ed8139e0592719334989e275b474f1eb04bf66d2d3d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/infrastructure/persistence/TeamMemberRepository.java",
+      "upstream_sha256": "a400a8674d35be6d6a02ffea146abfd7db3bd449928d9bd1de3e187bfaa18f5a",
+      "import_sha256": "a400a8674d35be6d6a02ffea146abfd7db3bd449928d9bd1de3e187bfaa18f5a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/infrastructure/persistence/TeamRepository.java",
+      "upstream_sha256": "336154ebfa70cfae73320bcc9f6e85cc122985ad3d6946991d94346ee6496789",
+      "import_sha256": "336154ebfa70cfae73320bcc9f6e85cc122985ad3d6946991d94346ee6496789",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/organization/web/DepartmentController.java",
+      "upstream_sha256": "002d1581ab1189cc2ba2c3472e577f5580c9137957fb3f83ad491bfae886332c",
+      "import_sha256": "002d1581ab1189cc2ba2c3472e577f5580c9137957fb3f83ad491bfae886332c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/request/AddProjectMemberRequest.java",
+      "upstream_sha256": "d5e15f2883705681fb005c6913a11559331671f8fd72246d42d5a847eb9df30d",
+      "import_sha256": "d5e15f2883705681fb005c6913a11559331671f8fd72246d42d5a847eb9df30d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/request/ChangeProjectStatusRequest.java",
+      "upstream_sha256": "1fd4a7070f8135e7c3dfc8e5780b940998fe6f34e7703d63bc37fee37fb5d75f",
+      "import_sha256": "1fd4a7070f8135e7c3dfc8e5780b940998fe6f34e7703d63bc37fee37fb5d75f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/request/CreateMilestoneRequest.java",
+      "upstream_sha256": "4223a93dcb247c22938acac76d609ddff8954a9285da4187cb0a781d577124fb",
+      "import_sha256": "4223a93dcb247c22938acac76d609ddff8954a9285da4187cb0a781d577124fb",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/request/CreateProjectRequest.java",
+      "upstream_sha256": "1fd21f2bdb03d141f152465dd7b0d147dd0fc9be60e59297497149a41f44a6f0",
+      "import_sha256": "1fd21f2bdb03d141f152465dd7b0d147dd0fc9be60e59297497149a41f44a6f0",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/request/UpdateProjectMemberRoleRequest.java",
+      "upstream_sha256": "a07964ce9bb2617a8c35b86cbc69035268f50431e81f135346fefed74c4e16bb",
+      "import_sha256": "a07964ce9bb2617a8c35b86cbc69035268f50431e81f135346fefed74c4e16bb",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/request/UpdateProjectRequest.java",
+      "upstream_sha256": "6218b78e25b2038f39ffdd578c8dd5f822360451de08e8814e93de6e6c17eeff",
+      "import_sha256": "6218b78e25b2038f39ffdd578c8dd5f822360451de08e8814e93de6e6c17eeff",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/response/MilestoneResponse.java",
+      "upstream_sha256": "248c1d7bb28dceef90139f97af7e7bbbbde48e5b8c42e5db1205b741f488ecba",
+      "import_sha256": "248c1d7bb28dceef90139f97af7e7bbbbde48e5b8c42e5db1205b741f488ecba",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/response/ProjectDetailResponse.java",
+      "upstream_sha256": "bda4eaa594d9f586d556f4329be4e46debfc55f05f324cae049888b816d43b05",
+      "import_sha256": "bda4eaa594d9f586d556f4329be4e46debfc55f05f324cae049888b816d43b05",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/response/ProjectMemberResponse.java",
+      "upstream_sha256": "9f04b7280e30ecf6c74f9bc0bf7cd1bd7188c1c898091186f384801118cfa728",
+      "import_sha256": "9f04b7280e30ecf6c74f9bc0bf7cd1bd7188c1c898091186f384801118cfa728",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/api/response/ProjectSummaryResponse.java",
+      "upstream_sha256": "139937b246a55d205a1da1b24a9e1857bd977fc000f39c43079a2c4c2c271543",
+      "import_sha256": "139937b246a55d205a1da1b24a9e1857bd977fc000f39c43079a2c4c2c271543",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/application/MilestoneApplicationService.java",
+      "upstream_sha256": "ec8ecf67c8c6a6fa7ded22b3b383b45f4e7fc947251c74e11606d7708bdce6be",
+      "import_sha256": "ec8ecf67c8c6a6fa7ded22b3b383b45f4e7fc947251c74e11606d7708bdce6be",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/application/ProjectApplicationService.java",
+      "upstream_sha256": "14687a1cb2bdd4095fc4feaccbc5da714c88570800768ba6bea4b639793cfdf0",
+      "import_sha256": "14687a1cb2bdd4095fc4feaccbc5da714c88570800768ba6bea4b639793cfdf0",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/application/ProjectMemberApplicationService.java",
+      "upstream_sha256": "be1ef4ef06f9286f45d6915adab55fa7eb08b7d4a62391f7db28e85818e04a6f",
+      "import_sha256": "be1ef4ef06f9286f45d6915adab55fa7eb08b7d4a62391f7db28e85818e04a6f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/Milestone.java",
+      "upstream_sha256": "bbb67773daaa4064022ad44ecf42b07b5020a02ae245117147d758a66c96be51",
+      "import_sha256": "bbb67773daaa4064022ad44ecf42b07b5020a02ae245117147d758a66c96be51",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/MilestoneStatus.java",
+      "upstream_sha256": "ab9a41657c904742c3a7ca76a968db7e09ccd1be01305ee7fcaafe63550d7b49",
+      "import_sha256": "ab9a41657c904742c3a7ca76a968db7e09ccd1be01305ee7fcaafe63550d7b49",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/Project.java",
+      "upstream_sha256": "0e3253840e89a3e5a04f226ee5b54fa47288f1e48234500ab2964e9191327868",
+      "import_sha256": "0e3253840e89a3e5a04f226ee5b54fa47288f1e48234500ab2964e9191327868",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/ProjectMember.java",
+      "upstream_sha256": "1e6f5ee77514dba0fe9956a9350f47ba22cbf214a2b8b5df3a0bcc3cbc042c4e",
+      "import_sha256": "1e6f5ee77514dba0fe9956a9350f47ba22cbf214a2b8b5df3a0bcc3cbc042c4e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/ProjectPriority.java",
+      "upstream_sha256": "b2b0901056eb5c36c6ddccfb00764a0ac794a68c0ba31da25e4aa45256e1f226",
+      "import_sha256": "b2b0901056eb5c36c6ddccfb00764a0ac794a68c0ba31da25e4aa45256e1f226",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/ProjectRole.java",
+      "upstream_sha256": "dba5ec9b12ef47d91b8e206d1ec91f418064ed2a31e8eb89276ba3eedf8cf8de",
+      "import_sha256": "dba5ec9b12ef47d91b8e206d1ec91f418064ed2a31e8eb89276ba3eedf8cf8de",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/ProjectStatus.java",
+      "upstream_sha256": "8db1f3aa81ae6a96d5e6779b8d6c42ef47ba031e80e5f76806de79ad20cfa916",
+      "import_sha256": "8db1f3aa81ae6a96d5e6779b8d6c42ef47ba031e80e5f76806de79ad20cfa916",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/domain/ProjectStatusHistory.java",
+      "upstream_sha256": "c35cba50dc117e4cda07083bcef69ffbf45c0aff9be99577cbee2603f9889b17",
+      "import_sha256": "c35cba50dc117e4cda07083bcef69ffbf45c0aff9be99577cbee2603f9889b17",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/infrastructure/persistence/MilestoneRepository.java",
+      "upstream_sha256": "63c1e8fe9b310475cf8e33b012c77ea53841aab6d473240abc978f441805cec8",
+      "import_sha256": "63c1e8fe9b310475cf8e33b012c77ea53841aab6d473240abc978f441805cec8",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/infrastructure/persistence/ProjectMemberRepository.java",
+      "upstream_sha256": "8891640bcea5556ab4139347752aef7f3157ef5500dbd1972116bc7701d325bb",
+      "import_sha256": "8891640bcea5556ab4139347752aef7f3157ef5500dbd1972116bc7701d325bb",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/infrastructure/persistence/ProjectRepository.java",
+      "upstream_sha256": "f0908ba89e875890301bf7fc626d34ce9597e2a7c5a6e0a73a7c8442313f6580",
+      "import_sha256": "f0908ba89e875890301bf7fc626d34ce9597e2a7c5a6e0a73a7c8442313f6580",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/infrastructure/persistence/ProjectStatusHistoryRepository.java",
+      "upstream_sha256": "fec45226aaf5f72ee59e1f157cb48c375ed2fade08b4895675ac35c6e928d839",
+      "import_sha256": "fec45226aaf5f72ee59e1f157cb48c375ed2fade08b4895675ac35c6e928d839",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/project/web/ProjectController.java",
+      "upstream_sha256": "4484d3efa51706d466687575e71b0486d62802afaabbb707d141d19411e35322",
+      "import_sha256": "4484d3efa51706d466687575e71b0486d62802afaabbb707d141d19411e35322",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/AssignServiceRequestRequest.java",
+      "upstream_sha256": "51924bc659b4fe9b938d435758f4fe425ebab62fc06182572f4ed2ad62c1a9f1",
+      "import_sha256": "51924bc659b4fe9b938d435758f4fe425ebab62fc06182572f4ed2ad62c1a9f1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/CreateServiceCategoryRequest.java",
+      "upstream_sha256": "e8ae4ceb61d2ecbb9585b21a736a7cb27a7e5167d5ec450c238a28d3f03bbe50",
+      "import_sha256": "e8ae4ceb61d2ecbb9585b21a736a7cb27a7e5167d5ec450c238a28d3f03bbe50",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/CreateServiceCommentRequest.java",
+      "upstream_sha256": "f99d4776cd40b35cec7642a99825e6e9fec140347a336f4c6c88b15baf421084",
+      "import_sha256": "f99d4776cd40b35cec7642a99825e6e9fec140347a336f4c6c88b15baf421084",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/CreateServiceRatingRequest.java",
+      "upstream_sha256": "4fcaf88ddbb33c0392abac2cad60f305eda0e13bff1a4ffeff186ac581ea7c6a",
+      "import_sha256": "4fcaf88ddbb33c0392abac2cad60f305eda0e13bff1a4ffeff186ac581ea7c6a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/CreateServiceRequestRequest.java",
+      "upstream_sha256": "319fa0e8f87af99258c868635a2cb4911645916751c1315cb0dbe82555b4928b",
+      "import_sha256": "319fa0e8f87af99258c868635a2cb4911645916751c1315cb0dbe82555b4928b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/RejectResolutionRequest.java",
+      "upstream_sha256": "59c7838ea372ac1c00d5d0bb0fe4bda34b461f25fd1f36fa91e725f9bd1d7be9",
+      "import_sha256": "59c7838ea372ac1c00d5d0bb0fe4bda34b461f25fd1f36fa91e725f9bd1d7be9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/UpdateServiceCategoryRequest.java",
+      "upstream_sha256": "b5fa393ba4975e8eefe1254579cda785e239648ece50cb4420f5e73a6d28d735",
+      "import_sha256": "b5fa393ba4975e8eefe1254579cda785e239648ece50cb4420f5e73a6d28d735",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/UpdateServiceRequestRequest.java",
+      "upstream_sha256": "91193b02d4d2ac3a0f64f2c358f1247c259840de9732a3a875bc641be1fb9410",
+      "import_sha256": "91193b02d4d2ac3a0f64f2c358f1247c259840de9732a3a875bc641be1fb9410",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/request/UpdateServiceRequestStatusRequest.java",
+      "upstream_sha256": "27e27e62261f7670b5286ed051b2c69675ab676daacfd2403fd14707aeeb13d9",
+      "import_sha256": "27e27e62261f7670b5286ed051b2c69675ab676daacfd2403fd14707aeeb13d9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/CreateServiceRequestResponse.java",
+      "upstream_sha256": "3260e9577e936eb693d999e0e3bb08b29f26aa157adfb552e0f8debf68908e56",
+      "import_sha256": "3260e9577e936eb693d999e0e3bb08b29f26aa157adfb552e0f8debf68908e56",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/ServiceAttachmentResponse.java",
+      "upstream_sha256": "1e2f18754d6d546d7eccf111f55e8b485ef7ad454c7a225e7dbece4b38edd138",
+      "import_sha256": "1e2f18754d6d546d7eccf111f55e8b485ef7ad454c7a225e7dbece4b38edd138",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/ServiceCategoryResponse.java",
+      "upstream_sha256": "717f3a539e7bf4752b10152116e89f9665b419f11115c0d675817d8baaba344e",
+      "import_sha256": "717f3a539e7bf4752b10152116e89f9665b419f11115c0d675817d8baaba344e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/ServiceCommentResponse.java",
+      "upstream_sha256": "9f6b2828f0541c94ab699fdea12ff6cc2b8dfca5276bdd317733eb99824bed92",
+      "import_sha256": "9f6b2828f0541c94ab699fdea12ff6cc2b8dfca5276bdd317733eb99824bed92",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/ServiceRatingResponse.java",
+      "upstream_sha256": "a20840acf592b2dca1693eb38ef0da393041e250cc6d29839a2b2f5fe5080790",
+      "import_sha256": "a20840acf592b2dca1693eb38ef0da393041e250cc6d29839a2b2f5fe5080790",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/ServiceRequestDetailResponse.java",
+      "upstream_sha256": "e7e90cd6c72d2362a9492162b4cbafec8ff156f24ad813d9b0395ae2fb69c1de",
+      "import_sha256": "e7e90cd6c72d2362a9492162b4cbafec8ff156f24ad813d9b0395ae2fb69c1de",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/ServiceRequestSummaryResponse.java",
+      "upstream_sha256": "fd2fddca40b0651d39ddca11c6abefba5e26112b802f13caf767904cd46ad514",
+      "import_sha256": "fd2fddca40b0651d39ddca11c6abefba5e26112b802f13caf767904cd46ad514",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/api/response/ServiceStatusHistoryResponse.java",
+      "upstream_sha256": "e68e53b0532533ebc76434e7e18b44cdecf46773ee758a0c018917509799c6a1",
+      "import_sha256": "e68e53b0532533ebc76434e7e18b44cdecf46773ee758a0c018917509799c6a1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/application/ServiceCategoryApplicationService.java",
+      "upstream_sha256": "e8bb917074707ca193ccea96872b9be46b6a0e09f58831edcf0df5c547fa2d47",
+      "import_sha256": "e8bb917074707ca193ccea96872b9be46b6a0e09f58831edcf0df5c547fa2d47",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/application/ServiceRequestApplicationService.java",
+      "upstream_sha256": "89141fd9c07ec5add4549c2e8cbd8ae575474ad9946e73c444aae09a106906d9",
+      "import_sha256": "89141fd9c07ec5add4549c2e8cbd8ae575474ad9946e73c444aae09a106906d9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceAssignment.java",
+      "upstream_sha256": "61b0ac7ba4b4e84bc07a419e8e5adb01ccd130deb8da1467721f6e7af6074a03",
+      "import_sha256": "61b0ac7ba4b4e84bc07a419e8e5adb01ccd130deb8da1467721f6e7af6074a03",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceAttachment.java",
+      "upstream_sha256": "cd917e137ad76c3c8b6acbdd162eb343e0c7c16e92b7aa33d4ad801f831a7674",
+      "import_sha256": "cd917e137ad76c3c8b6acbdd162eb343e0c7c16e92b7aa33d4ad801f831a7674",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceCategory.java",
+      "upstream_sha256": "350f51e396ddf2cccecd58f575b6bb882f34dba285966179b7021ca19ad424f9",
+      "import_sha256": "350f51e396ddf2cccecd58f575b6bb882f34dba285966179b7021ca19ad424f9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceComment.java",
+      "upstream_sha256": "421dca6abfc53db278a1ce5769353d4954271aea5dece5c8805f74c6c4c8631b",
+      "import_sha256": "421dca6abfc53db278a1ce5769353d4954271aea5dece5c8805f74c6c4c8631b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServicePriority.java",
+      "upstream_sha256": "12fc3bee9a338309e07dedfff231f71bed6697593f9ddad49f5935f9859ea68e",
+      "import_sha256": "12fc3bee9a338309e07dedfff231f71bed6697593f9ddad49f5935f9859ea68e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceRating.java",
+      "upstream_sha256": "b2695b5613c610c6b2a0fefab743abdd215426bcca6ef718150353eb15fd5d53",
+      "import_sha256": "b2695b5613c610c6b2a0fefab743abdd215426bcca6ef718150353eb15fd5d53",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceRequest.java",
+      "upstream_sha256": "609fbf35ec971056ba8a7892351a428c993aa785f92fd8ac41d26aa201d3b5f1",
+      "import_sha256": "609fbf35ec971056ba8a7892351a428c993aa785f92fd8ac41d26aa201d3b5f1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceStatus.java",
+      "upstream_sha256": "b608cf3b88971da0606957dc8c668441d55fe6ce7b87ae93ce2b42598d2859fc",
+      "import_sha256": "b608cf3b88971da0606957dc8c668441d55fe6ce7b87ae93ce2b42598d2859fc",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/domain/ServiceStatusHistory.java",
+      "upstream_sha256": "df212feb4d6975cd94ed68324f538e4e6a0dfcec4245077f768af5d4311f1ec3",
+      "import_sha256": "df212feb4d6975cd94ed68324f538e4e6a0dfcec4245077f768af5d4311f1ec3",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/infrastructure/persistence/ServiceAssignmentRepository.java",
+      "upstream_sha256": "bbceb87c2cdabf98e9b112d4cc03566789d0a0967113f8ecc82c3ca6da2c7ba0",
+      "import_sha256": "bbceb87c2cdabf98e9b112d4cc03566789d0a0967113f8ecc82c3ca6da2c7ba0",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/infrastructure/persistence/ServiceAttachmentRepository.java",
+      "upstream_sha256": "5f2bb77df0ca25443a110653e75911d31d81e1543f84d6ae3d5c9e2f8242e0f1",
+      "import_sha256": "5f2bb77df0ca25443a110653e75911d31d81e1543f84d6ae3d5c9e2f8242e0f1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/infrastructure/persistence/ServiceCategoryRepository.java",
+      "upstream_sha256": "466f2dacb42d4a991c48703ac79a8dc1a4a73562b54b63205a6c54b758078b9c",
+      "import_sha256": "466f2dacb42d4a991c48703ac79a8dc1a4a73562b54b63205a6c54b758078b9c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/infrastructure/persistence/ServiceCommentRepository.java",
+      "upstream_sha256": "25882a2447d71c75fc53c3496e4eb74ee8a06c463f508530f5fb8ae5fc1ac9dc",
+      "import_sha256": "25882a2447d71c75fc53c3496e4eb74ee8a06c463f508530f5fb8ae5fc1ac9dc",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/infrastructure/persistence/ServiceRatingRepository.java",
+      "upstream_sha256": "9ee83c251a891ec945821839ad6018c911abd7ae0b2c34e0dc3b4e9076d3bd74",
+      "import_sha256": "9ee83c251a891ec945821839ad6018c911abd7ae0b2c34e0dc3b4e9076d3bd74",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/infrastructure/persistence/ServiceRequestRepository.java",
+      "upstream_sha256": "2b9bef071d7981479d9f747fd16823d0d22b32dfe9a47114cffee964ba2a3a40",
+      "import_sha256": "2b9bef071d7981479d9f747fd16823d0d22b32dfe9a47114cffee964ba2a3a40",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/infrastructure/persistence/ServiceStatusHistoryRepository.java",
+      "upstream_sha256": "e63b7f4d0e103f0ceaedaaa33cfd4061f48e43f95618e09168a1be46b603edb1",
+      "import_sha256": "e63b7f4d0e103f0ceaedaaa33cfd4061f48e43f95618e09168a1be46b603edb1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/web/ServiceCategoryController.java",
+      "upstream_sha256": "585047487c2a6e5d7a4c1cf79c3797ad6b906fa0d43429ed49b5290c3231656f",
+      "import_sha256": "585047487c2a6e5d7a4c1cf79c3797ad6b906fa0d43429ed49b5290c3231656f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/service_request/web/ServiceRequestController.java",
+      "upstream_sha256": "798ac257184b577ad61b535ed019e255fd924cd6ba40f0793a9b016a52098e6d",
+      "import_sha256": "798ac257184b577ad61b535ed019e255fd924cd6ba40f0793a9b016a52098e6d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/config/DateTimeConfig.java",
+      "upstream_sha256": "bfb2fd4ec352f0275a77d4cc5a894ed9b9cd4b61299bfc9baf5812e26eec906e",
+      "import_sha256": "bfb2fd4ec352f0275a77d4cc5a894ed9b9cd4b61299bfc9baf5812e26eec906e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/config/SecurityConfig.java",
+      "upstream_sha256": "ddb871c44fc3d085e202aef1210edd0a5fa04bf801b16293c72f64110d1ef223",
+      "import_sha256": "ddb871c44fc3d085e202aef1210edd0a5fa04bf801b16293c72f64110d1ef223",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/exception/BusinessRuleException.java",
+      "upstream_sha256": "48c6557db26a7d824646347fa730c2f24253e672e75549f1064aedaf2988248a",
+      "import_sha256": "48c6557db26a7d824646347fa730c2f24253e672e75549f1064aedaf2988248a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/exception/GlobalExceptionHandler.java",
+      "upstream_sha256": "0bd1d628e5ae892e5c22e7c26ea74abdcef0a377b157dceac68ea541107bbdd1",
+      "import_sha256": "0bd1d628e5ae892e5c22e7c26ea74abdcef0a377b157dceac68ea541107bbdd1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/exception/ResourceNotFoundException.java",
+      "upstream_sha256": "1a573747d517ea77a121487e1d359e9eb2ba75fdc23a9433e4ae47731e6b72e2",
+      "import_sha256": "1a573747d517ea77a121487e1d359e9eb2ba75fdc23a9433e4ae47731e6b72e2",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/response/ApiResponse.java",
+      "upstream_sha256": "7fa6c55209c0882c053d68b4b8c021c7cff0f62815c4559dae813560e427b8f2",
+      "import_sha256": "7fa6c55209c0882c053d68b4b8c021c7cff0f62815c4559dae813560e427b8f2",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/response/PagedData.java",
+      "upstream_sha256": "092f78d25675c139055b541567e9ac5ddc22938c6baf92d808aab0144966c5ed",
+      "import_sha256": "092f78d25675c139055b541567e9ac5ddc22938c6baf92d808aab0144966c5ed",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/security/JwtAuthenticationException.java",
+      "upstream_sha256": "846d81b08d2706c80bd1d2fe7055bac6c8d1e6f4fdb6c176cff0c5350e252a35",
+      "import_sha256": "846d81b08d2706c80bd1d2fe7055bac6c8d1e6f4fdb6c176cff0c5350e252a35",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/security/JwtAuthenticationFilter.java",
+      "upstream_sha256": "1d77c19d97ca091b09633b7ea30161baa0e11e15c3c8e60a2eff1d7184af4bb6",
+      "import_sha256": "1d77c19d97ca091b09633b7ea30161baa0e11e15c3c8e60a2eff1d7184af4bb6",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/security/JwtService.java",
+      "upstream_sha256": "7bc9b2f35ae1b0d379ac4d37f32ab68ec4c88484c6544743809251836679d7b8",
+      "import_sha256": "7bc9b2f35ae1b0d379ac4d37f32ab68ec4c88484c6544743809251836679d7b8",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/security/WorkSphereAccessDeniedHandler.java",
+      "upstream_sha256": "bfc19decec49cb88b4bc3727182734bef574cd2c4597f56bd2d840f40b207475",
+      "import_sha256": "bfc19decec49cb88b4bc3727182734bef574cd2c4597f56bd2d840f40b207475",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/security/WorkSphereAuthEntryPoint.java",
+      "upstream_sha256": "800f5b88267528e5f96c3924e776d98bffee42fccfd169af12fa8116fb172895",
+      "import_sha256": "800f5b88267528e5f96c3924e776d98bffee42fccfd169af12fa8116fb172895",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/shared/security/WorkSphereUserPrincipal.java",
+      "upstream_sha256": "7bb58766f0071feb35eb3a9e4b3c44b7d4fe7e45b15eb0fb3410811469c5107c",
+      "import_sha256": "7bb58766f0071feb35eb3a9e4b3c44b7d4fe7e45b15eb0fb3410811469c5107c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/AssignTaskRequest.java",
+      "upstream_sha256": "5652d556ac4b72a19d3c8b3b0ccd5249febcf88ae4926e08e883a784139b3c22",
+      "import_sha256": "5652d556ac4b72a19d3c8b3b0ccd5249febcf88ae4926e08e883a784139b3c22",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/ChangeTaskStatusRequest.java",
+      "upstream_sha256": "6f6428737ba881e1ba7992ca181a7b882d467e07e2bc73c23be955519a6ffe6d",
+      "import_sha256": "6f6428737ba881e1ba7992ca181a7b882d467e07e2bc73c23be955519a6ffe6d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/CreateSubtaskRequest.java",
+      "upstream_sha256": "01c710e6d8f76df224e2ebe43953e5cbfb3534f7f20a51ff55cc6f6ecc1d3907",
+      "import_sha256": "01c710e6d8f76df224e2ebe43953e5cbfb3534f7f20a51ff55cc6f6ecc1d3907",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/CreateTaskCommentRequest.java",
+      "upstream_sha256": "693354d3e753b86e7e2aabb7523a989c444fea0c2c6e0c7cdcad1974c883ff7a",
+      "import_sha256": "693354d3e753b86e7e2aabb7523a989c444fea0c2c6e0c7cdcad1974c883ff7a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/CreateTaskRequest.java",
+      "upstream_sha256": "81cae322d5ab50c94effbf6f8b81253b8450f910a670d97b26012eebe58968e0",
+      "import_sha256": "81cae322d5ab50c94effbf6f8b81253b8450f910a670d97b26012eebe58968e0",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/UpdateTaskCommentRequest.java",
+      "upstream_sha256": "7714c495623c84e9fb7dd86db922794d32b4fcb2c8657fd4c4b6560d35edc0c1",
+      "import_sha256": "7714c495623c84e9fb7dd86db922794d32b4fcb2c8657fd4c4b6560d35edc0c1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/UpdateTaskProgressRequest.java",
+      "upstream_sha256": "d7f66631ebbe001e0d1ea679410873a04a6e3f184b5e17054e188d8bf5cb2fc2",
+      "import_sha256": "d7f66631ebbe001e0d1ea679410873a04a6e3f184b5e17054e188d8bf5cb2fc2",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/request/UpdateTaskRequest.java",
+      "upstream_sha256": "79e35049573135b5a02ca9b995d80cc16d59096a5d25cf81bdd1e86b78337955",
+      "import_sha256": "79e35049573135b5a02ca9b995d80cc16d59096a5d25cf81bdd1e86b78337955",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/response/TaskCommentResponse.java",
+      "upstream_sha256": "c73f3686ce4fb7efc161bf9e71c92a2d5257ffa55a9ef206a6e6b725731b1b22",
+      "import_sha256": "c73f3686ce4fb7efc161bf9e71c92a2d5257ffa55a9ef206a6e6b725731b1b22",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/response/TaskDetailResponse.java",
+      "upstream_sha256": "d66e929ab0a17463447a6c1eaee6f1aaf8ddfb85350189de4656a75fceaa7559",
+      "import_sha256": "d66e929ab0a17463447a6c1eaee6f1aaf8ddfb85350189de4656a75fceaa7559",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/response/TaskStatusHistoryResponse.java",
+      "upstream_sha256": "bf7730e23dcc8fa06dbcb61648fe54aa72d91331e4a274a9235c55ca04abafef",
+      "import_sha256": "bf7730e23dcc8fa06dbcb61648fe54aa72d91331e4a274a9235c55ca04abafef",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/api/response/TaskSummaryResponse.java",
+      "upstream_sha256": "2777543599ae87f23e37ac941661966755a38b682a7dd5b003e10a64329a1c9b",
+      "import_sha256": "2777543599ae87f23e37ac941661966755a38b682a7dd5b003e10a64329a1c9b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/application/TaskApplicationService.java",
+      "upstream_sha256": "74c87cd58a054452a657f4acc0ef3799a33f9d5cc9024780027e5c956ec0fb49",
+      "import_sha256": "74c87cd58a054452a657f4acc0ef3799a33f9d5cc9024780027e5c956ec0fb49",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/application/TaskCommentApplicationService.java",
+      "upstream_sha256": "b7bfc3cb582baa8eae6406cf4c724b29a6e121cf7b83fc6e2a424c82c744809f",
+      "import_sha256": "b7bfc3cb582baa8eae6406cf4c724b29a6e121cf7b83fc6e2a424c82c744809f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/domain/Task.java",
+      "upstream_sha256": "5e191c6b7b5d8a6030251f015259c6ed3f183828ed5d4f58aac9b329a14d5c45",
+      "import_sha256": "5e191c6b7b5d8a6030251f015259c6ed3f183828ed5d4f58aac9b329a14d5c45",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/domain/TaskAssignment.java",
+      "upstream_sha256": "ce76583b3763b22a1688a35640604da1c398e39ce2cb627c9c094e77e666eb5f",
+      "import_sha256": "ce76583b3763b22a1688a35640604da1c398e39ce2cb627c9c094e77e666eb5f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/domain/TaskAttachment.java",
+      "upstream_sha256": "7311628684c5863edf99c431a59ec27345f78e8a10d08d1570aca726bc4a795d",
+      "import_sha256": "7311628684c5863edf99c431a59ec27345f78e8a10d08d1570aca726bc4a795d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/domain/TaskComment.java",
+      "upstream_sha256": "86db305092ec23badb6fc2d16de6fe7af5b9d2d5d8aedd2548fd0e23c5b6e89c",
+      "import_sha256": "86db305092ec23badb6fc2d16de6fe7af5b9d2d5d8aedd2548fd0e23c5b6e89c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/domain/TaskPriority.java",
+      "upstream_sha256": "0d3869483af2ffce146c47d2b7483be859a0eb27f9cb6c6975049b4e2c62428d",
+      "import_sha256": "0d3869483af2ffce146c47d2b7483be859a0eb27f9cb6c6975049b4e2c62428d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/domain/TaskStatus.java",
+      "upstream_sha256": "f61495fac83aef98280d591b860c761fe99f0c87651e48fab8d7f70a1738f9f5",
+      "import_sha256": "f61495fac83aef98280d591b860c761fe99f0c87651e48fab8d7f70a1738f9f5",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/domain/TaskStatusHistory.java",
+      "upstream_sha256": "23a5e3a17cbfc8a3ec4a7c701d484fd029174b19e6223fc171766e99cb5f8b78",
+      "import_sha256": "23a5e3a17cbfc8a3ec4a7c701d484fd029174b19e6223fc171766e99cb5f8b78",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/infrastructure/TaskFlywayConfiguration.java",
+      "upstream_sha256": "762e4556dd13f26c00bf6010c7fd421a367096fb951955eb6f476f4a99b8cfc2",
+      "import_sha256": "762e4556dd13f26c00bf6010c7fd421a367096fb951955eb6f476f4a99b8cfc2",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/infrastructure/persistence/TaskAssignmentRepository.java",
+      "upstream_sha256": "e47d5794c60546828fb819f28e5df6fd154fe08fa6dfe5e4aa99d3f83ade3699",
+      "import_sha256": "e47d5794c60546828fb819f28e5df6fd154fe08fa6dfe5e4aa99d3f83ade3699",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/infrastructure/persistence/TaskAttachmentRepository.java",
+      "upstream_sha256": "2b7474278046b5ce7f4dd14de7a886bb7b7d50c53af60e1c39604adfd15a0033",
+      "import_sha256": "2b7474278046b5ce7f4dd14de7a886bb7b7d50c53af60e1c39604adfd15a0033",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/infrastructure/persistence/TaskCommentRepository.java",
+      "upstream_sha256": "bbe688037c2627d508504f8abe68fd6f67a7a7ce7f7a21f42881d49ed903311a",
+      "import_sha256": "bbe688037c2627d508504f8abe68fd6f67a7a7ce7f7a21f42881d49ed903311a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/infrastructure/persistence/TaskRepository.java",
+      "upstream_sha256": "e3a5fc4f9038ee27413a328d70926989a98fe584e9128959e7fb154c6f76538d",
+      "import_sha256": "e3a5fc4f9038ee27413a328d70926989a98fe584e9128959e7fb154c6f76538d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/infrastructure/persistence/TaskStatusHistoryRepository.java",
+      "upstream_sha256": "a987a8a08d57767a5d3c0a43079a6080995a6255331d5eb0f03ceb690ee6175f",
+      "import_sha256": "a987a8a08d57767a5d3c0a43079a6080995a6255331d5eb0f03ceb690ee6175f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/java/com/worksphere/task/web/TaskController.java",
+      "upstream_sha256": "07a1210b7d128f8e1d87ed6c8056972778ebc074e419462761bdeb5da8210b7f",
+      "import_sha256": "07a1210b7d128f8e1d87ed6c8056972778ebc074e419462761bdeb5da8210b7f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/application-dev.yml",
+      "upstream_sha256": "ba921418c487d03a78e4563fde5936b8ce78bfb8e70cd47f6018bdefcc53fc05",
+      "import_sha256": "ba921418c487d03a78e4563fde5936b8ce78bfb8e70cd47f6018bdefcc53fc05",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/application-test.yml",
+      "upstream_sha256": "efb309a9813b9ef7eae2353be936c7fcd40088a0b5a1e7acea5b298693888677",
+      "import_sha256": "efb309a9813b9ef7eae2353be936c7fcd40088a0b5a1e7acea5b298693888677",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/application.yml",
+      "upstream_sha256": "6c77074c5e75120422f32615183fb4b159d91659436a771702b1f8810a61921e",
+      "import_sha256": "6c77074c5e75120422f32615183fb4b159d91659436a771702b1f8810a61921e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V001__create_identity_tables.sql",
+      "upstream_sha256": "974d568ac008e2962bf2d02a18a8ce53198234f636e6f6d13f56ab360e566b2b",
+      "import_sha256": "974d568ac008e2962bf2d02a18a8ce53198234f636e6f6d13f56ab360e566b2b",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V002__create_organization_tables.sql",
+      "upstream_sha256": "f154e82d45bf05b0fbb319f5f77b280af250955b7909a06cfac350470283a715",
+      "import_sha256": "f154e82d45bf05b0fbb319f5f77b280af250955b7909a06cfac350470283a715",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V003__create_project_tables.sql",
+      "upstream_sha256": "bbad2f775b0225f58ddacf92cab63153ab0892a0d5de8ab3f7b21627d3be009e",
+      "import_sha256": "bbad2f775b0225f58ddacf92cab63153ab0892a0d5de8ab3f7b21627d3be009e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V004__create_file_tables.sql",
+      "upstream_sha256": "d0322826a3916bfddd830025135b8ea3179dfd6a93d32292a1817a1c0d4416a8",
+      "import_sha256": "d0322826a3916bfddd830025135b8ea3179dfd6a93d32292a1817a1c0d4416a8",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V005__create_task_tables.sql",
+      "upstream_sha256": "e00cd0370f39a05a4f19b28be078e5278212e9d197bd7af3c58a6dafe1876e3f",
+      "import_sha256": "e00cd0370f39a05a4f19b28be078e5278212e9d197bd7af3c58a6dafe1876e3f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V006__create_asset_tables.sql",
+      "upstream_sha256": "e4e91626192e2dfa7fd15f0ec2f74aceb68d490c14ef4254c49b45b61e3368fc",
+      "import_sha256": "e4e91626192e2dfa7fd15f0ec2f74aceb68d490c14ef4254c49b45b61e3368fc",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V007__create_service_request_tables.sql",
+      "upstream_sha256": "8e1ee1443680f287c2bfddd1fd859be88efe62f6e6504790ff62bd8c24d53347",
+      "import_sha256": "8e1ee1443680f287c2bfddd1fd859be88efe62f6e6504790ff62bd8c24d53347",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V008__create_notification_tables.sql",
+      "upstream_sha256": "e6129b5294933b91f387c01f3d35ffcaca7a96d6ebeb3296713cfa4423e99329",
+      "import_sha256": "e6129b5294933b91f387c01f3d35ffcaca7a96d6ebeb3296713cfa4423e99329",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V009__create_audit_tables.sql",
+      "upstream_sha256": "711f06e82ac6ce5489ee1ba381f2f7c2d2833632e697b1e8a1261fa1f54a8145",
+      "import_sha256": "711f06e82ac6ce5489ee1ba381f2f7c2d2833632e697b1e8a1261fa1f54a8145",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V010__create_deferred_foreign_keys_indexes_and_constraints.sql",
+      "upstream_sha256": "0cff71f347dca493b48acd4ad945f5b6a1326c3a963608f7f20a05180a7f8d65",
+      "import_sha256": "0cff71f347dca493b48acd4ad945f5b6a1326c3a963608f7f20a05180a7f8d65",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V011__seed_roles_and_permissions.sql",
+      "upstream_sha256": "29d9daa6c296eba05cb21c5db3dd4294148f8edff509d4c874e2b13232fe500e",
+      "import_sha256": "29d9daa6c296eba05cb21c5db3dd4294148f8edff509d4c874e2b13232fe500e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V012__add_active_task_assignment_uniqueness.sql",
+      "upstream_sha256": "7af68eb6fc85dcdb3df738fe55c78c751e964891b91bc2eac5893ae5afc5f260",
+      "import_sha256": "7af68eb6fc85dcdb3df738fe55c78c751e964891b91bc2eac5893ae5afc5f260",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V013__add_service_request_assignment_invariants.sql",
+      "upstream_sha256": "9748a447c0e03272ad32b358cdfb5ed6c9faa50b09d75bd237b8f553b633e019",
+      "import_sha256": "9748a447c0e03272ad32b358cdfb5ed6c9faa50b09d75bd237b8f553b633e019",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V014__seed_role_permissions.sql",
+      "upstream_sha256": "042038b64e4c3014920e9fc6e62c4ddc32cd58689feef92b8fea055fc9a775d1",
+      "import_sha256": "042038b64e4c3014920e9fc6e62c4ddc32cd58689feef92b8fea055fc9a775d1",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V015__correct_project_read_permissions_and_validate_role_matrix.sql",
+      "upstream_sha256": "76ea34ac13ef37ee0608cecc5e1a5e6965362f9820fcf876fc32565db94b3aec",
+      "import_sha256": "76ea34ac13ef37ee0608cecc5e1a5e6965362f9820fcf876fc32565db94b3aec",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V016__add_asset_assignment_and_category_invariants.sql",
+      "upstream_sha256": "bfee60c6a26ff2a6457aaf27da0c75f1a39c12ec8e44e7a14883f22cd2298201",
+      "import_sha256": "bfee60c6a26ff2a6457aaf27da0c75f1a39c12ec8e44e7a14883f22cd2298201",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V017__add_notification_idempotency_and_query_indexes.sql",
+      "upstream_sha256": "4aaaf714ac4a787374f01a38b331d19832cde711940d36760d64e1f1869d5406",
+      "import_sha256": "4aaaf714ac4a787374f01a38b331d19832cde711940d36760d64e1f1869d5406",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/BackendApplicationTests.java",
+      "upstream_sha256": "f74212f66b1ab41bdd36775ca4d492d713bf95b22ba5976420fc840111a29d81",
+      "import_sha256": "f74212f66b1ab41bdd36775ca4d492d713bf95b22ba5976420fc840111a29d81",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/MigrationIntegrationTest.java",
+      "upstream_sha256": "b7ca022f7eaaa8fcdfea3b8738cf5a40e446474a765beb205a658445984a5709",
+      "import_sha256": "b7ca022f7eaaa8fcdfea3b8738cf5a40e446474a765beb205a658445984a5709",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/asset/AssetAssignmentAndConcurrencyMockMvcTest.java",
+      "upstream_sha256": "222c188a9a8a0698487e8454eb6985aabbbbe2d326f28ba6091bff70d0508f10",
+      "import_sha256": "222c188a9a8a0698487e8454eb6985aabbbbe2d326f28ba6091bff70d0508f10",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/asset/AssetCategoryMockMvcTest.java",
+      "upstream_sha256": "289760b54fafcf723d9be4afc0117cb3a8220bb86412a7584761b2a044a6c201",
+      "import_sha256": "289760b54fafcf723d9be4afc0117cb3a8220bb86412a7584761b2a044a6c201",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/asset/AssetCoreMockMvcTest.java",
+      "upstream_sha256": "de3f46c4680b7002fc89fd7f5b9e4b6520618bd3709d6c512ffbe874c310a23e",
+      "import_sha256": "de3f46c4680b7002fc89fd7f5b9e4b6520618bd3709d6c512ffbe874c310a23e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/asset/AssetRepairHistoryMockMvcTest.java",
+      "upstream_sha256": "d7f6468a18f95b2cf8e42edf46002a7653deb1672f3089833e5adac3c60b5767",
+      "import_sha256": "d7f6468a18f95b2cf8e42edf46002a7653deb1672f3089833e5adac3c60b5767",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/asset/AssetServiceRequestIntegrationMockMvcTest.java",
+      "upstream_sha256": "c17683bd905e7b30d0cc0047dc4a0dc574a5521a00dc055224ef7a8a7a5c01e6",
+      "import_sha256": "c17683bd905e7b30d0cc0047dc4a0dc574a5521a00dc055224ef7a8a7a5c01e6",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/asset/V016MigrationTest.java",
+      "upstream_sha256": "0a71217bf75cdef54bde2bebdfb2a89da29dcd0af10440cc9f03ad2abbbc1e09",
+      "import_sha256": "0a71217bf75cdef54bde2bebdfb2a89da29dcd0af10440cc9f03ad2abbbc1e09",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/dashboard/DashboardMockMvcTest.java",
+      "upstream_sha256": "980fd847315df9e975741898cc31c5ca5715b9934d9783e5b53661ea32e5bb1d",
+      "import_sha256": "980fd847315df9e975741898cc31c5ca5715b9934d9783e5b53661ea32e5bb1d",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/file/FileMockMvcTest.java",
+      "upstream_sha256": "fda9903547eeb605e638cb38d923141d990067326ea05f0aade2233d129b8e62",
+      "import_sha256": "fda9903547eeb605e638cb38d923141d990067326ea05f0aade2233d129b8e62",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/file/application/FileApplicationServiceTest.java",
+      "upstream_sha256": "0738275c525f527ac0e335112e91899178454520a3753027091814fe72762cec",
+      "import_sha256": "0738275c525f527ac0e335112e91899178454520a3753027091814fe72762cec",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/file/application/FileValidationServiceTest.java",
+      "upstream_sha256": "c5286023bb4c6d65b5cb0e0b75280ea0cb1b6aae4714a6ae819b8d2bf876732f",
+      "import_sha256": "c5286023bb4c6d65b5cb0e0b75280ea0cb1b6aae4714a6ae819b8d2bf876732f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/file/application/FilenameSanitizerTest.java",
+      "upstream_sha256": "16ad289b73f2ee61896cdf2138e70676bc8240b2d1dd83abd85b5fb2a6314322",
+      "import_sha256": "16ad289b73f2ee61896cdf2138e70676bc8240b2d1dd83abd85b5fb2a6314322",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/file/domain/StoredFileTest.java",
+      "upstream_sha256": "877499b28b1779c6178fdd31bce10a601390e45734e314adcf5e585479484acd",
+      "import_sha256": "877499b28b1779c6178fdd31bce10a601390e45734e314adcf5e585479484acd",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/file/infrastructure/storage/LocalFileSystemStorageTest.java",
+      "upstream_sha256": "bf0d7e03bf7a8a6b8d2b35f2ad63d27c0d093468d3d9e481d1cc7f8f5968393c",
+      "import_sha256": "bf0d7e03bf7a8a6b8d2b35f2ad63d27c0d093468d3d9e481d1cc7f8f5968393c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/identity/AdminUserMockMvcTest.java",
+      "upstream_sha256": "dbad066f0a4635d2e9dc27ff075e702f15fbf367b215cd68a44b3144e630dbed",
+      "import_sha256": "dbad066f0a4635d2e9dc27ff075e702f15fbf367b215cd68a44b3144e630dbed",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/identity/AuthIntegrationTest.java",
+      "upstream_sha256": "e6236a4380d5d897f9ebbdc40493cb81c133f8ab1d1a35db3bac7c142263855c",
+      "import_sha256": "e6236a4380d5d897f9ebbdc40493cb81c133f8ab1d1a35db3bac7c142263855c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/identity/AuthMockMvcTest.java",
+      "upstream_sha256": "edc4d811c4d8308c7b7696feefc20866d04ba09a1b264fce11c2836fd435995e",
+      "import_sha256": "edc4d811c4d8308c7b7696feefc20866d04ba09a1b264fce11c2836fd435995e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/identity/RolePermissionSeedIntegrationTest.java",
+      "upstream_sha256": "1548118dd2224d2dd912c1834cc5b6b2b48a609bc926c15954dcc72fdc46240f",
+      "import_sha256": "1548118dd2224d2dd912c1834cc5b6b2b48a609bc926c15954dcc72fdc46240f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/identity/UserDirectoryMockMvcTest.java",
+      "upstream_sha256": "8d123a439f2cd75588b7458c51be2250c56b65638266c81bc8bbe1590a775f51",
+      "import_sha256": "8d123a439f2cd75588b7458c51be2250c56b65638266c81bc8bbe1590a775f51",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/identity/dev/E2eUserProvisionerTest.java",
+      "upstream_sha256": "2fcfae67b4d6587c6541c02065263cb82f44ce5ded0892e43d2165d60b8935ca",
+      "import_sha256": "2fcfae67b4d6587c6541c02065263cb82f44ce5ded0892e43d2165d60b8935ca",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/notification/NotificationIdempotencyAndScannerTest.java",
+      "upstream_sha256": "2e77c300aa01557a727a12e047fa8281f416b48153c474448af52e45c1f7a9e7",
+      "import_sha256": "2e77c300aa01557a727a12e047fa8281f416b48153c474448af52e45c1f7a9e7",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/notification/NotificationMockMvcTest.java",
+      "upstream_sha256": "d6de153a4173d81a185c0f477bfad4cd0c5ae996d24bb799ea9239d8d9f133b3",
+      "import_sha256": "d6de153a4173d81a185c0f477bfad4cd0c5ae996d24bb799ea9239d8d9f133b3",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/notification/NotificationPreferenceMockMvcTest.java",
+      "upstream_sha256": "efd1d44dc5fb2f6cea8680d65cb12f5a5fbec72067aa7dba2092ef9baeb5ee0a",
+      "import_sha256": "efd1d44dc5fb2f6cea8680d65cb12f5a5fbec72067aa7dba2092ef9baeb5ee0a",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/notification/NotificationTestCleanupListener.java",
+      "upstream_sha256": "0e25df01415154439a352c7d390a3a3cd39a9dd5e419fde637d5730c9c5f4834",
+      "import_sha256": "0e25df01415154439a352c7d390a3a3cd39a9dd5e419fde637d5730c9c5f4834",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/notification/SourceNotificationIntegrationTest.java",
+      "upstream_sha256": "fc5d534fc4e5b6560cd3e9e4dcee665cc0804f111ed80ee84316ad546fe2760e",
+      "import_sha256": "fc5d534fc4e5b6560cd3e9e4dcee665cc0804f111ed80ee84316ad546fe2760e",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/notification/V017MigrationTest.java",
+      "upstream_sha256": "91592927190f4d0b8df486a0ff80303742b3b3ca3f91527bde3db86774248b7c",
+      "import_sha256": "91592927190f4d0b8df486a0ff80303742b3b3ca3f91527bde3db86774248b7c",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/organization/DepartmentMockMvcTest.java",
+      "upstream_sha256": "b135a24a1365e597e4a3022d1eccea83c47aada807c942ecef255222b4680c78",
+      "import_sha256": "b135a24a1365e597e4a3022d1eccea83c47aada807c942ecef255222b4680c78",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/project/ProjectMockMvcTest.java",
+      "upstream_sha256": "9ff44211a0daf6a243937311098dbd2a75cb93082fc46b102c0abdb212aa2e31",
+      "import_sha256": "9ff44211a0daf6a243937311098dbd2a75cb93082fc46b102c0abdb212aa2e31",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/service_request/ServiceCategoryMockMvcTest.java",
+      "upstream_sha256": "09a681cb2f5bd3e04606f425ed88ad05220b7ccb4459baa2e22f18936a6ae6cd",
+      "import_sha256": "09a681cb2f5bd3e04606f425ed88ad05220b7ccb4459baa2e22f18936a6ae6cd",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/service_request/ServiceRequestMockMvcTest.java",
+      "upstream_sha256": "cc50192e1bf74044e10acd3b8dc349ec69f9bf73e91c21473cc1c839b99a5ca4",
+      "import_sha256": "cc50192e1bf74044e10acd3b8dc349ec69f9bf73e91c21473cc1c839b99a5ca4",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/task/TaskAttachmentMockMvcTest.java",
+      "upstream_sha256": "730cb23b08d3eb33db897354a3b5b7397d4ddcf43f50068fedf89a28c487041f",
+      "import_sha256": "730cb23b08d3eb33db897354a3b5b7397d4ddcf43f50068fedf89a28c487041f",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/task/TaskMockMvcTest.java",
+      "upstream_sha256": "da59048389f185d25d38746771d25fcce52b5c7e0e836a104890d12fc9819caa",
+      "import_sha256": "da59048389f185d25d38746771d25fcce52b5c7e0e836a104890d12fc9819caa",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/task/TaskTest.java",
+      "upstream_sha256": "b121203ad983a17624b1c8e971763c824938b24dba9dd79598535563ecf06727",
+      "import_sha256": "b121203ad983a17624b1c8e971763c824938b24dba9dd79598535563ecf06727",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/java/com/worksphere/task/TaskWorkflowTest.java",
+      "upstream_sha256": "6573c468046c4b9eb90e33c964f6a56d731b53df80ec4609d48638b47de890ad",
+      "import_sha256": "6573c468046c4b9eb90e33c964f6a56d731b53df80ec4609d48638b47de890ad",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/resources/META-INF/spring.factories",
+      "upstream_sha256": "4d93a8a3acc0a68836d6cb1b35fa424a741ccc2bfa769bf0f92fccfdbbb2dbb9",
+      "import_sha256": "4d93a8a3acc0a68836d6cb1b35fa424a741ccc2bfa769bf0f92fccfdbbb2dbb9",
+      "local_patch": false
+    },
+    {
+      "path": "backend/src/test/resources/application-test.yml",
+      "upstream_sha256": "9bf960e29462f8059744c41aae25982ab487ae0bbd47b14cfd08947c5f8aece5",
+      "import_sha256": "9bf960e29462f8059744c41aae25982ab487ae0bbd47b14cfd08947c5f8aece5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/.bundle/config",
+      "upstream_sha256": "b48c24e8f5e15694e6d3e804cb6a6b427993be957ee5237f62e006d0d3d2c2e0",
+      "import_sha256": "b48c24e8f5e15694e6d3e804cb6a6b427993be957ee5237f62e006d0d3d2c2e0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/.eslintrc.js",
+      "upstream_sha256": "4a6869d72e894df2dde1b7b1875bdca7e927f2aa18c71ee14cb4347500952666",
+      "import_sha256": "4a6869d72e894df2dde1b7b1875bdca7e927f2aa18c71ee14cb4347500952666",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/.gitignore",
+      "upstream_sha256": "2eaa79fd483b6962b679e99d258bdc415adf08c7bdbcbf39cac7e41507068882",
+      "import_sha256": "2eaa79fd483b6962b679e99d258bdc415adf08c7bdbcbf39cac7e41507068882",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/.node-version",
+      "upstream_sha256": "11237abfee2e76519e2dd9c69cb8790b2a15ce25aaa0540aa4e227ce8dfa2ac7",
+      "import_sha256": "11237abfee2e76519e2dd9c69cb8790b2a15ce25aaa0540aa4e227ce8dfa2ac7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/.prettierrc.js",
+      "upstream_sha256": "1fd46ddded0b2fdfbdcb862b969ef614d32b2f9776af1b689bd7ac02147bb4d0",
+      "import_sha256": "1fd46ddded0b2fdfbdcb862b969ef614d32b2f9776af1b689bd7ac02147bb4d0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/.watchmanconfig",
+      "upstream_sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f",
+      "import_sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/App.tsx",
+      "upstream_sha256": "2d28a6ea1749edb1db76913732d96c83637294257d6f16ea5cbf15a39f2a85f9",
+      "import_sha256": "2d28a6ea1749edb1db76913732d96c83637294257d6f16ea5cbf15a39f2a85f9",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/Gemfile",
+      "upstream_sha256": "39cee751c288031416f2608dfb0566d2b0e9d5c234e5d12434446a5d339c9e15",
+      "import_sha256": "39cee751c288031416f2608dfb0566d2b0e9d5c234e5d12434446a5d339c9e15",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/README.md",
+      "upstream_sha256": "ca1e4a9302872ea4065171ae7d44fe7e496acee0531fc40cd86d6e1cae742ccf",
+      "import_sha256": "ca1e4a9302872ea4065171ae7d44fe7e496acee0531fc40cd86d6e1cae742ccf",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/App.test.tsx",
+      "upstream_sha256": "b20d0307f44fa8940cecdc51d50c00ebb15367d883ca985cc51738f7d57a905a",
+      "import_sha256": "b20d0307f44fa8940cecdc51d50c00ebb15367d883ca985cc51738f7d57a905a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/api/apiClient.test.ts",
+      "upstream_sha256": "77f5432c747c4d6e2617b68b78ad353261cb809bfc92297afc3e3523da3c6a4b",
+      "import_sha256": "77f5432c747c4d6e2617b68b78ad353261cb809bfc92297afc3e3523da3c6a4b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/api/apiEnvelope.test.ts",
+      "upstream_sha256": "747b7644ec557d007f5a4483e7c5b277f70f7451f705a5be58f7b73be5b09649",
+      "import_sha256": "747b7644ec557d007f5a4483e7c5b277f70f7451f705a5be58f7b73be5b09649",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/api/apiError.test.ts",
+      "upstream_sha256": "f45a9e71789eb06c947d914e61791dec395bfc5c80cb5c708c25d24d30a4bc5e",
+      "import_sha256": "f45a9e71789eb06c947d914e61791dec395bfc5c80cb5c708c25d24d30a4bc5e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/AuthProvider.bootstrap.test.tsx",
+      "upstream_sha256": "52cf0b337a274d490b1d7c057354d9d380c156bd7a128c76b8b3a03e1f9b067b",
+      "import_sha256": "52cf0b337a274d490b1d7c057354d9d380c156bd7a128c76b8b3a03e1f9b067b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/AuthProvider.logout.test.tsx",
+      "upstream_sha256": "3fcba9af1930734b204de4e9364300fe4cd68b2c0f7c4346769bb1f1d4b2f8fb",
+      "import_sha256": "3fcba9af1930734b204de4e9364300fe4cd68b2c0f7c4346769bb1f1d4b2f8fb",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/AuthProvider.test.tsx",
+      "upstream_sha256": "1abfae0953856bc84e11dd3c4bb9c25dcf9835715fce04f832478f893e876877",
+      "import_sha256": "1abfae0953856bc84e11dd3c4bb9c25dcf9835715fce04f832478f893e876877",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/ForgotPasswordScreen.test.tsx",
+      "upstream_sha256": "706cfd06f30004bff1b10e8741ba129c0628f9afd3f920e79e6c98c6743d8c5f",
+      "import_sha256": "706cfd06f30004bff1b10e8741ba129c0628f9afd3f920e79e6c98c6743d8c5f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/LoginScreen.test.tsx",
+      "upstream_sha256": "964c11c69e7329c3abc1618ffc1aaeccf97f13aa6abf0594ec5a721b8c777fd0",
+      "import_sha256": "964c11c69e7329c3abc1618ffc1aaeccf97f13aa6abf0594ec5a721b8c777fd0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/ResetPasswordScreen.test.tsx",
+      "upstream_sha256": "bed9863331bf196b5d9cd96a85281e14c75bd028d192bc54ce8457d790616664",
+      "import_sha256": "bed9863331bf196b5d9cd96a85281e14c75bd028d192bc54ce8457d790616664",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/authApi.test.ts",
+      "upstream_sha256": "a4570e90f0d0ab0e81c0d7ae72000b5f364affae05c64b270e5524e259196fe0",
+      "import_sha256": "a4570e90f0d0ab0e81c0d7ae72000b5f364affae05c64b270e5524e259196fe0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/authErrorMapper.test.ts",
+      "upstream_sha256": "35171a3f8f682fbfe61f255bc3798732ed63b58e72b9e8c4ac652e6c4e778b83",
+      "import_sha256": "35171a3f8f682fbfe61f255bc3798732ed63b58e72b9e8c4ac652e6c4e778b83",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/authNavigationGuard.test.tsx",
+      "upstream_sha256": "8ecaf7c4c8757fa6b5fbdc70dc48a65efd0585a496b17dcbb583a94e82c55757",
+      "import_sha256": "8ecaf7c4c8757fa6b5fbdc70dc48a65efd0585a496b17dcbb583a94e82c55757",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/authReducer.test.ts",
+      "upstream_sha256": "ff30469f43b8229d6e84d45281255a7ba11b81d83549484a578a07a7233a9be3",
+      "import_sha256": "ff30469f43b8229d6e84d45281255a7ba11b81d83549484a578a07a7233a9be3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/authTypes.test.ts",
+      "upstream_sha256": "b19baf7f6a710c3658a6ea6a4d7c4298a0f61c7b528bc8bcd03afa9b656cfaf1",
+      "import_sha256": "b19baf7f6a710c3658a6ea6a4d7c4298a0f61c7b528bc8bcd03afa9b656cfaf1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/authValidation.test.ts",
+      "upstream_sha256": "de94aa4e906b16680888cce86f5aa26f2136b559e7daa5437f8bfba6c93f19b1",
+      "import_sha256": "de94aa4e906b16680888cce86f5aa26f2136b559e7daa5437f8bfba6c93f19b1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/refreshCoordinator.test.ts",
+      "upstream_sha256": "dd021b11704616829983e34381568ad7bde3cdda2b1330285a8be24fc1b43630",
+      "import_sha256": "dd021b11704616829983e34381568ad7bde3cdda2b1330285a8be24fc1b43630",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/auth/sessionCredentialCoordinator.test.ts",
+      "upstream_sha256": "369c57ead6012af701782dce8fa71ba1dd311fba9843d892fe1a4887336e69e7",
+      "import_sha256": "369c57ead6012af701782dce8fa71ba1dd311fba9843d892fe1a4887336e69e7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/AppButton.test.tsx",
+      "upstream_sha256": "22d3aea3f1cfea73dada2eb2261cc99b5a24b9e21fb66b86b26fdae62e700be3",
+      "import_sha256": "22d3aea3f1cfea73dada2eb2261cc99b5a24b9e21fb66b86b26fdae62e700be3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/AppTextInput.test.tsx",
+      "upstream_sha256": "9b11feb6b3f474569d466b4d3ebba1c0364186ce06d46d670508a2ce9929256b",
+      "import_sha256": "9b11feb6b3f474569d466b4d3ebba1c0364186ce06d46d670508a2ce9929256b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/ConfirmationDialog.test.tsx",
+      "upstream_sha256": "b6fb5c80b2b2253b43a01092efb6eb0c2a15f1ef970f69f1a15fb07e9fe23ed1",
+      "import_sha256": "b6fb5c80b2b2253b43a01092efb6eb0c2a15f1ef970f69f1a15fb07e9fe23ed1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/EmptyState.test.tsx",
+      "upstream_sha256": "39f0628aeffcebab11c7e7d0b899da01f3b9036158a99926e1a4cfecbb4138cb",
+      "import_sha256": "39f0628aeffcebab11c7e7d0b899da01f3b9036158a99926e1a4cfecbb4138cb",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/ErrorState.test.tsx",
+      "upstream_sha256": "ca416defcf244e9b17eb6c8d5bf2ae0fe06ce51f447f7c21286b67a98e8cfb90",
+      "import_sha256": "ca416defcf244e9b17eb6c8d5bf2ae0fe06ce51f447f7c21286b67a98e8cfb90",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/LoadingIndicator.test.tsx",
+      "upstream_sha256": "61a4b2b47588277015599b24bc4a146d8e8b5508d35bb9387ae32f9b336dcf1e",
+      "import_sha256": "61a4b2b47588277015599b24bc4a146d8e8b5508d35bb9387ae32f9b336dcf1e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/PasswordInput.test.tsx",
+      "upstream_sha256": "86c29ba27612295bc38f535ddf48f1c2b285ff3aef7a1c312dd0c6e21a9e582c",
+      "import_sha256": "86c29ba27612295bc38f535ddf48f1c2b285ff3aef7a1c312dd0c6e21a9e582c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/PriorityBadge.test.tsx",
+      "upstream_sha256": "9b9922e8cb8465f5f3a91abb7809d8848d26410bc053a0368b28a53d634ef753",
+      "import_sha256": "9b9922e8cb8465f5f3a91abb7809d8848d26410bc053a0368b28a53d634ef753",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/SearchBar.test.tsx",
+      "upstream_sha256": "9eaf5f15ac6c575ffff99cc6eb7c35e5854b7f7208ec49c2bfa4749e5aa0095b",
+      "import_sha256": "9eaf5f15ac6c575ffff99cc6eb7c35e5854b7f7208ec49c2bfa4749e5aa0095b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/components/StatusBadge.test.tsx",
+      "upstream_sha256": "175553dc1a89d292d4a52846802a613003f423de968872be61be09e4bb2536e7",
+      "import_sha256": "175553dc1a89d292d4a52846802a613003f423de968872be61be09e4bb2536e7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/config/environment.test.ts",
+      "upstream_sha256": "aa3d22b952c40d8bcb3bd9729e92d61485316521eb0713e0f81edcd4d5ea27db",
+      "import_sha256": "aa3d22b952c40d8bcb3bd9729e92d61485316521eb0713e0f81edcd4d5ea27db",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/dashboard/DashboardScreen.test.tsx",
+      "upstream_sha256": "6d9fded8a51bc5aab9f343b52b8c801c09c074acb29815ef15b4fc3854ca9720",
+      "import_sha256": "6d9fded8a51bc5aab9f343b52b8c801c09c074acb29815ef15b4fc3854ca9720",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/dashboard/dashboardApi.test.ts",
+      "upstream_sha256": "97eaa542e3be2ffffb3bdd68bfc842e17a1a31705a5450889af8694896fc4546",
+      "import_sha256": "97eaa542e3be2ffffb3bdd68bfc842e17a1a31705a5450889af8694896fc4546",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/dashboard/dashboardTypes.test.ts",
+      "upstream_sha256": "f43a66acda00fc25e2b67e01a0294e601130e7527f4b158a5c3f9f7efd8a5f21",
+      "import_sha256": "f43a66acda00fc25e2b67e01a0294e601130e7527f4b158a5c3f9f7efd8a5f21",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/dashboard/useDashboard.test.tsx",
+      "upstream_sha256": "0cee38493448618464df75281b3d12023d81e121f6ec7e738f3fe4bccf2988d4",
+      "import_sha256": "0cee38493448618464df75281b3d12023d81e121f6ec7e738f3fe4bccf2988d4",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/directory/UserPickerModal.test.tsx",
+      "upstream_sha256": "e2c17e30cff5600857cf9850f918b76f5cf6ef52a26c4fe70d302538ce95e595",
+      "import_sha256": "e2c17e30cff5600857cf9850f918b76f5cf6ef52a26c4fe70d302538ce95e595",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/directory/directoryApi.test.ts",
+      "upstream_sha256": "9461f79fed475b91412ebafc27290418528f7e2008663094694108710b8820a1",
+      "import_sha256": "9461f79fed475b91412ebafc27290418528f7e2008663094694108710b8820a1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/directory/directoryTypes.test.ts",
+      "upstream_sha256": "b87760991da7f9df38e35e126611960a3e0c589403d1286bc33445e00885a2b8",
+      "import_sha256": "b87760991da7f9df38e35e126611960a3e0c589403d1286bc33445e00885a2b8",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/directory/useUserDirectory.test.tsx",
+      "upstream_sha256": "c9f0b5f7873ab305aec857997cc3b10e28a5bbeaddba9aa255c5c370099f9a3c",
+      "import_sha256": "c9f0b5f7873ab305aec857997cc3b10e28a5bbeaddba9aa255c5c370099f9a3c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/more/SettingsScreen.test.tsx",
+      "upstream_sha256": "bc4595b13a159cd78d9871c86d89cd602437545aadf45469fa3f8e0944c01944",
+      "import_sha256": "bc4595b13a159cd78d9871c86d89cd602437545aadf45469fa3f8e0944c01944",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/navigation.test.tsx",
+      "upstream_sha256": "fcd4747c8ea5af98cf4136d94b7665c3e25736e19cd8ff5cdc3c13635aaaac53",
+      "import_sha256": "fcd4747c8ea5af98cf4136d94b7665c3e25736e19cd8ff5cdc3c13635aaaac53",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/organization/departmentApi.test.ts",
+      "upstream_sha256": "eaf7aabc7e32451d8b7dd34c26b10a631b18924059cde654a44dac03babe41b8",
+      "import_sha256": "eaf7aabc7e32451d8b7dd34c26b10a631b18924059cde654a44dac03babe41b8",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/profile/ChangePasswordScreen.test.tsx",
+      "upstream_sha256": "4a3b42925e3fa4f227ece8411ed8e4a261ad98d85b34239ef5401d62c853e910",
+      "import_sha256": "4a3b42925e3fa4f227ece8411ed8e4a261ad98d85b34239ef5401d62c853e910",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/profile/EditProfileScreen.test.tsx",
+      "upstream_sha256": "94eda0a7047baa2424548ecb79e18cb411ac239f7585c2246ca4d05573be5ba1",
+      "import_sha256": "94eda0a7047baa2424548ecb79e18cb411ac239f7585c2246ca4d05573be5ba1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/profile/ProfileScreen.test.tsx",
+      "upstream_sha256": "576ebf901385014657896c468ee66d401cffd9dbd655dfedcd5cf067a8f13090",
+      "import_sha256": "576ebf901385014657896c468ee66d401cffd9dbd655dfedcd5cf067a8f13090",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/ChangeStatusModal.test.tsx",
+      "upstream_sha256": "f33a87bc99cb009557143cbe4c4ef0de639d0a18c0863cdd065c96a95d66bdd9",
+      "import_sha256": "f33a87bc99cb009557143cbe4c4ef0de639d0a18c0863cdd065c96a95d66bdd9",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/CreateProjectScreen.test.tsx",
+      "upstream_sha256": "22cfcbeba97ef14b4c72b747870bf38c1b6d35199fa4a6b99c15714d337d5b6f",
+      "import_sha256": "22cfcbeba97ef14b4c72b747870bf38c1b6d35199fa4a6b99c15714d337d5b6f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/EditProjectScreen.test.tsx",
+      "upstream_sha256": "f6665ee6a14f53758d520b7b6af8ea696895b90c1e63e64639f5290780bf99d6",
+      "import_sha256": "f6665ee6a14f53758d520b7b6af8ea696895b90c1e63e64639f5290780bf99d6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/ProjectCard.test.tsx",
+      "upstream_sha256": "4bd3a863e034c5d1561d7932ae10ee7653c5801d7bdf3239c5b47d81a3605405",
+      "import_sha256": "4bd3a863e034c5d1561d7932ae10ee7653c5801d7bdf3239c5b47d81a3605405",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/ProjectDetailScreen.test.tsx",
+      "upstream_sha256": "4ddafca4c8efaf9df10dd777a9067cd074d8e03744dff10d62cc7b90ec2400e2",
+      "import_sha256": "4ddafca4c8efaf9df10dd777a9067cd074d8e03744dff10d62cc7b90ec2400e2",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/ProjectMembersScreen.test.tsx",
+      "upstream_sha256": "3ca4bb23a20eff768a8a8de6aad04e3a9729da320b87d0ca79c9b08407dcd44f",
+      "import_sha256": "3ca4bb23a20eff768a8a8de6aad04e3a9729da320b87d0ca79c9b08407dcd44f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/ProjectMilestonesScreen.test.tsx",
+      "upstream_sha256": "ef0bf0a2da89119b92c67a0c39e30ab731d1c1ab33aa482199bd9f3428e05e73",
+      "import_sha256": "ef0bf0a2da89119b92c67a0c39e30ab731d1c1ab33aa482199bd9f3428e05e73",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/ProjectsScreen.test.tsx",
+      "upstream_sha256": "25c4faf2b4122f78a18cd8653ba6b80042288abd073403f026d0e276483c3722",
+      "import_sha256": "25c4faf2b4122f78a18cd8653ba6b80042288abd073403f026d0e276483c3722",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/projectApi.test.ts",
+      "upstream_sha256": "b18cc3f7d10feda26965d7df06f074eff5ad3217e46f4a1adca3bae278a941b0",
+      "import_sha256": "b18cc3f7d10feda26965d7df06f074eff5ad3217e46f4a1adca3bae278a941b0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/projectErrorMapper.test.ts",
+      "upstream_sha256": "384c9049a6d4ca0bd78e97ee82a8dac1fd82a2d95bc3263d7e2f27014a3cc86b",
+      "import_sha256": "384c9049a6d4ca0bd78e97ee82a8dac1fd82a2d95bc3263d7e2f27014a3cc86b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/projectStatusTransitions.test.ts",
+      "upstream_sha256": "64521efe421671913a646751a929e59ed4b772dda589d5d08ec0bf828222ce96",
+      "import_sha256": "64521efe421671913a646751a929e59ed4b772dda589d5d08ec0bf828222ce96",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/projectTypes.test.ts",
+      "upstream_sha256": "b7a494263927449107a4fe441ad7499ad2de93c755cb52b720cfb374da288303",
+      "import_sha256": "b7a494263927449107a4fe441ad7499ad2de93c755cb52b720cfb374da288303",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/useProjectDetail.test.tsx",
+      "upstream_sha256": "548999179e5e5d48a71f9f86f9d806857ab6e4503e26ed64242ca4358e579a3d",
+      "import_sha256": "548999179e5e5d48a71f9f86f9d806857ab6e4503e26ed64242ca4358e579a3d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/projects/useProjects.test.tsx",
+      "upstream_sha256": "003d6b8c97ee42e34fd65181dd7afbfc2f74a159242d05b95639faadb0a63f5d",
+      "import_sha256": "003d6b8c97ee42e34fd65181dd7afbfc2f74a159242d05b95639faadb0a63f5d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/screens/CreateTaskScreen.test.tsx",
+      "upstream_sha256": "fe1f58c6d273ad6f27d02fe2fff84d383ce5156e0b30671f97e1c4dd3760d50f",
+      "import_sha256": "fe1f58c6d273ad6f27d02fe2fff84d383ce5156e0b30671f97e1c4dd3760d50f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/screens/EditTaskScreen.test.tsx",
+      "upstream_sha256": "4e383a767a022a261d1f54059b773184cbbb4a12817bffa4bbd877d1f2f8add3",
+      "import_sha256": "4e383a767a022a261d1f54059b773184cbbb4a12817bffa4bbd877d1f2f8add3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/screens/SubtaskListScreen.test.tsx",
+      "upstream_sha256": "4d9216187987f924d2521bde517f583140a978ffa7f274285f3187ff09c6205b",
+      "import_sha256": "4d9216187987f924d2521bde517f583140a978ffa7f274285f3187ff09c6205b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/screens/TaskCommentsScreen.test.tsx",
+      "upstream_sha256": "d1ad146887e0daca1e75c7f8bce8c90f435823433f8f19dd182a8937b3253b4c",
+      "import_sha256": "d1ad146887e0daca1e75c7f8bce8c90f435823433f8f19dd182a8937b3253b4c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/screens/TaskDetailScreen.test.tsx",
+      "upstream_sha256": "bb0ef0d68297dbb2543b198aff1d02f53c95ae2ae52b2247cd80814c9016cca5",
+      "import_sha256": "bb0ef0d68297dbb2543b198aff1d02f53c95ae2ae52b2247cd80814c9016cca5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/screens/TasksScreen.test.tsx",
+      "upstream_sha256": "6d9fe6c3bbc90b04719a0b362e9989f64fbfc4b51c948f4d2011f1f09669e313",
+      "import_sha256": "6d9fe6c3bbc90b04719a0b362e9989f64fbfc4b51c948f4d2011f1f09669e313",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/serviceRequests/serviceRequestApi.test.ts",
+      "upstream_sha256": "ed51eb4ba51a4cdcb09100df53ad4123c1e17305f2e85e2b99dbdbea90a502f7",
+      "import_sha256": "ed51eb4ba51a4cdcb09100df53ad4123c1e17305f2e85e2b99dbdbea90a502f7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/serviceRequests/serviceRequestErrorMapper.test.ts",
+      "upstream_sha256": "4f57b1c351f2dd7f2c88c6de495879a52011a7d29f3376a4d61290d502727013",
+      "import_sha256": "4f57b1c351f2dd7f2c88c6de495879a52011a7d29f3376a4d61290d502727013",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/serviceRequests/serviceRequestTypes.test.ts",
+      "upstream_sha256": "ded39bddf7d409f63bd9a8ad4960fb71e39c7696621aa96a3c9d47b8953695df",
+      "import_sha256": "ded39bddf7d409f63bd9a8ad4960fb71e39c7696621aa96a3c9d47b8953695df",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/storage/accessTokenStore.test.ts",
+      "upstream_sha256": "f4c6d6746296fc5522180bc4ea840b421f5d5574c64fc1b1d8deb1e6e4ab573f",
+      "import_sha256": "f4c6d6746296fc5522180bc4ea840b421f5d5574c64fc1b1d8deb1e6e4ab573f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/storage/localStorage.test.ts",
+      "upstream_sha256": "7dfea9348bad7938755fd5a53c7cf44fa9bc0238fcc9978dfbfb20bbb10897c1",
+      "import_sha256": "7dfea9348bad7938755fd5a53c7cf44fa9bc0238fcc9978dfbfb20bbb10897c1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/storage/secureStorage.test.ts",
+      "upstream_sha256": "d3ca81f9e45f74aa77e459002856c60e81c46574cfd3b0ff48fbf761e957ef6d",
+      "import_sha256": "d3ca81f9e45f74aa77e459002856c60e81c46574cfd3b0ff48fbf761e957ef6d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/ChangeStatusModal.test.tsx",
+      "upstream_sha256": "c36d76afd20ea22a553c20292be2ad963f2d419f48ba24d21f26666d17fd86ef",
+      "import_sha256": "c36d76afd20ea22a553c20292be2ad963f2d419f48ba24d21f26666d17fd86ef",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/CrossProjectAssigneeRace.test.tsx",
+      "upstream_sha256": "ecebcc3a87efcaa4f279d7305404fb06bde14700131b6f6c464d1ce3dd128989",
+      "import_sha256": "ecebcc3a87efcaa4f279d7305404fb06bde14700131b6f6c464d1ce3dd128989",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/ProjectMemberAssigneePickerModal.test.tsx",
+      "upstream_sha256": "b8dad2a212e8b6e00de219ba9753f85d4aa24f2175118c1eeff946cdaf02e0c9",
+      "import_sha256": "b8dad2a212e8b6e00de219ba9753f85d4aa24f2175118c1eeff946cdaf02e0c9",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/ProjectSelectModal.test.tsx",
+      "upstream_sha256": "cad96f2b27bc0e1874e95aff607a970932c93717ece5ee4c21059d2c28d82909",
+      "import_sha256": "cad96f2b27bc0e1874e95aff607a970932c93717ece5ee4c21059d2c28d82909",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/TaskCard.test.tsx",
+      "upstream_sha256": "5163d9660f722dc19e47974ec2b2d0d4cd9aca7010029a26843bad8933fd7d5b",
+      "import_sha256": "5163d9660f722dc19e47974ec2b2d0d4cd9aca7010029a26843bad8933fd7d5b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/UpdateProgressModal.test.tsx",
+      "upstream_sha256": "739df6de2232e17596ee19f92b4a297ea345eab49bfee1674fb7339f0088d76b",
+      "import_sha256": "739df6de2232e17596ee19f92b4a297ea345eab49bfee1674fb7339f0088d76b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/taskApi.test.ts",
+      "upstream_sha256": "794c5e997b47581e5ebccb9bd4db0825cb3a6cde86d9d27b3551926c57b7d48e",
+      "import_sha256": "794c5e997b47581e5ebccb9bd4db0825cb3a6cde86d9d27b3551926c57b7d48e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/taskDate.test.ts",
+      "upstream_sha256": "3c126d0b5dd8ffe3f1b6cc6d0d385eba6bf21a61e2e88e4756f51e0fd4feea41",
+      "import_sha256": "3c126d0b5dd8ffe3f1b6cc6d0d385eba6bf21a61e2e88e4756f51e0fd4feea41",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/taskErrorMapper.test.ts",
+      "upstream_sha256": "bb8396659ee4877509d95f2c6b65e1623ecd44f9cb35a82eb7bccf21682f16b6",
+      "import_sha256": "bb8396659ee4877509d95f2c6b65e1623ecd44f9cb35a82eb7bccf21682f16b6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/taskStatusTransitions.test.ts",
+      "upstream_sha256": "644734ab24594b85d494c5acfb16f583a2fe0c0069e0178eb79bed4130f790cc",
+      "import_sha256": "644734ab24594b85d494c5acfb16f583a2fe0c0069e0178eb79bed4130f790cc",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/taskTypes.test.ts",
+      "upstream_sha256": "68647146cd8bbbf5d83e45aecd2153a8d5368220ff90d85da5288d299bdb2dbc",
+      "import_sha256": "68647146cd8bbbf5d83e45aecd2153a8d5368220ff90d85da5288d299bdb2dbc",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/useSubtasks.test.tsx",
+      "upstream_sha256": "e5e18bb987bbcb4fd40f46c890090f1f3a7ed395fc8b54e952b1572de15a7122",
+      "import_sha256": "e5e18bb987bbcb4fd40f46c890090f1f3a7ed395fc8b54e952b1572de15a7122",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/useTaskComments.test.tsx",
+      "upstream_sha256": "d9d2ee876556b4783be564539124029568bd55f7bc599e00c69804c5fe2ee582",
+      "import_sha256": "d9d2ee876556b4783be564539124029568bd55f7bc599e00c69804c5fe2ee582",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/useTaskDetail.test.tsx",
+      "upstream_sha256": "a6073fa80919d0e10c65a0b3e7eb5f38954785d74b5726873b41c9c1e85ddf46",
+      "import_sha256": "a6073fa80919d0e10c65a0b3e7eb5f38954785d74b5726873b41c9c1e85ddf46",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/tasks/useTasks.test.tsx",
+      "upstream_sha256": "6c45cbedf6feb44a0025d57e9c2ec4b7348eb211944277cd856fd31232a5ff90",
+      "import_sha256": "6c45cbedf6feb44a0025d57e9c2ec4b7348eb211944277cd856fd31232a5ff90",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/test-utils/index.ts",
+      "upstream_sha256": "7acb5367ae6f1d30c5fe9b17d1923b5ec101d49c9d8b662b9170a9704cbf5436",
+      "import_sha256": "7acb5367ae6f1d30c5fe9b17d1923b5ec101d49c9d8b662b9170a9704cbf5436",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/test-utils/renderWithProviders.tsx",
+      "upstream_sha256": "1ea8cc595b87767e18d2581ed28d18a28b67a194cb791318b1a0778395d312bd",
+      "import_sha256": "1ea8cc595b87767e18d2581ed28d18a28b67a194cb791318b1a0778395d312bd",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/__tests__/theme.test.tsx",
+      "upstream_sha256": "2d3a9c64fb6786f95de6c4a0ed78ae60f3548f1100a623b23615bd25ee2fe48d",
+      "import_sha256": "2d3a9c64fb6786f95de6c4a0ed78ae60f3548f1100a623b23615bd25ee2fe48d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/build.gradle",
+      "upstream_sha256": "602ef88fda055435f38b7b101b40e025f87fda658f6fd1a147f955709bbbc915",
+      "import_sha256": "602ef88fda055435f38b7b101b40e025f87fda658f6fd1a147f955709bbbc915",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/debug.keystore",
+      "upstream_sha256": "221e0a3106aa4c3ccc154e0a418b55020b3f9ea6e84f92e8749cd9e2f39f5e58",
+      "import_sha256": "221e0a3106aa4c3ccc154e0a418b55020b3f9ea6e84f92e8749cd9e2f39f5e58",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/proguard-rules.pro",
+      "upstream_sha256": "75d4a0dca0e84d4e3302416528a535b4c9dba7be9d8946b4b9e98cd21cb05316",
+      "import_sha256": "75d4a0dca0e84d4e3302416528a535b4c9dba7be9d8946b4b9e98cd21cb05316",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/debug/AndroidManifest.xml",
+      "upstream_sha256": "3b7f621d4025951ae83e9d9e20809422274f6734735814bbdfa49e6b17561f63",
+      "import_sha256": "3b7f621d4025951ae83e9d9e20809422274f6734735814bbdfa49e6b17561f63",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/debug/res/xml/network_security_config.xml",
+      "upstream_sha256": "cb59af03c91c1f8981bba8971f04d7731e73856b917ae568c073275327098042",
+      "import_sha256": "cb59af03c91c1f8981bba8971f04d7731e73856b917ae568c073275327098042",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/AndroidManifest.xml",
+      "upstream_sha256": "e6dd8405bf3af439dd71b16371a245c2d98cae81cf0246fe8515f1214f33b90d",
+      "import_sha256": "e6dd8405bf3af439dd71b16371a245c2d98cae81cf0246fe8515f1214f33b90d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/java/com/workspheremobile/EnvironmentConfigModule.kt",
+      "upstream_sha256": "d46295d96343e8cb2068ad73c84847e75df38b97b6db4b14d3e0b5bc65da1261",
+      "import_sha256": "d46295d96343e8cb2068ad73c84847e75df38b97b6db4b14d3e0b5bc65da1261",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/java/com/workspheremobile/EnvironmentConfigPackage.kt",
+      "upstream_sha256": "383c6c089734907e92c48612986af61a04729b33bcfb08b18656ed7be9ee6fb4",
+      "import_sha256": "383c6c089734907e92c48612986af61a04729b33bcfb08b18656ed7be9ee6fb4",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/java/com/workspheremobile/MainActivity.kt",
+      "upstream_sha256": "1e0f4abee8517de2dd4d117d04365ccb15d2962c1ef47340cf6dca7b18796600",
+      "import_sha256": "1e0f4abee8517de2dd4d117d04365ccb15d2962c1ef47340cf6dca7b18796600",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/java/com/workspheremobile/MainApplication.kt",
+      "upstream_sha256": "8c8840fdcf61ded3cffb187249d3ec3019c2bc5916cacc1f8a4fd719bc17692a",
+      "import_sha256": "8c8840fdcf61ded3cffb187249d3ec3019c2bc5916cacc1f8a4fd719bc17692a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/drawable/rn_edit_text_material.xml",
+      "upstream_sha256": "a0ffe99c6c5b933311be2b56a1769600dcdca909289cb4446e58cac2b6c27c7c",
+      "import_sha256": "a0ffe99c6c5b933311be2b56a1769600dcdca909289cb4446e58cac2b6c27c7c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "upstream_sha256": "ded7aabf6a56b694e486e096efd89e2f0c9067d292b634663898e352c9491f10",
+      "import_sha256": "ded7aabf6a56b694e486e096efd89e2f0c9067d292b634663898e352c9491f10",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+      "upstream_sha256": "21304a0c9b00da6a72cfa31c7229c9528fc17b6e5eb4e68a969bce08c01a2fee",
+      "import_sha256": "21304a0c9b00da6a72cfa31c7229c9528fc17b6e5eb4e68a969bce08c01a2fee",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "upstream_sha256": "eef20f25fb1477d8c9df15757e764811cc503fb0777f18d0f7fb2d19178b5bf6",
+      "import_sha256": "eef20f25fb1477d8c9df15757e764811cc503fb0777f18d0f7fb2d19178b5bf6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+      "upstream_sha256": "520d05f978a15ba0ccf23006a1a5691a054a02478c70cafc5ebafae76e600f0d",
+      "import_sha256": "520d05f978a15ba0ccf23006a1a5691a054a02478c70cafc5ebafae76e600f0d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "upstream_sha256": "e77c5045bfdb6f4bbe955b3a793bfed3baa369ce4811ae2a9103d5480637cfff",
+      "import_sha256": "e77c5045bfdb6f4bbe955b3a793bfed3baa369ce4811ae2a9103d5480637cfff",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+      "upstream_sha256": "2846e1a703e519791fe22f41bcb243b82f908d12e5ebcb43f020ddf9982780b0",
+      "import_sha256": "2846e1a703e519791fe22f41bcb243b82f908d12e5ebcb43f020ddf9982780b0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "upstream_sha256": "eb3a34b13632e0cb3b1c0f4273035866cbe81b1b17b7178ce29d19c78d394a5e",
+      "import_sha256": "eb3a34b13632e0cb3b1c0f4273035866cbe81b1b17b7178ce29d19c78d394a5e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "upstream_sha256": "363a569beb72e8b007bf046454612148d4c9f782b9391352059fe83179f18e30",
+      "import_sha256": "363a569beb72e8b007bf046454612148d4c9f782b9391352059fe83179f18e30",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "upstream_sha256": "9ff27328b6916b7f75b99ef36153f154bb4724946e5654635cba2e257352c69f",
+      "import_sha256": "9ff27328b6916b7f75b99ef36153f154bb4724946e5654635cba2e257352c69f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "upstream_sha256": "5bacd97a1b41e4413c6092cdbd83f65112a9124e823cfaa3a219c65e2761647b",
+      "import_sha256": "5bacd97a1b41e4413c6092cdbd83f65112a9124e823cfaa3a219c65e2761647b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/values/strings.xml",
+      "upstream_sha256": "240ea3ad3d948da4d22ddf04c7c5d80c3916192453feff53db557542407a3249",
+      "import_sha256": "240ea3ad3d948da4d22ddf04c7c5d80c3916192453feff53db557542407a3249",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/app/src/main/res/values/styles.xml",
+      "upstream_sha256": "3f162a05aded30eefe69f1f420a598a0fecebdabfdb6c72e24bba2dff82f2e1c",
+      "import_sha256": "3f162a05aded30eefe69f1f420a598a0fecebdabfdb6c72e24bba2dff82f2e1c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/build.gradle",
+      "upstream_sha256": "3b0c7e13c8816c39f28637f75db0e4a3fe045c40220be4e51a1ef82fde8f76cc",
+      "import_sha256": "3b0c7e13c8816c39f28637f75db0e4a3fe045c40220be4e51a1ef82fde8f76cc",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/gradle.properties",
+      "upstream_sha256": "7c5b591a9ebf786c710ab7e6d4608f9554c1f7dc95aa2a514918d60a14b76995",
+      "import_sha256": "7c5b591a9ebf786c710ab7e6d4608f9554c1f7dc95aa2a514918d60a14b76995",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/gradle/wrapper/gradle-wrapper.properties",
+      "upstream_sha256": "d1f446be7e5aea7ed5e9fba2870f1ad9f54f94b27014f87ad1dfca699b10f455",
+      "import_sha256": "d1f446be7e5aea7ed5e9fba2870f1ad9f54f94b27014f87ad1dfca699b10f455",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/gradlew",
+      "upstream_sha256": "6d342d5765739fc2c34a15759035d0bc5beef0c039b7ddd68b78e7e637b8dd21",
+      "import_sha256": "6d342d5765739fc2c34a15759035d0bc5beef0c039b7ddd68b78e7e637b8dd21",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/gradlew.bat",
+      "upstream_sha256": "982f1b2979dd2d13505c11e92192ab43eef338242ca61587f86f8d7fbc86f67b",
+      "import_sha256": "982f1b2979dd2d13505c11e92192ab43eef338242ca61587f86f8d7fbc86f67b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/android/settings.gradle",
+      "upstream_sha256": "9dcdd03814c74e920a877145da693ed1272e25634d986e55b17841539c5758ab",
+      "import_sha256": "9dcdd03814c74e920a877145da693ed1272e25634d986e55b17841539c5758ab",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/app.json",
+      "upstream_sha256": "f32b81275ecd271e462704f89c0f26e8b40c17ca564ab0acc794b8bdde1a0251",
+      "import_sha256": "f32b81275ecd271e462704f89c0f26e8b40c17ca564ab0acc794b8bdde1a0251",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/babel.config.js",
+      "upstream_sha256": "bdf7ee2f8288a26bdc7b6258896138fa30f10dec91392c17f35717ded6dea089",
+      "import_sha256": "bdf7ee2f8288a26bdc7b6258896138fa30f10dec91392c17f35717ded6dea089",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/index.js",
+      "upstream_sha256": "e5b8c57e1ee9462e9adba0b17bab1100733f27af4477c8082dac305ea2883447",
+      "import_sha256": "e5b8c57e1ee9462e9adba0b17bab1100733f27af4477c8082dac305ea2883447",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/.xcode.env",
+      "upstream_sha256": "d8ab5e0beeb93e2b8de917f349c9fa5887c20676269f8ac596b7a6faad3334e3",
+      "import_sha256": "d8ab5e0beeb93e2b8de917f349c9fa5887c20676269f8ac596b7a6faad3334e3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/Podfile",
+      "upstream_sha256": "951962a2ca98e2e77819bd4dd1ebd86850b91569f38bc43429295731490d9dce",
+      "import_sha256": "951962a2ca98e2e77819bd4dd1ebd86850b91569f38bc43429295731490d9dce",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile.xcodeproj/project.pbxproj",
+      "upstream_sha256": "ea38f90307ec1cc17e87c39490f017505e95e86cfcf7a443f6ddd0b1a4cd3286",
+      "import_sha256": "ea38f90307ec1cc17e87c39490f017505e95e86cfcf7a443f6ddd0b1a4cd3286",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile.xcodeproj/xcshareddata/xcschemes/WorkSphereMobile.xcscheme",
+      "upstream_sha256": "dc5c39ed78ce37b7b8e3c23212fa2bf5538c6dc128e0a49c548aaa9f3fb728d0",
+      "import_sha256": "dc5c39ed78ce37b7b8e3c23212fa2bf5538c6dc128e0a49c548aaa9f3fb728d0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/AppDelegate.swift",
+      "upstream_sha256": "09d62fdd0aa5007a5c5a64664e88eab58426fd0a0f17d62bcca4b8b94d6a4af0",
+      "import_sha256": "09d62fdd0aa5007a5c5a64664e88eab58426fd0a0f17d62bcca4b8b94d6a4af0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/EnvironmentConfigModule.h",
+      "upstream_sha256": "7ef647257142d03c34d4efce582b6b9b10a0c98478433416f3e58e10024de34d",
+      "import_sha256": "7ef647257142d03c34d4efce582b6b9b10a0c98478433416f3e58e10024de34d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/EnvironmentConfigModule.m",
+      "upstream_sha256": "b91c1011fa3dfc54755feb9ce6a4497456bfa7157aa57beb1b3806d5cc672531",
+      "import_sha256": "b91c1011fa3dfc54755feb9ce6a4497456bfa7157aa57beb1b3806d5cc672531",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/Images.xcassets/AppIcon.appiconset/Contents.json",
+      "upstream_sha256": "1e7fa02146e2e2133fa6ff288e9a19785f18d72fc13eff6d47f790c6dc538f5f",
+      "import_sha256": "1e7fa02146e2e2133fa6ff288e9a19785f18d72fc13eff6d47f790c6dc538f5f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/Images.xcassets/Contents.json",
+      "upstream_sha256": "f97dab825674f3003d44bcf553703d4af93f42d6f4bee4a64b2e22007b200d64",
+      "import_sha256": "f97dab825674f3003d44bcf553703d4af93f42d6f4bee4a64b2e22007b200d64",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/Info.plist",
+      "upstream_sha256": "c42a7cbeb980b2cd8db1dc5d147d4aad89b95aefdb7f39c955177e9b743d8511",
+      "import_sha256": "c42a7cbeb980b2cd8db1dc5d147d4aad89b95aefdb7f39c955177e9b743d8511",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/LaunchScreen.storyboard",
+      "upstream_sha256": "b74562f6ccf1466bf5a3a0e1f2d61a774101e42265e28fc51509a57e6038a136",
+      "import_sha256": "b74562f6ccf1466bf5a3a0e1f2d61a774101e42265e28fc51509a57e6038a136",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/PrivacyInfo.xcprivacy",
+      "upstream_sha256": "1417f9a86f319d8b2f9890289e2665d1a8b62601186723a31a707935d56ce1b7",
+      "import_sha256": "1417f9a86f319d8b2f9890289e2665d1a8b62601186723a31a707935d56ce1b7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/ios/WorkSphereMobile/SceneDelegate.swift",
+      "upstream_sha256": "e29fe71cea70775d3983ef64aa0a3c295780551b9466c2aabdc179e99e2cf540",
+      "import_sha256": "e29fe71cea70775d3983ef64aa0a3c295780551b9466c2aabdc179e99e2cf540",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/jest.config.js",
+      "upstream_sha256": "68c31321a15a42e4d697b28a7b8d6d7f7739eee0f5f557654aed60c9a7437f3a",
+      "import_sha256": "68c31321a15a42e4d697b28a7b8d6d7f7739eee0f5f557654aed60c9a7437f3a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/metro.config.js",
+      "upstream_sha256": "dd1d59228f96f3724ccf5b62135c2f10e043351d8f16a565b74c8be7f3c57212",
+      "import_sha256": "dd1d59228f96f3724ccf5b62135c2f10e043351d8f16a565b74c8be7f3c57212",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/package-lock.json",
+      "upstream_sha256": "4497fe2ed898b7bed514739b4b58270ab6b5c676b4a6e457e56a2c3fb97eadde",
+      "import_sha256": "4497fe2ed898b7bed514739b4b58270ab6b5c676b4a6e457e56a2c3fb97eadde",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/package.json",
+      "upstream_sha256": "5e81467e0351304f6bde46a1cbff9c20312fffd978257113f110f3f82209711d",
+      "import_sha256": "5e81467e0351304f6bde46a1cbff9c20312fffd978257113f110f3f82209711d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/AppRoot.tsx",
+      "upstream_sha256": "fdcb31ec1ff511eb87dbaf12fd8a5bd3a0e7eaaae4fde5cbffd093949797a0f2",
+      "import_sha256": "fdcb31ec1ff511eb87dbaf12fd8a5bd3a0e7eaaae4fde5cbffd093949797a0f2",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/auth/AuthProvider.tsx",
+      "upstream_sha256": "eb653e374d4df479ef022d39661cdb00beaa08e6f3ba131e18b417d1ba27a413",
+      "import_sha256": "eb653e374d4df479ef022d39661cdb00beaa08e6f3ba131e18b417d1ba27a413",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/auth/authReducer.ts",
+      "upstream_sha256": "b7d39b15b55ac88cd41a5630af78fff555405b689923466ec771823bbab11dc5",
+      "import_sha256": "b7d39b15b55ac88cd41a5630af78fff555405b689923466ec771823bbab11dc5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/auth/authTypes.ts",
+      "upstream_sha256": "0ea7025e7432f94282e9adaefbc19b67299ee7d66ed3e41e7d6462d3fbb8dcb6",
+      "import_sha256": "0ea7025e7432f94282e9adaefbc19b67299ee7d66ed3e41e7d6462d3fbb8dcb6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/auth/index.ts",
+      "upstream_sha256": "255864d7db6ba85730d28f2016928a2089546ee48f3997c7fe3087ffba1fdefd",
+      "import_sha256": "255864d7db6ba85730d28f2016928a2089546ee48f3997c7fe3087ffba1fdefd",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/auth/refreshCoordinator.ts",
+      "upstream_sha256": "a07f15eea4960c25239294040b3cbf651be16b7746e31cf92c9c2d227d811c0d",
+      "import_sha256": "a07f15eea4960c25239294040b3cbf651be16b7746e31cf92c9c2d227d811c0d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/auth/sessionCredentialCoordinator.ts",
+      "upstream_sha256": "c6d9976a91157707de2822876d0eb6191bf04924c0933efb4deca6aedbc7ce9d",
+      "import_sha256": "c6d9976a91157707de2822876d0eb6191bf04924c0933efb4deca6aedbc7ce9d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/navigation/AuthNavigator.tsx",
+      "upstream_sha256": "e5521bf7502dd4c7c341c6917577e0817595fb6364425c1bfa26bfe7259f11a9",
+      "import_sha256": "e5521bf7502dd4c7c341c6917577e0817595fb6364425c1bfa26bfe7259f11a9",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/navigation/MainTabNavigator.tsx",
+      "upstream_sha256": "7df37cd79ee4e0d87ffc76a20f11aa8746220acbf4a36c5baafc0649b41d9e14",
+      "import_sha256": "7df37cd79ee4e0d87ffc76a20f11aa8746220acbf4a36c5baafc0649b41d9e14",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/navigation/RootNavigator.tsx",
+      "upstream_sha256": "c3f364306cb866fc5ea5109951d72d36195bba0c913361a265e35517d04b6180",
+      "import_sha256": "c3f364306cb866fc5ea5109951d72d36195bba0c913361a265e35517d04b6180",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/navigation/index.ts",
+      "upstream_sha256": "ddde0712d5773b4c13a40f0020c4680c71454f2c24038a111b919e8656e885f5",
+      "import_sha256": "ddde0712d5773b4c13a40f0020c4680c71454f2c24038a111b919e8656e885f5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/navigation/types.ts",
+      "upstream_sha256": "6acad008096509a584acc74b2b44f0ad515119156e3fcba5036ec5cc2dbcde5a",
+      "import_sha256": "6acad008096509a584acc74b2b44f0ad515119156e3fcba5036ec5cc2dbcde5a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/providers/AppProviders.tsx",
+      "upstream_sha256": "300d883f0da04a2b72cfad6f5c7921a5a0ed2eeaffc68b7598da0d4cf82290f3",
+      "import_sha256": "300d883f0da04a2b72cfad6f5c7921a5a0ed2eeaffc68b7598da0d4cf82290f3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/providers/ThemeProvider.tsx",
+      "upstream_sha256": "a052099a8e88292e169b31c4775ac3ae8fcaad637387ab174eecb347982c6813",
+      "import_sha256": "a052099a8e88292e169b31c4775ac3ae8fcaad637387ab174eecb347982c6813",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/app/providers/index.ts",
+      "upstream_sha256": "8de4ecec836f864445aaf7a1f1d0583e3b2c2adc3357c561a08ba810c5dfdd18",
+      "import_sha256": "8de4ecec836f864445aaf7a1f1d0583e3b2c2adc3357c561a08ba810c5dfdd18",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/api/authApi.ts",
+      "upstream_sha256": "13623485d665a1a67cd150f7c64d078f63991e98b519a4c3c064b04cb932fd47",
+      "import_sha256": "13623485d665a1a67cd150f7c64d078f63991e98b519a4c3c064b04cb932fd47",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/api/authTypes.ts",
+      "upstream_sha256": "24c02dbbd75ccc0d4720ab2a183c0ed5d52fb5192daab1f9fce3f6b49eb60760",
+      "import_sha256": "24c02dbbd75ccc0d4720ab2a183c0ed5d52fb5192daab1f9fce3f6b49eb60760",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/api/index.ts",
+      "upstream_sha256": "68f1bab101f8824aec796749e893f43af3662fd0da8c252c3080d864478b19dd",
+      "import_sha256": "68f1bab101f8824aec796749e893f43af3662fd0da8c252c3080d864478b19dd",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/errors/authErrorMapper.ts",
+      "upstream_sha256": "40f636fbcec803ea21ddc114e6accd7591054ffa358290571a86343d336e2ec6",
+      "import_sha256": "40f636fbcec803ea21ddc114e6accd7591054ffa358290571a86343d336e2ec6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/errors/index.ts",
+      "upstream_sha256": "478912c123edda4c3e2434ae1399195b58147d87967ce5d487275071c9c93d59",
+      "import_sha256": "478912c123edda4c3e2434ae1399195b58147d87967ce5d487275071c9c93d59",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/index.ts",
+      "upstream_sha256": "026dba769869449bdb04a24edc623eaf40c68ad61112674becb17f704282251d",
+      "import_sha256": "026dba769869449bdb04a24edc623eaf40c68ad61112674becb17f704282251d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/screens/ForgotPasswordScreen.tsx",
+      "upstream_sha256": "4b3b58d70a7c5de621c55107c2315accf38385237025df5dde80dcb991831a0d",
+      "import_sha256": "4b3b58d70a7c5de621c55107c2315accf38385237025df5dde80dcb991831a0d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/screens/LoginScreen.tsx",
+      "upstream_sha256": "3e8591b3eb3f7b71dec99da3b124fd3b37e2aa74cc614ad4646bab47eca15b66",
+      "import_sha256": "3e8591b3eb3f7b71dec99da3b124fd3b37e2aa74cc614ad4646bab47eca15b66",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/screens/ResetPasswordScreen.tsx",
+      "upstream_sha256": "f468847f6ae266865e19cc9e69846a474127da31f659fc6cb3647c4802a33685",
+      "import_sha256": "f468847f6ae266865e19cc9e69846a474127da31f659fc6cb3647c4802a33685",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/screens/index.ts",
+      "upstream_sha256": "d12ac2ff150facbc1e16425ab33cfa980085b7a2bf2a5ab8a805723f08fe4402",
+      "import_sha256": "d12ac2ff150facbc1e16425ab33cfa980085b7a2bf2a5ab8a805723f08fe4402",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/validation/authValidation.ts",
+      "upstream_sha256": "04c9b11ea93ed907a52e4d666b78cc6341a0b1882eab6e343345f992cee65661",
+      "import_sha256": "04c9b11ea93ed907a52e4d666b78cc6341a0b1882eab6e343345f992cee65661",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/auth/validation/index.ts",
+      "upstream_sha256": "85721df103d5585d43a8f6fc5f15f826025fe9f037c917d1f9aca46977654a9c",
+      "import_sha256": "85721df103d5585d43a8f6fc5f15f826025fe9f037c917d1f9aca46977654a9c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/api/dashboardApi.ts",
+      "upstream_sha256": "7abb3b46139e37906128db915fb608beb8635aca4cd943876b1fbbf602db8845",
+      "import_sha256": "7abb3b46139e37906128db915fb608beb8635aca4cd943876b1fbbf602db8845",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/api/dashboardTypes.ts",
+      "upstream_sha256": "df6912fe3ca4cd3eff79232ecb5039962a0f3cf42e5ec9a7297e5f43730a76cf",
+      "import_sha256": "df6912fe3ca4cd3eff79232ecb5039962a0f3cf42e5ec9a7297e5f43730a76cf",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/api/index.ts",
+      "upstream_sha256": "abb5ff939eadd17db7277bae168819d0f1c71f4d4d9d58d1e5ce50619b28f412",
+      "import_sha256": "abb5ff939eadd17db7277bae168819d0f1c71f4d4d9d58d1e5ce50619b28f412",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/components/MetricCard.tsx",
+      "upstream_sha256": "3898034e40a2ae210bd8e0995ef81bac007097fe5e2ebd12d1599e5ee7993dfe",
+      "import_sha256": "3898034e40a2ae210bd8e0995ef81bac007097fe5e2ebd12d1599e5ee7993dfe",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/components/index.ts",
+      "upstream_sha256": "270f077779f305e38b1dd8a0de4aa9da1c27ae6d29fb01183f9437f90d2fa53c",
+      "import_sha256": "270f077779f305e38b1dd8a0de4aa9da1c27ae6d29fb01183f9437f90d2fa53c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/hooks/index.ts",
+      "upstream_sha256": "478342c22287b5df556fdf2b23deac78f63319a72b0f7253106b30645afb18e5",
+      "import_sha256": "478342c22287b5df556fdf2b23deac78f63319a72b0f7253106b30645afb18e5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/hooks/useDashboard.ts",
+      "upstream_sha256": "cc351f032a03e3f9f9c82ab3c33abbb1d9de6e6b255f5956aa52d0bdeb7cd0b6",
+      "import_sha256": "cc351f032a03e3f9f9c82ab3c33abbb1d9de6e6b255f5956aa52d0bdeb7cd0b6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/index.ts",
+      "upstream_sha256": "4bb9a5fbabbaeee4b905391526b6ba4d6102212a4513138dd5c985db8eb7f580",
+      "import_sha256": "4bb9a5fbabbaeee4b905391526b6ba4d6102212a4513138dd5c985db8eb7f580",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/screens/DashboardScreen.tsx",
+      "upstream_sha256": "b2bddfd93c5be2b8f135a5d9e54d4c35f7844e308db49d3b00d2fcec90c2d43e",
+      "import_sha256": "b2bddfd93c5be2b8f135a5d9e54d4c35f7844e308db49d3b00d2fcec90c2d43e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/screens/index.ts",
+      "upstream_sha256": "9b84a1adff1bae144aa477fbc44cda07b31db6c391288332345361e62209bf5e",
+      "import_sha256": "9b84a1adff1bae144aa477fbc44cda07b31db6c391288332345361e62209bf5e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/utils/dateFormat.ts",
+      "upstream_sha256": "c27c9704f32640f1c93e346c7e4edf53575d3f1d1a3daa674160105bc90f0c5e",
+      "import_sha256": "c27c9704f32640f1c93e346c7e4edf53575d3f1d1a3daa674160105bc90f0c5e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/dashboard/utils/index.ts",
+      "upstream_sha256": "5ee76a987e19be44a740aa33393cc33626715ab021ae5fd2f10effa043a2f6f4",
+      "import_sha256": "5ee76a987e19be44a740aa33393cc33626715ab021ae5fd2f10effa043a2f6f4",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/directory/api/directoryApi.ts",
+      "upstream_sha256": "8600bef3d3acecfd705174afb71f4c86258254aa90e5c1397edde688c25b39d8",
+      "import_sha256": "8600bef3d3acecfd705174afb71f4c86258254aa90e5c1397edde688c25b39d8",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/directory/api/directoryTypes.ts",
+      "upstream_sha256": "ae5e9d88a1673e759f6034b0ffc2fa3efed7a2ab9fbf1bb8174d167e16706eb5",
+      "import_sha256": "ae5e9d88a1673e759f6034b0ffc2fa3efed7a2ab9fbf1bb8174d167e16706eb5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/directory/components/UserPickerModal.tsx",
+      "upstream_sha256": "ebd67ec52a265bbe512aae114e73907afcc252f5b11ecaec8756c15822752673",
+      "import_sha256": "ebd67ec52a265bbe512aae114e73907afcc252f5b11ecaec8756c15822752673",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/directory/hooks/useUserDirectory.ts",
+      "upstream_sha256": "05ddacc1f484eaf3dbae13ab25fb43d19a15aea05827fb90b822ec06b6245ae6",
+      "import_sha256": "05ddacc1f484eaf3dbae13ab25fb43d19a15aea05827fb90b822ec06b6245ae6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/directory/index.ts",
+      "upstream_sha256": "66d40e7594ef3e8fd7e890ed52612e8c8ccc2328dc26adc7c70c98a839b6013a",
+      "import_sha256": "66d40e7594ef3e8fd7e890ed52612e8c8ccc2328dc26adc7c70c98a839b6013a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/more/screens/MoreScreen.tsx",
+      "upstream_sha256": "3c26463183e230e19cd0e0728fda9075e2f8771fe0a4e6add6cff3a643967360",
+      "import_sha256": "3c26463183e230e19cd0e0728fda9075e2f8771fe0a4e6add6cff3a643967360",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/more/screens/SettingsScreen.tsx",
+      "upstream_sha256": "2928b81686aa767e396dbd21a78a01b6f095896beecb53b71c91c64fa83cb52b",
+      "import_sha256": "2928b81686aa767e396dbd21a78a01b6f095896beecb53b71c91c64fa83cb52b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/more/screens/index.ts",
+      "upstream_sha256": "162dcaa83f5b918f4c6df4ca8f5bcf4c0b42e1019bd64e723b4733ee66da59f4",
+      "import_sha256": "162dcaa83f5b918f4c6df4ca8f5bcf4c0b42e1019bd64e723b4733ee66da59f4",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/organization/api/departmentApi.ts",
+      "upstream_sha256": "c79d5da9450c019c3502a5b56e4dc23e4ca4460b381a51f081d7fba1417fb3f5",
+      "import_sha256": "c79d5da9450c019c3502a5b56e4dc23e4ca4460b381a51f081d7fba1417fb3f5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/organization/api/departmentTypes.ts",
+      "upstream_sha256": "a114887b878399bbd0c9f2933896e5705d2b291e43dd044f46be7273af51fc17",
+      "import_sha256": "a114887b878399bbd0c9f2933896e5705d2b291e43dd044f46be7273af51fc17",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/organization/components/DepartmentSelectModal.tsx",
+      "upstream_sha256": "d0ed5d1a1e9fcf60a8c547ceba2b85331fa2f46f53e29910e81e269551e63a59",
+      "import_sha256": "d0ed5d1a1e9fcf60a8c547ceba2b85331fa2f46f53e29910e81e269551e63a59",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/organization/index.ts",
+      "upstream_sha256": "b83df8133433b440a9167ab6c5d419eb0cd912036e2c30e704a32c8052b5a4ac",
+      "import_sha256": "b83df8133433b440a9167ab6c5d419eb0cd912036e2c30e704a32c8052b5a4ac",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/profile/index.ts",
+      "upstream_sha256": "3bc90b6236464a8c358d85143bb2510f58b47aaa8e51fdd3b840262da55b4e36",
+      "import_sha256": "3bc90b6236464a8c358d85143bb2510f58b47aaa8e51fdd3b840262da55b4e36",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/profile/screens/ChangePasswordScreen.tsx",
+      "upstream_sha256": "a29a4615e0f96c007960a6a9aa8604e9f4b37c5f5e0674d0851e7c7cf446a7ff",
+      "import_sha256": "a29a4615e0f96c007960a6a9aa8604e9f4b37c5f5e0674d0851e7c7cf446a7ff",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/profile/screens/EditProfileScreen.tsx",
+      "upstream_sha256": "b69177ccd9ec0f46ca7393759e3cb6111dfe1a0fee5313198891c81df575b44f",
+      "import_sha256": "b69177ccd9ec0f46ca7393759e3cb6111dfe1a0fee5313198891c81df575b44f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/profile/screens/ProfileScreen.tsx",
+      "upstream_sha256": "70f221939a7b6374d683fa1763d6c513e97c251c7301083b1287db95593eb4f7",
+      "import_sha256": "70f221939a7b6374d683fa1763d6c513e97c251c7301083b1287db95593eb4f7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/profile/screens/index.ts",
+      "upstream_sha256": "20c634692d49bc14693c20bc3cc3ae8f6c3e44037c1b7fe445e216b68e49b8aa",
+      "import_sha256": "20c634692d49bc14693c20bc3cc3ae8f6c3e44037c1b7fe445e216b68e49b8aa",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/api/index.ts",
+      "upstream_sha256": "c298d16664de3952bd73cf9019ff93cd0d63b5f1d68ce21e8338863b23e018a4",
+      "import_sha256": "c298d16664de3952bd73cf9019ff93cd0d63b5f1d68ce21e8338863b23e018a4",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/api/projectApi.ts",
+      "upstream_sha256": "cd280cd6fbcd044e8110a068dafe3be4a93d28f746837a302f833c2a077be7d3",
+      "import_sha256": "cd280cd6fbcd044e8110a068dafe3be4a93d28f746837a302f833c2a077be7d3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/api/projectTypes.ts",
+      "upstream_sha256": "8ccdcd2bd874a667933b73aad1f7011457af87c2294debb27dae2cc56571d413",
+      "import_sha256": "8ccdcd2bd874a667933b73aad1f7011457af87c2294debb27dae2cc56571d413",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/components/ChangeStatusModal.tsx",
+      "upstream_sha256": "7067f23c64295c1679b68b1b50d8839c5fe24838e214f36b419b0f3b5c703a16",
+      "import_sha256": "7067f23c64295c1679b68b1b50d8839c5fe24838e214f36b419b0f3b5c703a16",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/components/CreateMilestoneModal.tsx",
+      "upstream_sha256": "28a7ad39f710a72ef229e6a7008373e0e17650ec9917bfa6af695de6bb4e43e3",
+      "import_sha256": "28a7ad39f710a72ef229e6a7008373e0e17650ec9917bfa6af695de6bb4e43e3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/components/ProjectCard.tsx",
+      "upstream_sha256": "42f075c0688a9b63ea22024d8be6116625a9dc36b7d4296e658d1577fe0a423c",
+      "import_sha256": "42f075c0688a9b63ea22024d8be6116625a9dc36b7d4296e658d1577fe0a423c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/components/index.ts",
+      "upstream_sha256": "f270812d3e32815fe99fe04aaeba91557727dce852d7d125957915eef7b4c65a",
+      "import_sha256": "f270812d3e32815fe99fe04aaeba91557727dce852d7d125957915eef7b4c65a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/domain/projectStatusTransitions.ts",
+      "upstream_sha256": "f29933bc1b136d8b5a497400e21d5b96a892eb814c74149d5ac23ec17f5c7b56",
+      "import_sha256": "f29933bc1b136d8b5a497400e21d5b96a892eb814c74149d5ac23ec17f5c7b56",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/errors/index.ts",
+      "upstream_sha256": "bba4f89c69c6c4e43089b4e8addcfeaf5316c58f4eead3d5db9135f6f64552a0",
+      "import_sha256": "bba4f89c69c6c4e43089b4e8addcfeaf5316c58f4eead3d5db9135f6f64552a0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/errors/projectErrorMapper.ts",
+      "upstream_sha256": "ff20901836c45190cada16fb840168882957043e06953e8e5122a5ffe0aab2b3",
+      "import_sha256": "ff20901836c45190cada16fb840168882957043e06953e8e5122a5ffe0aab2b3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/hooks/index.ts",
+      "upstream_sha256": "ee3275c40fe47027c7c1b32e60bbcecfced62043cda3bc5c9b9ac7460bc8afbf",
+      "import_sha256": "ee3275c40fe47027c7c1b32e60bbcecfced62043cda3bc5c9b9ac7460bc8afbf",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/hooks/useProjectDetail.ts",
+      "upstream_sha256": "0f338375f0bebef84304be8e4ec511dce0a23ca03bf2bc2a1a58c177cdfa0b3f",
+      "import_sha256": "0f338375f0bebef84304be8e4ec511dce0a23ca03bf2bc2a1a58c177cdfa0b3f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/hooks/useProjectMembers.ts",
+      "upstream_sha256": "1391a076a9ed5a28e769de6b1e75d900a39bfd6b185f09cb99a28af8971e5785",
+      "import_sha256": "1391a076a9ed5a28e769de6b1e75d900a39bfd6b185f09cb99a28af8971e5785",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/hooks/useProjects.ts",
+      "upstream_sha256": "e92d48d704bc6434ad348956be02f1db2fd5e9d25ba5657bac436fddc59cb9bb",
+      "import_sha256": "e92d48d704bc6434ad348956be02f1db2fd5e9d25ba5657bac436fddc59cb9bb",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/index.ts",
+      "upstream_sha256": "5d8fd86644898f68722b723601252f028ec2b5d5526fe4b581fb86e1584ca907",
+      "import_sha256": "5d8fd86644898f68722b723601252f028ec2b5d5526fe4b581fb86e1584ca907",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/screens/CreateProjectScreen.tsx",
+      "upstream_sha256": "2a47de42a905e92504b496f281dcb1c4914cbc80f8e554e1f56b40195ea813bb",
+      "import_sha256": "2a47de42a905e92504b496f281dcb1c4914cbc80f8e554e1f56b40195ea813bb",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/screens/EditProjectScreen.tsx",
+      "upstream_sha256": "1fc5100d98460fe10eab8077b18f5db3cdf3525d78eda8c8542c76ce5ed5d5f5",
+      "import_sha256": "1fc5100d98460fe10eab8077b18f5db3cdf3525d78eda8c8542c76ce5ed5d5f5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/screens/ProjectDetailScreen.tsx",
+      "upstream_sha256": "be86158ba23909a029422dbe13647b2831e9af0e50439a7fd827e3d86733c87f",
+      "import_sha256": "be86158ba23909a029422dbe13647b2831e9af0e50439a7fd827e3d86733c87f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/screens/ProjectMembersScreen.tsx",
+      "upstream_sha256": "c59c3872c6f402527fc975150124f0275f2def2fda917be8d2124c6996f55416",
+      "import_sha256": "c59c3872c6f402527fc975150124f0275f2def2fda917be8d2124c6996f55416",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/screens/ProjectMilestonesScreen.tsx",
+      "upstream_sha256": "28e2984cecc4deb2a91016337ea4eeed662cc264549740e456ffd178b1a6361c",
+      "import_sha256": "28e2984cecc4deb2a91016337ea4eeed662cc264549740e456ffd178b1a6361c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/screens/ProjectsScreen.tsx",
+      "upstream_sha256": "764b420bb9894b7322bd0d0816b4ccdb62184fdbc7dcad04e381e62918b19e2b",
+      "import_sha256": "764b420bb9894b7322bd0d0816b4ccdb62184fdbc7dcad04e381e62918b19e2b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/projects/screens/index.ts",
+      "upstream_sha256": "3779af5dbe92e3b6664e4e9384fab50f77357e28bac82f2deae546a7575be11d",
+      "import_sha256": "3779af5dbe92e3b6664e4e9384fab50f77357e28bac82f2deae546a7575be11d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/api/index.ts",
+      "upstream_sha256": "559ca0914f918a77670a3585e43a88a176f6ca528205463dff50206311ecf1a1",
+      "import_sha256": "559ca0914f918a77670a3585e43a88a176f6ca528205463dff50206311ecf1a1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/api/serviceRequestApi.ts",
+      "upstream_sha256": "69a3bb040cdb464bfaad7eb2e1b640e14a010347b6cf3963ebeeac837fac87bb",
+      "import_sha256": "69a3bb040cdb464bfaad7eb2e1b640e14a010347b6cf3963ebeeac837fac87bb",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/errors/index.ts",
+      "upstream_sha256": "5b7b2608eb202ec1e43ffa5d6e70e2f86b860976286f598f711097d8f9e6feda",
+      "import_sha256": "5b7b2608eb202ec1e43ffa5d6e70e2f86b860976286f598f711097d8f9e6feda",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/errors/serviceRequestErrorMapper.ts",
+      "upstream_sha256": "c41816975772dcd850c455ad93209d07064d76979bde78fff094c55ac623f858",
+      "import_sha256": "c41816975772dcd850c455ad93209d07064d76979bde78fff094c55ac623f858",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/index.ts",
+      "upstream_sha256": "7f15ad8da14d90024dc61e91816b9ca2d5174d0ee6f75ee6322187465c9725c6",
+      "import_sha256": "7f15ad8da14d90024dc61e91816b9ca2d5174d0ee6f75ee6322187465c9725c6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/screens/ServiceRequestsScreen.tsx",
+      "upstream_sha256": "05c1b554e3d8f6cb79390ed93bed816d72ada5964b9a5fad2acf387151968317",
+      "import_sha256": "05c1b554e3d8f6cb79390ed93bed816d72ada5964b9a5fad2acf387151968317",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/screens/index.ts",
+      "upstream_sha256": "544fe740b87e584f221b5d7571d28c62c6d499dd0882b4d3f0055eb6109e4c83",
+      "import_sha256": "544fe740b87e584f221b5d7571d28c62c6d499dd0882b4d3f0055eb6109e4c83",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/types/index.ts",
+      "upstream_sha256": "fce298d4f181fc7c4b6a1c5f29a3ee2491540ee6bda48f9aced65df4e5382a2a",
+      "import_sha256": "fce298d4f181fc7c4b6a1c5f29a3ee2491540ee6bda48f9aced65df4e5382a2a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/serviceRequests/types/serviceRequestTypes.ts",
+      "upstream_sha256": "263df0cc203b3da7dba9ba9a61b8d5aee33511fa846b81b4e4de3b68528945e1",
+      "import_sha256": "263df0cc203b3da7dba9ba9a61b8d5aee33511fa846b81b4e4de3b68528945e1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/api/index.ts",
+      "upstream_sha256": "fa363660b9e4b6f082ac22948b840851ea3e9dc2a52e8c50a102fcbd69743685",
+      "import_sha256": "fa363660b9e4b6f082ac22948b840851ea3e9dc2a52e8c50a102fcbd69743685",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/api/taskApi.ts",
+      "upstream_sha256": "06f3f0a00a692e9d798ddb91274c18ac19c2a109df46773cc72ce8a3daacca20",
+      "import_sha256": "06f3f0a00a692e9d798ddb91274c18ac19c2a109df46773cc72ce8a3daacca20",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/api/taskTypes.ts",
+      "upstream_sha256": "83eaa1893c45854f94e4f6883d71726e4d6108900f18726eaff1954963d965c9",
+      "import_sha256": "83eaa1893c45854f94e4f6883d71726e4d6108900f18726eaff1954963d965c9",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/components/ChangeStatusModal.tsx",
+      "upstream_sha256": "49acf61ddb5e4853a6da853e508261a3cbc03e213ccfa91b90562811b0b390ed",
+      "import_sha256": "49acf61ddb5e4853a6da853e508261a3cbc03e213ccfa91b90562811b0b390ed",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/components/CreateSubtaskModal.tsx",
+      "upstream_sha256": "bd097220077bda6f94e5af86831b81e5dfcc2fbc79d76bbcac808f0c4fe7b3b0",
+      "import_sha256": "bd097220077bda6f94e5af86831b81e5dfcc2fbc79d76bbcac808f0c4fe7b3b0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/components/ProjectMemberAssigneePickerModal.tsx",
+      "upstream_sha256": "4b7a07cdbb99e1d0fe019d1d12ea21d3fa24b0be218c9f2c29caf99717477b7a",
+      "import_sha256": "4b7a07cdbb99e1d0fe019d1d12ea21d3fa24b0be218c9f2c29caf99717477b7a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/components/ProjectSelectModal.tsx",
+      "upstream_sha256": "b5841673450c0c0bd42d12afa50dfeabfa0e7b9ec56432936dbe44cf4b01dc5e",
+      "import_sha256": "b5841673450c0c0bd42d12afa50dfeabfa0e7b9ec56432936dbe44cf4b01dc5e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/components/TaskCard.tsx",
+      "upstream_sha256": "67732eeb372cc9c79295d8a134d7987a1de7a2ceb1a36594d6474b2840349bc7",
+      "import_sha256": "67732eeb372cc9c79295d8a134d7987a1de7a2ceb1a36594d6474b2840349bc7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/components/UpdateProgressModal.tsx",
+      "upstream_sha256": "5a87d2b38fdb5ef2910fa11390bb761c75f4ba6cc3b206e4381e731908ff1223",
+      "import_sha256": "5a87d2b38fdb5ef2910fa11390bb761c75f4ba6cc3b206e4381e731908ff1223",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/components/index.ts",
+      "upstream_sha256": "b42715a94d930a2bb1b27e8759d7d48593b2e40c69393fc8bf3678e7aa640738",
+      "import_sha256": "b42715a94d930a2bb1b27e8759d7d48593b2e40c69393fc8bf3678e7aa640738",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/domain/taskStatusTransitions.ts",
+      "upstream_sha256": "2a1d3d4959812be8afaeb0b2d23044aa3a301e13af05be44f115d4aaa90ed583",
+      "import_sha256": "2a1d3d4959812be8afaeb0b2d23044aa3a301e13af05be44f115d4aaa90ed583",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/errors/index.ts",
+      "upstream_sha256": "5d754157d7b2e2178d04df0bcb20c3d71d0cdfd8df7d0f3b4089359bf2b2b204",
+      "import_sha256": "5d754157d7b2e2178d04df0bcb20c3d71d0cdfd8df7d0f3b4089359bf2b2b204",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/errors/taskErrorMapper.ts",
+      "upstream_sha256": "f1203920dd8c58122aac16391902a12e1c7eef2c24996b4a78a70d552879ffe5",
+      "import_sha256": "f1203920dd8c58122aac16391902a12e1c7eef2c24996b4a78a70d552879ffe5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/hooks/index.ts",
+      "upstream_sha256": "519b21bc5b5615ce569499a4bf628dde1bb6410b70d6746f14d91195b9035e8b",
+      "import_sha256": "519b21bc5b5615ce569499a4bf628dde1bb6410b70d6746f14d91195b9035e8b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/hooks/useSubtasks.ts",
+      "upstream_sha256": "2216479cbaa0ad49519fc91fa47371623b57292bcbc5c819e4c72b19320e400b",
+      "import_sha256": "2216479cbaa0ad49519fc91fa47371623b57292bcbc5c819e4c72b19320e400b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/hooks/useTaskComments.ts",
+      "upstream_sha256": "b6a462ff0bf7a78479b1ef7d284f9e5b258f661416d51e283d97ae582886f42a",
+      "import_sha256": "b6a462ff0bf7a78479b1ef7d284f9e5b258f661416d51e283d97ae582886f42a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/hooks/useTaskDetail.ts",
+      "upstream_sha256": "0bbc8801303c201a597432d3227ce68f485282f5cba866b107272da668336dd7",
+      "import_sha256": "0bbc8801303c201a597432d3227ce68f485282f5cba866b107272da668336dd7",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/hooks/useTasks.ts",
+      "upstream_sha256": "24851a6355bbed0462b435ec0e8f3a8eee3bf919a9e27a561445b1a92ce266fa",
+      "import_sha256": "24851a6355bbed0462b435ec0e8f3a8eee3bf919a9e27a561445b1a92ce266fa",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/index.ts",
+      "upstream_sha256": "83b3635f5dd83d7c166d3946988c192be4791563fabee579e088447c7db01ff6",
+      "import_sha256": "83b3635f5dd83d7c166d3946988c192be4791563fabee579e088447c7db01ff6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/screens/CreateTaskScreen.tsx",
+      "upstream_sha256": "b29a446c3b902d72e39e1debb1ebdef10a1ee5aaebadfc9f455d8aaa0dc92051",
+      "import_sha256": "b29a446c3b902d72e39e1debb1ebdef10a1ee5aaebadfc9f455d8aaa0dc92051",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/screens/EditTaskScreen.tsx",
+      "upstream_sha256": "05c822258166fdacb08c5c33caf135f5654b6f8f4609b2c2e13fbcfb6106726c",
+      "import_sha256": "05c822258166fdacb08c5c33caf135f5654b6f8f4609b2c2e13fbcfb6106726c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/screens/SubtaskListScreen.tsx",
+      "upstream_sha256": "402a868c0400141fc383cc9a09b5a0d59aaf572b5f55bea74843e1c6b610d83f",
+      "import_sha256": "402a868c0400141fc383cc9a09b5a0d59aaf572b5f55bea74843e1c6b610d83f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/screens/TaskCommentsScreen.tsx",
+      "upstream_sha256": "8f3d9c8a3fc57f810718dd351d5672740ee05f61f6d6b6f33ba87aceddd24cf6",
+      "import_sha256": "8f3d9c8a3fc57f810718dd351d5672740ee05f61f6d6b6f33ba87aceddd24cf6",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/screens/TaskDetailScreen.tsx",
+      "upstream_sha256": "ca7166b7924999b05203cce189eed344cd61220897da763fcf60d3ef9c2d54dd",
+      "import_sha256": "ca7166b7924999b05203cce189eed344cd61220897da763fcf60d3ef9c2d54dd",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/screens/TasksScreen.tsx",
+      "upstream_sha256": "ad57c3f7a883e9201fea26b9637b2eba432f97a6d69a3db004efa816109c90df",
+      "import_sha256": "ad57c3f7a883e9201fea26b9637b2eba432f97a6d69a3db004efa816109c90df",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/screens/index.ts",
+      "upstream_sha256": "8fa3c4f8cfe5148d5fd6737c4ea5703c8eeddf866cbd035afb8b4c58ca4544f4",
+      "import_sha256": "8fa3c4f8cfe5148d5fd6737c4ea5703c8eeddf866cbd035afb8b4c58ca4544f4",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/features/tasks/utils/taskDate.ts",
+      "upstream_sha256": "63c501abafe9521ea1580bac9da64dfbc541b25288e49fdc6f0f1705f9d5b0b9",
+      "import_sha256": "63c501abafe9521ea1580bac9da64dfbc541b25288e49fdc6f0f1705f9d5b0b9",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/api/apiClient.ts",
+      "upstream_sha256": "3d80691dfa3daf0f7e6fcec3e7025f9aa7d86690aa299e150c0c1e714f8a92f0",
+      "import_sha256": "3d80691dfa3daf0f7e6fcec3e7025f9aa7d86690aa299e150c0c1e714f8a92f0",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/api/apiEnvelope.ts",
+      "upstream_sha256": "7db3190a8c71e35344007549b3a7d109c16828d8a49f5ef574951f8f8b6225ee",
+      "import_sha256": "7db3190a8c71e35344007549b3a7d109c16828d8a49f5ef574951f8f8b6225ee",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/api/apiError.ts",
+      "upstream_sha256": "eeed659f3e0af13c3d4b1e61d970d6f94ddf4eca344342b48fb25b0e6f89bf1b",
+      "import_sha256": "eeed659f3e0af13c3d4b1e61d970d6f94ddf4eca344342b48fb25b0e6f89bf1b",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/api/apiTypes.ts",
+      "upstream_sha256": "ee131dbf45f4cdb9c72e38b0c157bd451ae653abd98b5da7a62f323a7c046c76",
+      "import_sha256": "ee131dbf45f4cdb9c72e38b0c157bd451ae653abd98b5da7a62f323a7c046c76",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/api/axios.d.ts",
+      "upstream_sha256": "0bb64f1a9891eb87ee3bee3107fa22dd26d744ed16c85722d8e018e18e568143",
+      "import_sha256": "0bb64f1a9891eb87ee3bee3107fa22dd26d744ed16c85722d8e018e18e568143",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/api/index.ts",
+      "upstream_sha256": "da3f17c62b68fd26f218cb542eb35ed39f6593a537d126de82071e5e43962f75",
+      "import_sha256": "da3f17c62b68fd26f218cb542eb35ed39f6593a537d126de82071e5e43962f75",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/AppButton.tsx",
+      "upstream_sha256": "90fcb20e5bd28f8ddc71254ae8dee05c103a27aac80b1d250481ab237a8787ad",
+      "import_sha256": "90fcb20e5bd28f8ddc71254ae8dee05c103a27aac80b1d250481ab237a8787ad",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/AppTextInput.tsx",
+      "upstream_sha256": "94c8508d580314c5a13d631fd983911e3134eaa7fc82e251a061bbfa955927e2",
+      "import_sha256": "94c8508d580314c5a13d631fd983911e3134eaa7fc82e251a061bbfa955927e2",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/ConfirmationDialog.tsx",
+      "upstream_sha256": "b06409be3e4b007557b27adc2ed07074324767ccc895eb19141893a5c50ff390",
+      "import_sha256": "b06409be3e4b007557b27adc2ed07074324767ccc895eb19141893a5c50ff390",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/EmptyState.tsx",
+      "upstream_sha256": "ebe1e290eaea7b15e8874cdb5823feec70bfb47c8fd0916de76c544d3af937fe",
+      "import_sha256": "ebe1e290eaea7b15e8874cdb5823feec70bfb47c8fd0916de76c544d3af937fe",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/ErrorState.tsx",
+      "upstream_sha256": "9afde8effb038a40652c7e5fbec0db8bd5044e89f01c5187f219eeefd1fb3a47",
+      "import_sha256": "9afde8effb038a40652c7e5fbec0db8bd5044e89f01c5187f219eeefd1fb3a47",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/LoadingIndicator.tsx",
+      "upstream_sha256": "a56be4fd895a9671e004824f08daa866b670c6767da0e9cc32559932fe5a8630",
+      "import_sha256": "a56be4fd895a9671e004824f08daa866b670c6767da0e9cc32559932fe5a8630",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/PasswordInput.tsx",
+      "upstream_sha256": "3bb6aa6e080cdeac657b08c174ebadbdf092bd4aa0acea0e7fd9931148ddac30",
+      "import_sha256": "3bb6aa6e080cdeac657b08c174ebadbdf092bd4aa0acea0e7fd9931148ddac30",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/PlaceholderScreen.tsx",
+      "upstream_sha256": "60d34d744ea4bca6af6c0a0d71e73bb2319b5f047ba560709ec0a2fc4ca992d2",
+      "import_sha256": "60d34d744ea4bca6af6c0a0d71e73bb2319b5f047ba560709ec0a2fc4ca992d2",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/PriorityBadge.tsx",
+      "upstream_sha256": "9c82c2f4b983493c4ac66e69d4f9ba51cfa77c6137312bb25e9c9e1692386d7c",
+      "import_sha256": "9c82c2f4b983493c4ac66e69d4f9ba51cfa77c6137312bb25e9c9e1692386d7c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/SearchBar.tsx",
+      "upstream_sha256": "307706ef3f056f35321ab426592e05fc10367a18b9359563b6e0b6c4c22e2886",
+      "import_sha256": "307706ef3f056f35321ab426592e05fc10367a18b9359563b6e0b6c4c22e2886",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/StatusBadge.tsx",
+      "upstream_sha256": "e36cfb24192cf48c0586644fe1068b34ce9ccbcd69a3c86ff3a7b42e8dc01986",
+      "import_sha256": "e36cfb24192cf48c0586644fe1068b34ce9ccbcd69a3c86ff3a7b42e8dc01986",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/components/index.ts",
+      "upstream_sha256": "a940b704f68008efdb9bdee1ef01741f25a31a3a27d487b25143b149478da3f2",
+      "import_sha256": "a940b704f68008efdb9bdee1ef01741f25a31a3a27d487b25143b149478da3f2",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/config/appInfo.ts",
+      "upstream_sha256": "84346b1df6529749efc84c12812100f7589de3dc248316ab2cda0eac40ec108c",
+      "import_sha256": "84346b1df6529749efc84c12812100f7589de3dc248316ab2cda0eac40ec108c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/config/environment.ts",
+      "upstream_sha256": "edfbf5577447922bb48247fa979a58707f9a269ba374c04cff31f09cc1cf88c3",
+      "import_sha256": "edfbf5577447922bb48247fa979a58707f9a269ba374c04cff31f09cc1cf88c3",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/config/index.ts",
+      "upstream_sha256": "38a1fba9feaf4c10838b1ee1235528a46010b11e90665ad539a253382df2c3f1",
+      "import_sha256": "38a1fba9feaf4c10838b1ee1235528a46010b11e90665ad539a253382df2c3f1",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/config/nativeEnvironment.ts",
+      "upstream_sha256": "0a5d4af1e520d632164a0c3e0765da06734ab1a46d879d1d4f16980fa03f147e",
+      "import_sha256": "0a5d4af1e520d632164a0c3e0765da06734ab1a46d879d1d4f16980fa03f147e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/storage/accessTokenStore.ts",
+      "upstream_sha256": "3b16bf7418d1afc64a5e2ff799f5401e6a5835bb4be027190d3fe727b8d41527",
+      "import_sha256": "3b16bf7418d1afc64a5e2ff799f5401e6a5835bb4be027190d3fe727b8d41527",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/storage/index.ts",
+      "upstream_sha256": "898bbd358a74061a24359a96dce1c72e0ee69c21012d8d773554d6cac5f34414",
+      "import_sha256": "898bbd358a74061a24359a96dce1c72e0ee69c21012d8d773554d6cac5f34414",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/storage/localStorage.ts",
+      "upstream_sha256": "d56a5833e1e30784e042d434ad265994260e6313a224129cf9cc64d24f95722f",
+      "import_sha256": "d56a5833e1e30784e042d434ad265994260e6313a224129cf9cc64d24f95722f",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/storage/secureStorage.ts",
+      "upstream_sha256": "840174eead14d82de2f6022f6165aa699aab5e17e44c7df0fbbacb36a0df99f9",
+      "import_sha256": "840174eead14d82de2f6022f6165aa699aab5e17e44c7df0fbbacb36a0df99f9",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/storage/storageKeys.ts",
+      "upstream_sha256": "ac8be2ec89986322f17e6243f570c8061614ab084c1ecd6a8deb6ca3b33a5144",
+      "import_sha256": "ac8be2ec89986322f17e6243f570c8061614ab084c1ecd6a8deb6ca3b33a5144",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/theme/colors.ts",
+      "upstream_sha256": "29e376840c39189d2f433e3e5bc16c40e3cc52d932c0ffeabc018dfa65d6913c",
+      "import_sha256": "29e376840c39189d2f433e3e5bc16c40e3cc52d932c0ffeabc018dfa65d6913c",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/theme/index.ts",
+      "upstream_sha256": "5357e5fe9b67f678ac0c073ff1154f583729b669793f1bdf97ed7ee390c1a65e",
+      "import_sha256": "5357e5fe9b67f678ac0c073ff1154f583729b669793f1bdf97ed7ee390c1a65e",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/theme/radii.ts",
+      "upstream_sha256": "af7a19844379e6aa762cbd3b90a019155bbed0774a4457d448353869d10dcb8a",
+      "import_sha256": "af7a19844379e6aa762cbd3b90a019155bbed0774a4457d448353869d10dcb8a",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/theme/shadows.ts",
+      "upstream_sha256": "9b21c152104dfe617c57c4e88bcbb7253991395f21c4bdd775945397dbb1aadc",
+      "import_sha256": "9b21c152104dfe617c57c4e88bcbb7253991395f21c4bdd775945397dbb1aadc",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/theme/spacing.ts",
+      "upstream_sha256": "8d935fa67c0cac61fbe8de3b0d7f837e3c165a1fb0d0d3407f6a0ee2625c78b5",
+      "import_sha256": "8d935fa67c0cac61fbe8de3b0d7f837e3c165a1fb0d0d3407f6a0ee2625c78b5",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/theme/theme.ts",
+      "upstream_sha256": "1eafa4330d9363c7e89826dafdb8e27a2923658821967911fba6a5affcc9a53d",
+      "import_sha256": "1eafa4330d9363c7e89826dafdb8e27a2923658821967911fba6a5affcc9a53d",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/src/shared/theme/typography.ts",
+      "upstream_sha256": "ac6952059fc7eff043e51745c34fadfacba7f716b3ae7f4c67b53ed971c7c544",
+      "import_sha256": "ac6952059fc7eff043e51745c34fadfacba7f716b3ae7f4c67b53ed971c7c544",
+      "local_patch": false
+    },
+    {
+      "path": "mobile/tsconfig.json",
+      "upstream_sha256": "081c5d1a004f8dd2d9f14356c930ff8ca542a52be787e9df202c01d06dba158b",
+      "import_sha256": "081c5d1a004f8dd2d9f14356c930ff8ca542a52be787e9df202c01d06dba158b",
+      "local_patch": false
+    }
+  ]
+}

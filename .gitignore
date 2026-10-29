@@ -1,0 +1,79 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Java and Spring Boot
+backend/target/
+*.class
+*.jar
+*.war
+
+# Node and React Native
+node_modules/
+mobile/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React Native Android
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+mobile/android/local.properties
+
+# React Native iOS
+mobile/ios/Pods/
+mobile/ios/build/
+mobile/ios/DerivedData/
+
+# Build, coverage and test output
+coverage/
+test-results/
+dist/
+build/
+*.exec
+
+# Runtime data
+logs/
+*.log
+uploads/
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE and operating system
+.idea/
+*.iml
+.vscode/settings.json
+.vs/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+~$*
+
+# External resources, quarantined artifacts, and local caches (never commit third-party artifacts)
+.external/*
+!.external/README.md
+
+# Course repositories: local-only data
+work/
+.external/
+.env.local
+*.dump
+*.backup
+*.apk
+*.aab
+**/.xcode.env.local
