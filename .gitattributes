@@ -1,0 +1,8 @@
+*.pdf binary
+*.keystore binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.sh text eol=lf
+backend/mvnw text eol=lf
+mobile/android/gradlew text eol=lf
