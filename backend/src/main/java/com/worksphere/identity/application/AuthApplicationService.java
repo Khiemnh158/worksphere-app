@@ -160,14 +160,20 @@ public class AuthApplicationService {
             throw new BusinessRuleException("ACCOUNT_DISABLED", "Tài khoản đã bị vô hiệu hóa");
         }
 
+        user.validateCanLogin();
+
         // Find session associated with old token
-        LoginSession session = loginSessionRepository.findByRefreshTokenId(oldToken.getId())
+        LoginSession session = loginSessionRepository.findByRefreshTokenIdForUpdate(oldToken.getId())
                 .orElseThrow(() -> new BusinessRuleException("SESSION_NOT_FOUND",
                         "Phiên đăng nhập không tồn tại"));
 
         if (!session.isActive()) {
             throw new BusinessRuleException("SESSION_NOT_FOUND", "Phiên đăng nhập không còn hoạt động");
         }
+
+        // All session mutations lock the session before token rows to avoid lock-order inversions.
+        oldToken = refreshTokenRepository.findByTokenHashForUpdate(tokenHash)
+                .orElseThrow(() -> new BusinessRuleException("REFRESH_TOKEN_INVALID", "Refresh token không hợp lệ"));
 
         // Rotate refresh token
         String newRawToken = generateSecureToken();
@@ -214,21 +220,31 @@ public class AuthApplicationService {
      */
     @Transactional
     public void logout(LogoutRequest request, UUID currentUserId) {
-        String tokenHash = hashToken(request.refreshToken());
+        refreshTokenRepository.findByTokenHash(hashToken(request.refreshToken()))
+                .filter(token -> currentUserId.equals(token.getUserId()))
+                .flatMap(token -> loginSessionRepository.findByRefreshTokenId(token.getId()))
+                .ifPresent(session -> logout(request, currentUserId, session.getId()));
+    }
 
-        refreshTokenRepository.findByTokenHash(tokenHash).ifPresent(token -> {
-            // Verify token belongs to current user
-            if (token.getUserId().equals(currentUserId)) {
-                token.revoke();
-                refreshTokenRepository.save(token);
-
-                loginSessionRepository.findByRefreshTokenId(token.getId()).ifPresent(session -> {
+    @Transactional
+    public void logout(LogoutRequest request, UUID currentUserId, UUID currentSessionId) {
+        if (currentSessionId == null) {
+            throw new org.springframework.security.access.AccessDeniedException("Không tìm thấy phiên đăng nhập hiện hành");
+        }
+        loginSessionRepository.findByIdForUpdate(currentSessionId)
+                .filter(session -> currentUserId.equals(session.getUserId()))
+                .ifPresent(session -> {
                     session.logout();
                     loginSessionRepository.save(session);
+                    if (session.getRefreshTokenId() != null) {
+                        refreshTokenRepository.findById(session.getRefreshTokenId())
+                                .filter(token -> currentUserId.equals(token.getUserId()))
+                                .ifPresent(token -> {
+                                    token.revoke();
+                                    refreshTokenRepository.save(token);
+                                });
+                    }
                 });
-                log.info("User logged out. userId={}", currentUserId);
-            }
-        });
     }
 
     /**
@@ -237,8 +253,8 @@ public class AuthApplicationService {
      */
     @Transactional
     public void logoutAll(UUID currentUserId) {
-        refreshTokenRepository.revokeAllByUserId(currentUserId, Instant.now());
         loginSessionRepository.revokeAllActiveByUserId(currentUserId, Instant.now());
+        refreshTokenRepository.revokeAllByUserId(currentUserId, Instant.now());
         log.info("All sessions revoked. userId={}", currentUserId);
     }
 
@@ -316,8 +332,8 @@ public class AuthApplicationService {
         passwordResetTokenRepository.save(resetToken);
 
         // Per security policy: revoke all active sessions after password reset
-        refreshTokenRepository.revokeAllByUserId(user.getId(), Instant.now());
         loginSessionRepository.revokeAllActiveByUserId(user.getId(), Instant.now());
+        refreshTokenRepository.revokeAllByUserId(user.getId(), Instant.now());
 
         log.info("Password reset completed. userId={}", user.getId());
     }

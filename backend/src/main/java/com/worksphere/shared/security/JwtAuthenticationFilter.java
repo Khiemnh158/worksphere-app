@@ -5,6 +5,7 @@ import com.worksphere.identity.domain.Role;
 import com.worksphere.identity.domain.User;
 import com.worksphere.identity.domain.UserStatus;
 import com.worksphere.identity.infrastructure.persistence.UserRepository;
+import com.worksphere.identity.infrastructure.persistence.LoginSessionRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,10 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final LoginSessionRepository loginSessionRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository,
+                                   LoginSessionRepository loginSessionRepository) {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.loginSessionRepository = loginSessionRepository;
     }
 
     @Override
@@ -62,6 +66,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             Claims claims = jwtService.validateAndParseToken(token);
             UUID userId = UUID.fromString(claims.getSubject());
+            UUID sessionId = UUID.fromString(claims.get("sessionId", String.class));
+
+            boolean activeSession = loginSessionRepository.findById(sessionId)
+                    .filter(session -> session.isActive() && userId.equals(session.getUserId()))
+                    .isPresent();
+            if (!activeSession) {
+                throw new JwtAuthenticationException("ACCESS_TOKEN_REVOKED", "Phiên đăng nhập không còn hoạt động");
+            }
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 User user = userRepository.findActiveById(userId).orElse(null);
@@ -71,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    new WorkSphereUserPrincipal(user),
+                                    new WorkSphereUserPrincipal(user, sessionId),
                                     null,
                                     authorities
                             );

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111413" />
+    <title>WorkSphere · Không gian làm việc</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Đến nội dung</a>
+    <aside class="sidebar">
+      <a class="brand" href="./" aria-label="WorkSphere, trang chủ"
+        ><span class="brand-mark">w<span>·</span></span
+        ><span>worksphere<small>KHÔNG GIAN NỘI BỘ</small></span></a
+      >
+      <div class="workspace">
+        <span class="workspace-logo">A</span
+        ><span>An Phát<small>Thương mại & dịch vụ</small></span
+        ><span class="online" title="Dữ liệu minh họa"></span>
+      </div>
+      <p class="nav-label">KHÔNG GIAN CỦA BẠN</p>
+      <nav aria-label="Điều hướng chính">
+        <button class="nav active" data-view="overview">
+          <span>◈</span>Tổng quan
+        </button>
+        <button class="nav" data-view="calendar">
+          <span>▦</span>Lịch công việc
+        </button>
+        <button class="nav" data-view="assigned">
+          <span>☷</span>Việc được giao <b>4</b>
+        </button>
+        <button class="nav" data-view="requests">
+          <span>◇</span>Yêu cầu hỗ trợ
+        </button>
+        <button class="nav scoped" data-view="queue" hidden>
+          <span>▤</span>Hàng đợi IT
+        </button>
+        <button class="nav scoped" data-view="accounts" hidden>
+          <span>♧</span>Tài khoản nội bộ
+        </button>
+      </nav>
+      <div class="sidebar-note">
+        <span class="note-icon">↗</span>
+        <p>
+          Một nơi để bắt đầu.<small
+            >Theo dõi công việc, tiếp nối tiến độ và cùng hoàn thành.</small
+          >
+        </p>
+      </div>
+      <button class="profile" id="profile-button">
+        <span class="avatar lime" id="profile-initial">H</span
+        ><span id="profile-name"
+          >Hải Nguyễn<small>Nhân viên · Phòng IT</small></span
+        ><span>⌄</span>
+      </button>
+    </aside>
+    <div class="page">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Không gian làm việc <span>/</span>
+          <strong id="view-title">Tổng quan</strong>
+        </div>
+        <div class="top-actions">
+          <span class="preview-label">Bản xem trước · Dữ liệu minh họa</span
+          ><button
+            class="icon-button"
+            id="notifications"
+            aria-label="Xem thông báo"
+          >
+            ♧<i></i></button
+          ><button
+            class="avatar lime mobile-avatar"
+            id="mobile-profile"
+            aria-label="Xem phạm vi quyền"
+          >
+            H
+          </button>
+        </div>
+      </header>
+      <main id="main">
+        <section class="greeting">
+          <div>
+            <div class="eyebrow" id="today-label"></div>
+            <h1 id="greeting">Chào bạn, Hải<span>✦</span></h1>
+            <p>Một ngày mới, từng việc một. Bạn đã sẵn sàng tiếp tục?</p>
+          </div>
+          <label class="persona-label"
+            >Xem bố cục theo vai trò<select
+              id="persona"
+              aria-label="Chọn vai trò để xem bố cục minh họa"
+            >
+              <option value="employee">Hải · Nhân viên IT</option>
+              <option value="manager">Hùng · Quản lý IT</option>
+              <option value="admin">Admin · Quản trị</option>
+            </select></label
+          >
+        </section>
+        <div id="secondary-view" hidden></div>
+        <div id="overview">
+          <div class="layout">
+            <div class="main-column">
+              <section class="hero">
+                <div class="hero-copy">
+                  <span class="hero-kicker">KHÔNG GIAN CỦA BẠN</span>
+                  <h2>Mọi việc,<br />đúng nhịp.</h2>
+                  <p>
+                    Tiến độ được tiếp nối.<br />Mỗi đóng góp đều được ghi nhận.
+                  </p>
+                  <button id="hero-action">
+                    Xem việc hôm nay <span>↗</span>
+                  </button>
+                </div>
+                <div class="hero-art" aria-hidden="true">
+                  <div class="orbit orbit-one"></div>
+                  <div class="orbit orbit-two"></div>
+                  <div class="art-card">
+                    <span>TIẾP NỐI CÔNG VIỆC</span><b>65<span>%</span></b>
+                    <div class="art-progress"><i></i></div>
+                    <small>Lan <span>→</span> Hải</small>
+                  </div>
+                  <div class="spark">✦</div>
+                </div>
+              </section>
+              <section class="stats" aria-label="Tổng quan công việc minh họa">
+                <article>
+                  <span class="stat-icon lavender">☷</span>
+                  <div>
+                    <p>Việc được giao</p>
+                    <strong>04</strong><small>Trong phạm vi của bạn</small>
+                  </div>
+                </article>
+                <article>
+                  <span class="stat-icon lime">↗</span>
+                  <div>
+                    <p>Cần rà soát bàn giao</p>
+                    <strong id="review-count">01</strong
+                    ><small id="review-summary">Tiếp tục tiến độ đã có</small>
+                  </div>
+                </article>
+                <article>
+                  <span class="stat-icon peach">◷</span>
+                  <div>
+                    <p>Đến hạn tuần này</p>
+                    <strong>03</strong><small>Cùng sắp xếp ưu tiên</small>
+                  </div>
+                </article>
+              </section>
+              <section class="work-section">
+                <div class="section-heading">
+                  <div>
+                    <span class="eyebrow">TỪNG BƯỚC HOÀN THÀNH</span>
+                    <h2>Công việc của tôi <span class="count">4</span></h2>
+                  </div>
+                  <button class="text-button" id="all-work">
+                    Xem tất cả ↗
+                  </button>
+                </div>
+                <div class="filter-row">
+                  <div class="filters" role="group" aria-label="Lọc công việc">
+                    <button
+                      class="selected"
+                      data-filter="all"
+                      aria-pressed="true"
+                    >
+                      Tất cả</button
+                    ><button data-filter="progress" aria-pressed="false">
+                      Đang làm</button
+                    ><button data-filter="handover" aria-pressed="false">
+                      Bàn giao
+                    </button>
+                  </div>
+                  <label class="search"
+                    ><span aria-hidden="true">⌕</span
+                    ><input
+                      id="search"
+                      aria-label="Tìm công việc"
+                      placeholder="Tìm công việc..."
+                  /></label>
+                </div>
+                <div id="task-grid" class="task-grid"></div>
+                <p id="empty-tasks" class="empty" hidden>
+                  Không có công việc phù hợp.
+                </p>
+              </section>
+              <section class="handover-banner">
+                <div class="handover-symbol">⇄</div>
+                <div>
+                  <h3>Bàn giao là tiếp nối</h3>
+                  <p>
+                    Giữ tiến độ của Lan. Hải xem lại kết quả, xác định phần cần
+                    làm tiếp và ghi nhận nếu có vấn đề.
+                  </p>
+                </div>
+                <button id="handover-open" class="text-button">
+                  Rà soát ↗
+                </button>
+              </section>
+            </div>
+            <aside class="agenda-column">
+              <section class="agenda">
+                <div class="section-heading">
+                  <h2>Lịch của tôi</h2>
+                  <span class="calendar-icon">▦</span>
+                </div>
+                <div class="month-label">
+                  <strong id="month-label"></strong><span>7 ngày tới</span>
+                </div>
+                <div
+                  class="days"
+                  id="days"
+                  role="group"
+                  aria-label="Chọn ngày xem công việc"
+                ></div>
+                <div class="agenda-heading">
+                  <span id="agenda-day"></span
+                  ><span class="dot-label">Kế hoạch cá nhân</span>
+                </div>
+                <div id="agenda-items"></div>
+                <p class="agenda-footnote">
+                  Thời gian dưới đây là lịch minh họa để duyệt bố cục.
+                </p>
+              </section>
+              <section class="activity">
+                <div class="section-heading">
+                  <h2>Gần đây</h2>
+                  <span class="small muted">HÔM NAY</span>
+                </div>
+                <div class="activity-line">
+                  <span class="avatar tiny lavender">L</span>
+                  <div>
+                    <p><b>Lan</b> đã cập nhật tài liệu cấu hình.</p>
+                    <small>Lịch sử trước bàn giao</small>
+                  </div>
+                </div>
+                <div class="activity-line">
+                  <span class="avatar tiny lime">H</span>
+                  <div>
+                    <p><b>Hùng</b> đã bàn giao công việc cho Hải.</p>
+                    <small>Tiến độ giữ nguyên: 65%</small>
+                  </div>
+                </div>
+                <div id="review-activity"></div>
+              </section>
+              <button class="access-link" id="access-button">
+                ◉ Phạm vi quyền của tôi <span>↗</span>
+              </button>
+            </aside>
+          </div>
+        </div>
+        <footer class="page-footer">
+          <span>WorkSphere · Làm việc cùng nhau.</span
+          ><span>Giao diện đang được phát triển</span>
+        </footer>
+      </main>
+    </div>
+    <dialog id="detail-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-top">
+        <span class="eyebrow">CHI TIẾT CÔNG VIỆC MINH HỌA</span
+        ><button
+          id="dialog-close"
+          class="icon-button"
+          aria-label="Đóng chi tiết"
+        >
+          ×
+        </button>
+      </div>
+      <div id="dialog-body"></div>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

@@ -76,6 +76,7 @@ public class NotificationMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         OpenEntityManagerInViewFilter osivFilter = new OpenEntityManagerInViewFilter();
         osivFilter.setServletContext(context.getServletContext());
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
@@ -89,8 +90,8 @@ public class NotificationMockMvcTest {
         createTestUser(user1Id, "notif_user1", "notif_user1@test.com", "EMPLOYEE");
         createTestUser(user2Id, "notif_user2", "notif_user2@test.com", "EMPLOYEE");
 
-        user1Token = jwtService.generateAccessToken(user1Id, UUID.randomUUID());
-        user2Token = jwtService.generateAccessToken(user2Id, UUID.randomUUID());
+        user1Token = authorizationAccessToken(user1Id);
+        user2Token = authorizationAccessToken(user2Id);
     }
 
     @Test
@@ -268,5 +269,15 @@ public class NotificationMockMvcTest {
                 SELECT ?, r.id, NOW() FROM roles r WHERE r.code = ?
                 ON CONFLICT DO NOTHING
                 """, userId, roleCode);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

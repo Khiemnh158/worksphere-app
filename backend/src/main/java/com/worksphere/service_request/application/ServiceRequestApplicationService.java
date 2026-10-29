@@ -78,6 +78,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ServiceRequestApplicationService {
 
+    private final ServiceRequestAccessPolicy accessPolicy;
+
     private static final Logger log = LoggerFactory.getLogger(ServiceRequestApplicationService.class);
     private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
@@ -108,7 +110,8 @@ public class ServiceRequestApplicationService {
             AssetRepository assetRepository,
             AssetAssignmentRepository assetAssignmentRepository,
             Clock clock,
-            com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher
+            com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher,
+            ServiceRequestAccessPolicy accessPolicy
     ) {
         this.requestRepository = requestRepository;
         this.categoryRepository = categoryRepository;
@@ -123,6 +126,7 @@ public class ServiceRequestApplicationService {
         this.assetAssignmentRepository = assetAssignmentRepository;
         this.clock = clock;
         this.eventDispatcher = eventDispatcher;
+        this.accessPolicy = accessPolicy;
     }
 
     @Transactional
@@ -438,6 +442,10 @@ public class ServiceRequestApplicationService {
             categoryId = cat.getId();
         }
 
+        if (request.assetId() != null) {
+            validateAssetForRequest(request.assetId(), principal);
+        }
+
         sr.updateContent(
                 request.title().trim(),
                 request.description().trim(),
@@ -456,6 +464,13 @@ public class ServiceRequestApplicationService {
     public void assignRequest(UUID requestId, AssignServiceRequestRequest request, WorkSphereUserPrincipal principal) {
         ServiceRequest sr = requestRepository.findByIdForUpdate(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+
+        if (sr.getStatus() == ServiceStatus.CLOSED || sr.getStatus() == ServiceStatus.CANCELLED) {
+            throw new BusinessRuleException("INVALID_REQUEST_STATE", "Không thể phân công yêu cầu đã kết thúc");
+        }
+        if (sr.getRequesterId().equals(request.assigneeId())) {
+            throw new BusinessRuleException("INVALID_REQUEST_STATE", "Người gửi không được tự xử lý yêu cầu của mình");
+        }
 
         User assignee = userRepository.findById(request.assigneeId())
                 .orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", "Không tìm thấy người xử lý"));
@@ -515,7 +530,8 @@ public class ServiceRequestApplicationService {
         boolean isAdmin = hasSystemAdminRole(principal);
         boolean isActiveAssignee = assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(requestId, principal.userId());
 
-        if (!isAdmin && !isActiveAssignee) {
+        boolean isRequester = sr.getRequesterId().equals(principal.userId());
+        if (!isAdmin && !isActiveAssignee && !isRequester) {
             throw new AccessDeniedException("Bạn không có quyền cập nhật trạng thái yêu cầu này");
         }
 
@@ -532,6 +548,10 @@ public class ServiceRequestApplicationService {
                     "SERVICE_STATUS_TRANSITION_INVALID",
                     "Chuyển đổi trạng thái không hợp lệ từ " + sr.getStatus() + " sang " + request.status()
             );
+        }
+
+        if (!accessPolicy.canTransition(sr.getStatus(), request.status(), isRequester, isActiveAssignee, isAdmin)) {
+            throw new AccessDeniedException("Bạn không có quyền thực hiện bước này trong quy trình hỗ trợ");
         }
 
         if (request.status() == ServiceStatus.RESOLVED) {
@@ -865,17 +885,21 @@ public class ServiceRequestApplicationService {
                 request.getId(), principal.userId()
         );
 
-        if (isAdmin) {
+        if (isAdmin && request.getStatus() != ServiceStatus.CLOSED && request.getStatus() != ServiceStatus.CANCELLED) {
             actions.add("ASSIGN");
         }
 
         if (isRequester) {
             if (request.getStatus() == ServiceStatus.OPEN) {
                 actions.add("UPDATE");
-                actions.add("CANCEL");
+                if (accessPolicy.canTransition(request.getStatus(), ServiceStatus.CANCELLED, isRequester, isActiveAssignee, isAdmin)) {
+                    actions.add("CANCEL");
+                }
             } else if (request.getStatus() == ServiceStatus.RESOLVED) {
                 actions.add("REJECT_RESOLUTION");
-                actions.add("CONFIRM");
+                if (accessPolicy.canTransition(request.getStatus(), ServiceStatus.CLOSED, isRequester, isActiveAssignee, isAdmin)) {
+                    actions.add("CONFIRM");
+                }
             } else if (request.getStatus() == ServiceStatus.CLOSED) {
                 if (!ratingRepository.existsByRequestId(request.getId())) {
                     actions.add("RATE");

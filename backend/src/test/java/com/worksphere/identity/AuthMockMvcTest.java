@@ -122,6 +122,7 @@ public class AuthMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -334,7 +335,7 @@ public class AuthMockMvcTest {
     @Order(11)
     void protectedEndpoint_shouldSucceed_whenValidTokenProvided() throws Exception {
         UUID sessionId = UUID.randomUUID();
-        String validToken = jwtService.generateAccessToken(activeUserId, sessionId);
+        String validToken = authorizationAccessToken(activeUserId);
 
         mockMvc.perform(get("/api/v1/me")
                         .header("Authorization", "Bearer " + validToken))
@@ -495,5 +496,15 @@ public class AuthMockMvcTest {
         } catch (Exception e) {
             throw new RuntimeException("SHA-256 not available", e);
         }
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

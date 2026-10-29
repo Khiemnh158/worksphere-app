@@ -1,3 +1,3 @@
 # Trạng thái hiện hành
 
-29/10/2026: tách baseline cho ba môn. Đọc STATUS.md và TODO.md ở root; báo cáo lịch sử nằm dưới reports/legacy và không phải kết quả của phiên hiện tại. Hai patch F01/F02 đã nhập; chưa bắt đầu xây lại UI/auth/role trong lượt tách repo.
+29/10/2026: authorization foundation đợt 1 và dark UI draft; đọc STATUS.md, reports/AUTHORIZATION_FOUNDATION.md và docs/ACCESS_AND_HANDOVER_MVP.md. Tập 97 tests qua, 8 integration PostgreSQL thật; không phải toàn bộ backend suite. Chưa nối web vào API hoặc triển khai offboarding/handover đầy đủ.

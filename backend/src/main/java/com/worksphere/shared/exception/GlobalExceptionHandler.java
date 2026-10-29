@@ -85,6 +85,9 @@ public class GlobalExceptionHandler {
                  "SERVICE_RATING_ALREADY_EXISTS", "OPTIMISTIC_LOCK_CONFLICT",
                  "ASSET_CODE_ALREADY_EXISTS", "ASSET_SERIAL_ALREADY_EXISTS",
                  "ASSET_ASSIGNMENT_CONFLICT", "ASSET_CATEGORY_CODE_ALREADY_EXISTS" -> HttpStatus.CONFLICT;
+            case "INVALID_CREDENTIALS", "REFRESH_TOKEN_INVALID", "REFRESH_TOKEN_EXPIRED", "REFRESH_TOKEN_REVOKED",
+                 "SESSION_NOT_FOUND", "ACCOUNT_LOCKED", "ACCOUNT_DISABLED", "ACCOUNT_PENDING" -> HttpStatus.UNAUTHORIZED;
+            case "FORBIDDEN" -> HttpStatus.FORBIDDEN;
             default -> HttpStatus.UNPROCESSABLE_ENTITY;
         };
         return ResponseEntity.status(status)

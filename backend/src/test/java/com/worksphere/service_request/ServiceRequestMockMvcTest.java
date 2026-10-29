@@ -163,6 +163,7 @@ public class ServiceRequestMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -191,25 +192,25 @@ public class ServiceRequestMockMvcTest {
         adminUserId = UUID.randomUUID();
         insertUser(adminUserId, "admin_sr_test", "admin_sr@test.com", true);
         assignRole(adminUserId, "ADMIN");
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         // 2. Requester (Employee)
         requesterUserId = UUID.randomUUID();
         insertUser(requesterUserId, "requester_sr_test", "requester_sr@test.com", true);
         assignRole(requesterUserId, "EMPLOYEE");
-        requesterToken = jwtService.generateAccessToken(requesterUserId, UUID.randomUUID());
+        requesterToken = authorizationAccessToken(requesterUserId);
 
         // 3. Assignee (Team Leader / Handler)
         assigneeUserId = UUID.randomUUID();
         insertUser(assigneeUserId, "assignee_sr_test", "assignee_sr@test.com", true);
         assignRole(assigneeUserId, "TEAM_LEADER");
-        assigneeToken = jwtService.generateAccessToken(assigneeUserId, UUID.randomUUID());
+        assigneeToken = authorizationAccessToken(assigneeUserId);
 
         // 4. Unrelated (Employee)
         unrelatedUserId = UUID.randomUUID();
         insertUser(unrelatedUserId, "unrelated_sr_test", "unrelated_sr@test.com", true);
         assignRole(unrelatedUserId, "EMPLOYEE");
-        unrelatedToken = jwtService.generateAccessToken(unrelatedUserId, UUID.randomUUID());
+        unrelatedToken = authorizationAccessToken(unrelatedUserId);
 
         // 5. Default Category
         defaultCategory = ServiceCategory.create(
@@ -637,10 +638,10 @@ public class ServiceRequestMockMvcTest {
         assertThat(sr.getStatus()).isEqualTo(ServiceStatus.RESOLVED);
         assertThat(sr.getResolvedAt()).isNotNull();
 
-        // 6. RESOLVED -> CLOSED by Admin
+        // 6. RESOLVED -> CLOSED by requester
         UpdateServiceRequestStatusRequest toClosed = new UpdateServiceRequestStatusRequest(ServiceStatus.CLOSED, "Xác nhận đóng", sr.getVersion());
         mockMvc.perform(put("/api/v1/service-requests/" + sr.getId() + "/status")
-                        .header("Authorization", "Bearer " + adminToken)
+                        .header("Authorization", "Bearer " + requesterToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(toClosed)))
                 .andExpect(status().isOk());
@@ -1231,5 +1232,15 @@ public class ServiceRequestMockMvcTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isForbidden());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

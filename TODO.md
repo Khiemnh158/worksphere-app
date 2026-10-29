@@ -13,15 +13,15 @@ Các ô bỏ trống đều CHƯA LÀM, không phải kết quả đã hoàn th�
 - [ ] Tạo fixture requester/coordinator/agent/admin và hai project/nhóm để test chéo.
 
 ## A1 - Xác thực và quyền (chặn public)
-- [ ] F03 thu hồi access theo session khi logout/reset, test phiên A/B.
-- [ ] F04 rotation refresh atomic: 2 concurrent refresh chỉ 1 thành công.
-- [ ] F05 ProjectPolicy trên mọi mutation và test PM A không sửa B.
+- [x] F03 thu hồi access theo session khi logout/reset, test phiên A/B.
+- [x] F04 rotation refresh atomic: 2 concurrent refresh chỉ 1 thành công.
+- [x] F05 ProjectPolicy trên mọi mutation và test PM A không sửa B.
 - [ ] F14/F15 error catalog + lỗi login ngoài thống nhất; rate limit theo phạm vi.
 - [ ] Chẩn đoán 1 Jest timeout/act/open handles, không tăng timeout để che nguyên nhân.
 
 ## A2 - Ticket trọn vòng
-- [ ] F06 requester cancel/confirm; F07 không assign terminal; F08 asset link khi update.
-- [ ] F32 owner team/category + queue scope + coordinator assign đúng team, migration mới.
+- [x] F06 requester cancel/confirm; F07 không assign terminal; F08 asset link khi update.
+- [ ] F32 category/phòng tiếp nhận + queue scope + coordinator đúng phòng, migration mới; nhiều team hoãn.
 - [ ] F17 timestamp reopen; F18 notification reject; audit thao tác chính F23.
 - [ ] Test state, version, permissions và attachment liên quan.
 
@@ -39,3 +39,11 @@ Các ô bỏ trống đều CHƯA LÀM, không phải kết quả đã hoàn th�
 - [ ] Full asset UI, SLA và ticket-task link sau khi phần bắt buộc đủ.
 
 Chi tiết F01-F34: docs/audit/findings.json và PDF. Hạ tầng ở repo deployment; test an toàn chuyên đề ở security; mọi fix business code vẫn ở app.
+
+## Bổ sung sau đợt 1
+
+- [x] Phác thảo dark UI responsive: công việc, lịch 7 ngày, rà soát bàn giao giữ 65%; fixture, chưa nối API.
+- [x] 97 kiểm thử thuộc tập được chọn và Maven package qua; 8 ca integration PostgreSQL riêng.
+- [ ] API nghỉ việc/ngừng hoạt động, queue cần bàn giao, ghi nhận rà soát của người nhận; không reset tiến độ.
+- [ ] Nối UI vào login/me và nghiệp vụ thực, sau đó áp thiết kế mobile.
+- [ ] Chạy toàn bộ legacy Testcontainers suite khi Docker Engine sẵn sàng.

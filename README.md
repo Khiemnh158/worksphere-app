@@ -2,7 +2,7 @@
 
 Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh nghiệp. Đây là **nguồn ứng dụng chuẩn** của ba học phần.
 
-**Trạng thái 29/10/2026: import baseline đã chạy local + hai bản vá khởi động/xác thực. Chưa hoàn thiện nghiệp vụ, chưa xây lại UI, chưa đạt production-ready.**
+**Trạng thái 29/10/2026: nhánh feat/authorization-foundation bổ sung quyền dự án/phiên/ticket và UI dark prototype. 97 test được chọn qua; chưa hoàn thiện nghiệp vụ, chưa đạt production-ready.**
 
 | Học phần | Repository | Phạm vi |
 | --- | --- | --- |
@@ -18,6 +18,12 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 4. [Backlog ưu tiên](TODO.md), [kế hoạch cho một người chính](docs/SOLO_PLAN.md).
 5. [Cách chạy](docs/RUNNING.md), [báo cáo audit PDF](docs/audit/WorkSphere-audit-2026-10-29.pdf).
 
+## Bắt đầu phát triển
+
+- [Hợp đồng quyền và bàn giao](docs/ACCESS_AND_HANDOVER_MVP.md)
+- [Kết quả đợt 1 và giới hạn kiểm thử](reports/AUTHORIZATION_FOUNDATION.md)
+- [Dark UI prototype](web/README.md): chạy `node scripts/preview-ui.mjs`, mở http://127.0.0.1:18110.
+
 ## Có sẵn
 
 - `backend/`: Spring Boot modular monolith, PostgreSQL, Flyway V001-V017; identity, organization, project, task, service_request, asset, file, notification.
@@ -28,8 +34,8 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 
 ## Chưa có, không coi là đã làm
 
-- Web app mới và thiết kế UI mới; hàng đợi hỗ trợ theo team; quyền trạng thái requester đúng đầy đủ.
-- Sửa triệt để logout/refresh race, phạm vi project và các phát hiện còn mở.
+- Web client nối API thật; hàng đợi theo phòng; offboarding và bàn giao lưu DB đầy đủ.
+- Các phát hiện còn lại ngoài phạm vi đợt 1; xem STATUS và kết quả kiểm thử mới.
 - Pipeline CI/CD hoàn chỉnh, Dockerfile/Compose, Sonar, Prometheus/Grafana và bản release mobile.
 - Audit writer/onboarding email đầy đủ.
 

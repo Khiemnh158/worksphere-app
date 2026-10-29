@@ -222,8 +222,8 @@ public class UserManagementApplicationService {
         userRepository.save(user);
 
         // Revoke active sessions and refresh tokens per security rules
-        refreshTokenRepository.revokeAllByUserId(userId, Instant.now());
         loginSessionRepository.revokeAllActiveByUserId(userId, Instant.now());
+        refreshTokenRepository.revokeAllByUserId(userId, Instant.now());
 
         log.info("User locked by admin. userId={}, reason={}", userId, reason);
     }
