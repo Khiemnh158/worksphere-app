@@ -1,3 +1,8 @@
+# Chạy web hiện hành
+
+Đọc WEB_RUNNING.md cho cổng web/API mới. Tên JAR trong repo này hiện là target/worksphere-web.jar. Phần dưới là hướng dẫn nguồn kế thừa; launcher mobile trong workspace dùng checkout gốc riêng, không dùng để nhận web mới đã hoạt động.
+
+
 # Chạy source hiện có
 
 ## Toolchain

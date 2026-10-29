@@ -7,19 +7,33 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * JPA Entity for service_requests table.
- * Per 05_DATABASE_DESIGN.md section 9.2 and V007 migration.
+ * JPA Entity for service_requests table. Per 05_DATABASE_DESIGN.md section 9.2 and V007 migration.
  */
 @Entity
 @Table(name = "service_requests")
 public class ServiceRequest {
+    public void touch(UUID actor, Instant now) {
+        this.updatedBy = actor;
+        this.updatedAt = now;
+    }
 
-    @Id
-    private UUID id;
+    @Column(name = "receiving_department_id")
+    private UUID receivingDepartmentId;
+
+    public UUID getReceivingDepartmentId() {
+        return receivingDepartmentId;
+    }
+
+    public void routeTo(UUID departmentId) {
+        this.receivingDepartmentId = departmentId;
+    }
+
+    @Id private UUID id;
 
     @Column(name = "request_number", nullable = false, unique = true, length = 30)
     private String requestNumber;
@@ -75,8 +89,7 @@ public class ServiceRequest {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    protected ServiceRequest() {
-    }
+    protected ServiceRequest() {}
 
     public static ServiceRequest create(
             UUID id,
@@ -88,8 +101,7 @@ public class ServiceRequest {
             String description,
             ServicePriority priority,
             UUID createdBy,
-            Instant now
-    ) {
+            Instant now) {
         ServiceRequest sr = new ServiceRequest();
         sr.id = id != null ? id : UUID.randomUUID();
         sr.requestNumber = requestNumber;
@@ -115,8 +127,7 @@ public class ServiceRequest {
             UUID categoryId,
             UUID assetId,
             UUID updatedBy,
-            Instant now
-    ) {
+            Instant now) {
         this.title = title;
         this.description = description;
         if (priority != null) {

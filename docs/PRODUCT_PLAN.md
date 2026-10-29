@@ -1,3 +1,8 @@
+# Kế hoạch hiện hành
+
+Cổng web đã được triển khai theo docs/WEB_WORKFLOWS.md và báo cáo ở reports/WEB_IMPLEMENTATION.md. Mobile làm sau. Các phần mô tả kế hoạch ban đầu bên dưới không thay thế hợp đồng mới hoặc biến mục chưa làm thành đã làm.
+
+
 # Kế hoạch xây lại UI và hoàn thiện nghiệp vụ (CHƯA TRIỂN KHAI)
 
 ## Mô hình tối thiểu

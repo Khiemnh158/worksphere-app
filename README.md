@@ -2,11 +2,11 @@
 
 Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh nghiệp. Đây là **nguồn ứng dụng chuẩn** của ba học phần.
 
-**Trạng thái 29/10/2026: nhánh feat/authorization-foundation bổ sung quyền dự án/phiên/ticket và UI dark prototype. 97 test được chọn qua; chưa hoàn thiện nghiệp vụ, chưa đạt production-ready.**
+**Trạng thái: web đã nối API và PostgreSQL, có đăng nhập thật, quyền theo phòng, hỗ trợ, công việc/bàn giao, quản trị và đối soát công/thu nhập. 120 backend tests trong tập chọn + 5 client session tests đạt; chưa phải bản production hoặc toàn bộ test suite.**
 
 | Học phần | Repository | Phạm vi |
 | --- | --- | --- |
-| Kỹ năng lập trình nâng cao | [worksphere-app](https://github.com/Khiemnh158/worksphere-app) | Backend, web dự kiến, mobile kế thừa, hợp đồng API, nghiệp vụ, tests |
+| Kỹ năng lập trình nâng cao | [worksphere-app](https://github.com/Khiemnh158/worksphere-app) | Backend, web, mobile kế thừa, hợp đồng API, nghiệp vụ, tests |
 | An toàn thông tin | [worksphere-security](https://github.com/Khiemnh158/worksphere-security) | Mô hình đe dọa, test quyền/session, scan, báo cáo trước/sau |
 | Triển khai phần mềm | [worksphere-deployment](https://github.com/Khiemnh158/worksphere-deployment) | Jenkins, Docker Compose, Sonar, Prom/Graf, vận hành và minh chứng |
 
@@ -22,11 +22,11 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 
 - [Hợp đồng quyền và bàn giao](docs/ACCESS_AND_HANDOVER_MVP.md)
 - [Kết quả đợt 1 và giới hạn kiểm thử](reports/AUTHORIZATION_FOUNDATION.md)
-- [Dark UI prototype](web/README.md): chạy `node scripts/preview-ui.mjs`, mở http://127.0.0.1:18110.
+- [Cổng web và cách chạy](docs/WEB_RUNNING.md), [hợp đồng nghiệp vụ](docs/WEB_WORKFLOWS.md), [kết quả xác minh](reports/WEB_IMPLEMENTATION.md).
 
 ## Có sẵn
 
-- `backend/`: Spring Boot modular monolith, PostgreSQL, Flyway V001-V017; identity, organization, project, task, service_request, asset, file, notification.
+- `backend/`: Spring Boot modular monolith, PostgreSQL, Flyway V001-V022; identity, organization, project, task, service_request, asset, file, notification.
 - `mobile/`: React Native/TypeScript; auth, dashboard, project/task; ServiceRequest mới có foundation/API, UI chưa trọn luồng.
 - `design/`: thiết kế/prototype kế thừa, **không phải web frontend đang vận hành**.
 - `docs/legacy/`, `reports/legacy/`: tài liệu lịch sử của source bốn môn cũ, giữ để truy vết.
@@ -34,7 +34,7 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 
 ## Chưa có, không coi là đã làm
 
-- Web client nối API thật; hàng đợi theo phòng; offboarding và bàn giao lưu DB đầy đủ.
+- Chấm công QR/GPS và kết nối máy vân tay thật, ca đêm/qua ngày, thuế/BHXH/lương thực nhận, xử lý pháp lý bồi thường, lịch ngừng việc tương lai, email khôi phục và hardening production.
 - Các phát hiện còn lại ngoài phạm vi đợt 1; xem STATUS và kết quả kiểm thử mới.
 - Pipeline CI/CD hoàn chỉnh, Dockerfile/Compose, Sonar, Prometheus/Grafana và bản release mobile.
 - Audit writer/onboarding email đầy đủ.

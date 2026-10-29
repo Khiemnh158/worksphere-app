@@ -1,3 +1,15 @@
+# Web đang chạy — 29/10/2026
+
+Nhánh feat/authorization-foundation tiếp tục phát triển cổng web thật. Không còn persona picker/prototype cho các màn đang vận hành. Hợp đồng hiện hành: docs/WEB_WORKFLOWS.md; cách chạy: docs/WEB_RUNNING.md.
+
+- Đã có: login/refresh/logout, phòng/nhân sự/quyền, queue theo phòng, hỗ trợ trọn vòng, công việc và nghiệm thu/bàn giao, thông báo, nguồn công/đơn/duyệt, thu nhập tạm tính và khóa phiếu đối soát.
+- 120 backend tests được chọn: 0 lỗi, 0 failure, 0 skip; 31 integration PostgreSQL thật (23 Workplace + 8 Authorization). 5 tests session client đạt. Maven package thành công. Xem reports/web-validation.json và reports/WEB_IMPLEMENTATION.md.
+- Máy đang chạy database thực hành worksphere_web riêng; ứng dụng/database mobile cũ được giữ. Không tạo lịch công, quỹ nghỉ hoặc mức lương giả định cho người dùng.
+- Chưa làm: mobile mới; thiết bị vân tay/QR/GPS; ca đêm; lương thực nhận/thuế/BHXH/bồi thường; lịch nghỉ việc tương lai; email onboarding/reset; hardening/rate limit và toàn bộ legacy Testcontainers suite.
+- Các module project/task cũ chưa được coi là đã chuyển sang mô hình phòng ban. Hai repo security/deployment vẫn ghim baseline cho tới khi chốt release.
+
+## Lịch sử đợt trước (không phải trạng thái web hiện tại)
+
 # Trạng thái hiện hành - 29/10/2026
 
 Đợt 1 đang ở nhánh feat/authorization-foundation. Quyền theo project, session revocation/refresh và quyền trạng thái ticket đã có code + test. Dark UI responsive ở web/ là prototype dữ liệu minh họa, chưa nối backend. Chưa có offboarding/handover và queue phòng ban hoàn chỉnh.

@@ -1,3 +1,9 @@
+# Cập nhật triển khai web
+
+Hợp đồng đang vận hành và giới hạn ở WEB_WORKFLOWS.md. Bàn giao công việc và yêu cầu hỗ trợ đã lưu DB, không còn chỉ là minh họa. Tài khoản/phòng ban và ngừng truy cập đã có API; quyết định pháp lý/lịch hiệu lực tương lai vẫn chưa được tự động hóa.
+
+## Hợp đồng đợt foundation ban đầu
+
 # Hợp đồng quyền và bàn giao MVP - 29/10/2026
 
 Trạng thái: hợp đồng đã được thống nhất trong trao đổi. Chỉ các mục ở phần “đã triển khai đợt 1” là code hoạt động; các luồng còn lại là thiết kế tiếp theo.

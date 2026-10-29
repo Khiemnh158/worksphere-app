@@ -1,3 +1,9 @@
+# Cập nhật phạm vi theo yêu cầu triển khai web
+
+Người dùng đã chọn web làm trước, mobile triển khai sau trên cùng máy chủ. Các tính năng và giới hạn đang có được chốt bằng docs/WEB_WORKFLOWS.md; phiên bản web thật thay prototype. Đề cương chấm điểm chính thức vẫn chưa được cung cấp, không tự suy diễn yêu cầu giảng viên.
+
+## Phạm vi đề xuất ban đầu (đọc cùng cập nhật trên)
+
 # Phạm vi Kỹ năng lập trình nâng cao
 
 ## Mục tiêu

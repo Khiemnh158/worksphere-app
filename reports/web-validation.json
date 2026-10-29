@@ -1,0 +1,113 @@
+{
+  "scope": "Selected web, authorization and domain tests; not the entire legacy Testcontainers suite",
+  "suites": [
+    {
+      "name": "com.worksphere.file.application.FilenameSanitizerTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.174"
+    },
+    {
+      "name": "com.worksphere.file.application.FileValidationServiceTest",
+      "tests": "25",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.245"
+    },
+    {
+      "name": "com.worksphere.file.domain.StoredFileTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.07"
+    },
+    {
+      "name": "com.worksphere.identity.AuthorizationPostgresTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "15.098"
+    },
+    {
+      "name": "com.worksphere.identity.dev.E2eUserProvisionerTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.766"
+    },
+    {
+      "name": "com.worksphere.identity.SessionAuthorizationTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.361"
+    },
+    {
+      "name": "com.worksphere.identity.WorkplacePostgresTest",
+      "tests": "23",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "44.354"
+    },
+    {
+      "name": "com.worksphere.project.ProjectAccessPolicyTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.13"
+    },
+    {
+      "name": "com.worksphere.service_request.ServiceRequestAccessPolicyTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.007"
+    },
+    {
+      "name": "com.worksphere.task.TaskTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.014"
+    },
+    {
+      "name": "com.worksphere.task.TaskWorkflowTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.016"
+    }
+  ],
+  "total": {
+    "tests": 120,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "postgresIntegrationTests": 31,
+  "clientSessionTests": {
+    "tests": 5,
+    "pass": 5,
+    "fail": 0,
+    "script": "scripts/test-web-session.mjs"
+  },
+  "browserScenarios": [
+    "requester to department manager to handler to requester close",
+    "Lan to Hai handover preserving 65 percent and authorship",
+    "logout while context reload is in progress",
+    "role-specific administration and specialist views",
+    "light/dark, collapsible menu, responsive viewport"
+  ]
+}

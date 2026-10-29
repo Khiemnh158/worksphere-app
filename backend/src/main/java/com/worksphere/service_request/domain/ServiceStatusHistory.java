@@ -6,19 +6,19 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * JPA Entity for service_status_histories table.
- * Per 05_DATABASE_DESIGN.md section 9.6 and V007 migration.
+ * JPA Entity for service_status_histories table. Per 05_DATABASE_DESIGN.md section 9.6 and V007
+ * migration.
  */
 @Entity
 @Table(name = "service_status_histories")
 public class ServiceStatusHistory {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
     @Column(name = "request_id", nullable = false)
     private UUID requestId;
@@ -31,7 +31,7 @@ public class ServiceStatusHistory {
     @Column(name = "to_status", nullable = false, length = 30)
     private ServiceStatus toStatus;
 
-    @Column(name = "comment", length = 1000)
+    @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
     @Column(name = "changed_by", nullable = false)
@@ -40,8 +40,7 @@ public class ServiceStatusHistory {
     @Column(name = "changed_at", nullable = false)
     private Instant changedAt;
 
-    protected ServiceStatusHistory() {
-    }
+    protected ServiceStatusHistory() {}
 
     public static ServiceStatusHistory create(
             UUID id,
@@ -50,8 +49,7 @@ public class ServiceStatusHistory {
             ServiceStatus toStatus,
             String comment,
             UUID changedBy,
-            Instant changedAt
-    ) {
+            Instant changedAt) {
         ServiceStatusHistory history = new ServiceStatusHistory();
         history.id = id != null ? id : UUID.randomUUID();
         history.requestId = requestId;

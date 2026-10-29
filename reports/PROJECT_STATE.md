@@ -1,3 +1,7 @@
-# Trạng thái hiện hành
+# Trạng thái dự án
 
-29/10/2026: authorization foundation đợt 1 và dark UI draft; đọc STATUS.md, reports/AUTHORIZATION_FOUNDATION.md và docs/ACCESS_AND_HANDOVER_MVP.md. Tập 97 tests qua, 8 integration PostgreSQL thật; không phải toàn bộ backend suite. Chưa nối web vào API hoặc triển khai offboarding/handover đầy đủ.
+Cổng web ở feat/authorization-foundation dùng API và PostgreSQL thật. Hợp đồng mới: docs/WEB_WORKFLOWS.md. Không dùng các tuyên bố prototype lịch sử làm trạng thái hiện tại.
+
+120 backend tests chọn lọc đạt, gồm 31 PostgreSQL integration; 5 client session tests đạt. Build JAR thành công. Browser xác minh Minh → IT/Hùng → Hải → Minh đóng yêu cầu, bàn giao Lan → Hải vẫn 65%, theme/menu và màn chuyên trách.
+
+Chưa coi toàn bộ source kế thừa hoặc sản phẩm production đã đạt. Xem STATUS.md, TODO.md, reports/WEB_IMPLEMENTATION.md. Mobile và hai repo môn khác chưa được nâng pin/release trong lượt này.
