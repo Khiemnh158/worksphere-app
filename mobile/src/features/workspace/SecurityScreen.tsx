@@ -116,9 +116,11 @@ export function SecurityScreen() {
       <Card>
         <Copy title>Xác thực hai bước</Copy>
         <Copy>
-          {state.data?.enabled
-            ? 'Đã bật mã xác thực'
-            : 'Chưa bật hoặc đang tải trạng thái'}
+          {state.data
+            ? state.data.enabled
+              ? 'Đã bật mã xác thực'
+              : 'Chưa bật mã xác thực'
+            : 'Đang tải trạng thái'}
         </Copy>
         <Field
           label="Mật khẩu hiện tại"
@@ -197,8 +199,8 @@ export function SecurityScreen() {
           </Card>
         )}
         <Copy muted>
-          Khóa, mật khẩu và mã dự phòng không được lưu vào bộ nhớ ứng dụng hoặc
-          nhật ký.
+          Khóa, mật khẩu và mã dự phòng không được ghi xuống tệp, bộ nhớ lưu trữ
+          hoặc nhật ký.
         </Copy>
       </Card>
       <Button

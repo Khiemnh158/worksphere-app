@@ -5,17 +5,17 @@
     "exitCode": 0
   },
   "jest": {
-    "suitesPassed": 92,
-    "suitesTotal": 92,
-    "testsPassed": 822,
-    "testsTotal": 822,
+    "suitesPassed": 93,
+    "suitesTotal": 93,
+    "testsPassed": 824,
+    "testsTotal": 824,
     "skipped": 0,
-    "seconds": 57.541,
+    "seconds": 67.013,
     "notes": "Inherited act warnings remain"
   },
   "lintChangedSource": {
     "errors": 0,
-    "warnings": 31
+    "warnings": 32
   },
   "android": {
     "target": "debug x86_64",
@@ -39,7 +39,7 @@
   "remaining": [
     "Physical QR IN/OUT and camera/network edge cases",
     "Mobile attachment workflows",
-    "Mobile security settings and OS deep links",
+    "OS deep links",
     "Push/realtime/offline",
     "ARM release signing and iOS",
     "User acceptance"
@@ -73,6 +73,10 @@
     "backendRequired": true,
     "environment": "loopback local, debug signed",
     "emulatorLoginAndAttendance": "PASS",
-    "physicalNewBuildOut": "NOT_VERIFIED"
+    "physicalNewBuildOut": "NOT_VERIFIED",
+    "buildSeconds": 48,
+    "tasks": 151,
+    "profileBasics": "IMPLEMENTED; two regression tests pass; physical UI not verified",
+    "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made"
   }
 }

@@ -28,12 +28,13 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [x] Công/nghỉ/OT/sửa công; xem và duyệt theo canReview, phiên bản; OT phải xác nhận thực tế.
 - [x] Bridge camera QR Android; chặn mã sai, hủy camera không chấm, kết quả camera sau đổi phiên bị bỏ. Đã mở camera trên giả lập.
 - [x] Thông báo trong app, danh bạ phòng 20/trang, hồ sơ đọc, phiếu thu nhập của chính mình đã phát hành; che số tiền mặc định.
-- [x] TypeScript; toàn bộ 92 suites/822 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
+- [x] TypeScript; toàn bộ 93 suites/824 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
 - [x] Ghi chú Android → web đồng bộ; công việc bàn giao giữ 65%. Khôi phục Wrapper chính thức, ghim checksum.
 - [ ] Nghiệm thu camera quét QR đang xoay và lượt IN/OUT trên điện thoại thật; thử mất mạng, hết hạn, trùng lượt bằng thiết bị. Test backend cho các điều kiện này đã có, không thay thế thử thiết bị.
 - [ ] Tải lên/xem/tải tệp đính kèm mobile; hiện chỉ có metadata tệp công việc, thao tác tệp trên web.
 - [x] Mobile: đổi mật khẩu, thiết lập/bật/tắt TOTP, mã dự phòng một lần và đăng xuất mọi thiết bị; che secrets khi background/blur, không giả báo remote logout thành công khi mất mạng.
-- [ ] Sửa hồ sơ trực tiếp và deep link OS; hiện hồ sơ đọc, kích hoạt/reset bằng dán liên kết.
+- [x] Mobile sửa họ tên/số liên hệ qua /me; giữ số đã có khi chỉ sửa tên, không gửi thay đổi quyền/phòng/ảnh.
+- [ ] Deep link OS; hiện kích hoạt/reset bằng dán liên kết.
 - [ ] Push khi ứng dụng đóng/realtime; hiện làm mới khi focus/foreground hoặc bấm cập nhật.
 - [ ] Điều phối hỗ trợ mở rộng (chuyển phòng/đề nghị hủy/đổi người kèm rà soát), tạo/sửa việc từ mobile nếu chốt cần mang khỏi web. Hiện thực hiện đầy đủ trên web, không hiện nút giả.
 - [x] Build/cài Android debug arm64-v8a trên OPPO thật qua USB; vẫn phụ thuộc Metro/backend local. Đã xác nhận lượt IN bằng camera điện thoại thật trong môi trường thử local; OUT còn chờ.

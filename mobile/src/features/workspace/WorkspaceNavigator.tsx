@@ -10,6 +10,7 @@ import { useAppTheme } from '../../app/providers/ThemeProvider';
 import { workspaceApi, WorkplaceContext } from './api';
 import { Button, Copy, Page, useLoad } from './ui';
 import { SecurityScreen } from './SecurityScreen';
+import { ProfileBasicsScreen } from './ProfileBasicsScreen';
 import { ChangePasswordScreen } from '../profile/screens/ChangePasswordScreen';
 import { HomeScreen, WorkScreen, WorkDetailScreen } from './WorkScreens';
 import {
@@ -38,6 +39,7 @@ export type WorkspaceRoutes = {
   Notices: undefined;
   Security: undefined;
   ChangePassword: undefined;
+  ProfileBasics: undefined;
 };
 export type WorkspaceNavigation = NativeStackNavigationProp<WorkspaceRoutes>;
 const Stack = createNativeStackNavigator<WorkspaceRoutes>();
@@ -208,6 +210,11 @@ export function WorkspaceNavigator() {
           name="ChangePassword"
           component={ChangePasswordScreen}
           options={{ title: 'Đổi mật khẩu' }}
+        />
+        <Stack.Screen
+          name="ProfileBasics"
+          component={ProfileBasicsScreen}
+          options={{ title: 'Thông tin cá nhân' }}
         />
       </Stack.Navigator>
     </Context.Provider>

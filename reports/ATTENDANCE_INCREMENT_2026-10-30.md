@@ -12,15 +12,15 @@
 ## Kiểm tra
 
 - 150 backend tests chọn lọc đạt: 56 PostgreSQL thật, 94 unit; 0 failure/error/skip. Maven package thành công. Không phải toàn bộ legacy Testcontainers.
-- Toàn bộ mobile: 92 suites/822 tests đạt; TypeScript đạt. Lint nguồn thay đổi: 0 lỗi/31 cảnh báo style/render; cảnh báo act kế thừa còn.
+- Toàn bộ mobile: 93 suites/824 tests đạt; TypeScript đạt. Lint nguồn thay đổi: 0 lỗi/32 cảnh báo style/render; cảnh báo act kế thừa còn.
 - 5 tests phiên web, cú pháp JS, diff whitespace và dò secrets/artifacts đạt.
-- Android localDemo cuối: BUILD SUCCESSFUL 52 giây, 151 tasks. Lượt đầu vướng Windows subst/Metro; giải quyết bằng projectRoot thực qua WORKSPHERE_JS_ROOT, không sửa registry hay hạ yêu cầu HTTPS của release.
+- Android localDemo cuối: BUILD SUCCESSFUL 48 giây, 151 tasks. Lượt đầu vướng Windows subst/Metro; giải quyết bằng projectRoot thực qua WORKSPHERE_JS_ROOT, không sửa registry hay hạ yêu cầu HTTPS của release.
 - Web: IN mở đã hiện, lưu giờ nghỉ người dùng chọn, kiểm biểu mẫu giờ điểm/CIDR. Không tự cấu hình IP văn phòng, lương hoặc duyệt công thay người dùng.
 
 Ảnh/log minh chứng giữ local ngoài Git. Báo cáo công khai không chứa tài khoản/giờ hoạt động/IP cá nhân từ lượt quét thật.
 
 ## Còn thiếu
 
-OUT/OT/mạng trên điện thoại thật với APK mới; mạng văn phòng thật; lịch ca riêng từng người/ca qua đêm; phân trang punches; giải trình riêng từng punch; tệp/sửa hồ sơ/deep link/push mobile; ký production/iOS; thử tải, toàn bộ legacy suite và người dùng nghiệm thu. Clone sạch trên máy hiện tại cần kiểm tra riêng; chưa thay thế kiểm tra máy thứ hai.
+OUT/OT/mạng trên điện thoại thật với APK mới; mạng văn phòng thật; lịch ca riêng từng người/ca qua đêm; phân trang punches; giải trình riêng từng punch; tệp/deep link/push mobile; ký production/iOS; thử tải, toàn bộ legacy suite và người dùng nghiệm thu. Clone sạch trên cùng máy đã chạy Maven Wrapper, database/cổng riêng, đăng nhập/đăng xuất và thư reset đúng origin; thử reuse/Stop/restart đạt, web chính không bị dừng. Có dùng cache thư viện; chưa thay thế kiểm tra máy thứ hai.
 
 Hợp đồng: docs/ATTENDANCE_POLICY.md. Cách chạy: docs/FRESH_CLONE_RUNNING.md. Theo dõi: TODO.md.

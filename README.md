@@ -2,7 +2,7 @@
 
 Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh nghiệp. Đây là **nguồn ứng dụng chuẩn** của ba học phần.
 
-**Trạng thái: web đã nối API và PostgreSQL, có đăng nhập thật, quyền theo phòng, hỗ trợ, công việc/bàn giao, quản trị và đối soát công/thu nhập. 150 backend tests chọn lọc (56 PostgreSQL), 5 tests phiên web và 822 tests mobile/92 suites đạt; chưa phải bản production; chưa chạy toàn bộ backend kế thừa.**
+**Trạng thái: web đã nối API và PostgreSQL, có đăng nhập thật, quyền theo phòng, hỗ trợ, công việc/bàn giao, quản trị và đối soát công/thu nhập. 150 backend tests chọn lọc (56 PostgreSQL), 5 tests phiên web và 824 tests mobile/93 suites đạt; chưa phải bản production; chưa chạy toàn bộ backend kế thừa.**
 
 | Học phần | Repository | Phạm vi |
 | --- | --- | --- |

@@ -23,6 +23,11 @@ export function AccountScreen() {
         <Copy muted>{context.user.employee_code ?? context.user.username}</Copy>
         <Copy>{context.user.email}</Copy>
       </Card>
+      <Button
+        title="Chỉnh thông tin cá nhân"
+        secondary
+        onPress={() => navigation.navigate('ProfileBasics')}
+      />
       {!context.admin && (
         <>
           <Button

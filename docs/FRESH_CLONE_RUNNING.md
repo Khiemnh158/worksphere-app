@@ -42,3 +42,5 @@ Giả lập x86_64: thay kiến trúc thành x86_64; có thể build cả hai b�
 Bản localDemo debug-signed, chỉ cho loopback/emulator HTTP và tắt dev support; release vẫn yêu cầu HTTPS, chưa ký phát hành. Giao diện đã nằm trong APK nhưng backend vẫn phải chạy; giữ USB. Không phải ứng dụng dùng được ở mọi nơi sau khi rút USB. Nếu API dùng cổng khác, truyền ApiPort cho launcher (ClientPort mặc định 18120 phải khớp URL build).
 
 Windows đường dẫn dài: ưu tiên clone vào đường dẫn ngắn. Nếu dùng ổ subst cho native build, đặt WORKSPHERE_JS_ROOT là đường dẫn mobile gốc cho Metro; không đổi root Gradle sang ổ khác. Xem docs/MOBILE_RUNNING.md. Hai script không tự cài JDK/PostgreSQL/SDK và không tự đổi thiết lập bảo mật máy.
+
+Kiểm chứng 30/10: clone sạch cùng máy, Maven Wrapper và database/cổng riêng chạy được; login/logout, thư reset đúng origin, reuse/Stop/restart đạt. Có dùng cache dependencies; chưa kiểm chứng máy thứ hai hoàn toàn mới.

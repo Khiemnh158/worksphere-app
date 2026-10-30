@@ -216,6 +216,12 @@ export function TimeScreen() {
           </Copy>
         )}
         <Copy muted>{state.data?.today?.message}</Copy>
+        {state.data?.today && !state.data.today.actions.length && (
+          <Copy muted>
+            Hiện không có thao tác quét khả dụng. Kiểm tra lịch hoặc gửi đơn bổ
+            sung nếu quên chấm công.
+          </Copy>
+        )}
         {!!state.data?.today && (
           <Copy muted>
             Muộn {state.data.today.lateMinutes ?? 0} phút · Về sớm{' '}
