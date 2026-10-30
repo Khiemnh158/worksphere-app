@@ -1,5 +1,6 @@
 {
-  "scope": "Selected web, authorization and domain tests; not the entire legacy Testcontainers suite",
+  "date": "2026-10-30",
+  "scope": "Selected backend tests, not entire legacy Testcontainers suite",
   "suites": [
     {
       "name": "com.worksphere.file.application.FilenameSanitizerTest",
@@ -7,7 +8,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.174"
+      "time": "0.154"
     },
     {
       "name": "com.worksphere.file.application.FileValidationServiceTest",
@@ -15,7 +16,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.245"
+      "time": "0.211"
     },
     {
       "name": "com.worksphere.file.domain.StoredFileTest",
@@ -23,7 +24,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.07"
+      "time": "0.072"
     },
     {
       "name": "com.worksphere.identity.AuthorizationPostgresTest",
@@ -31,7 +32,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "15.098"
+      "time": "15.5"
     },
     {
       "name": "com.worksphere.identity.dev.E2eUserProvisionerTest",
@@ -39,7 +40,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.766"
+      "time": "0.758"
     },
     {
       "name": "com.worksphere.identity.SessionAuthorizationTest",
@@ -47,15 +48,15 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.361"
+      "time": "0.382"
     },
     {
       "name": "com.worksphere.identity.WorkplacePostgresTest",
-      "tests": "23",
+      "tests": "42",
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "44.354"
+      "time": "82.356"
     },
     {
       "name": "com.worksphere.project.ProjectAccessPolicyTest",
@@ -63,7 +64,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.13"
+      "time": "0.123"
     },
     {
       "name": "com.worksphere.service_request.ServiceRequestAccessPolicyTest",
@@ -71,7 +72,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.007"
+      "time": "0.006"
     },
     {
       "name": "com.worksphere.task.TaskTest",
@@ -87,27 +88,37 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.016"
+      "time": "0.013"
+    },
+    {
+      "name": "com.worksphere.identity.application.TwoFactorServiceTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.025"
     }
   ],
   "total": {
-    "tests": 120,
+    "tests": 140,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
-  "postgresIntegrationTests": 31,
+  "postgresIntegrationTests": 50,
   "clientSessionTests": {
     "tests": 5,
     "pass": 5,
-    "fail": 0,
     "script": "scripts/test-web-session.mjs"
   },
   "browserScenarios": [
-    "requester to department manager to handler to requester close",
-    "Lan to Hai handover preserving 65 percent and authorship",
-    "logout while context reload is in progress",
-    "role-specific administration and specialist views",
-    "light/dark, collapsible menu, responsive viewport"
-  ]
+    "Admin has management-only navigation",
+    "CSV department-code preview without creating accounts",
+    "department directory scoped to three IT members",
+    "logo/menu, retained navigation position, responsive and light/dark",
+    "forgot-password writes a private local test email",
+    "HR attendance station produces rotating QR",
+    "executive approval workspace and personnel/delegation forms"
+  ],
+  "mobile": "Deferred explicitly until user reviews web; no native client changes"
 }

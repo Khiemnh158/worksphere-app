@@ -87,11 +87,11 @@ export async function api(path, { method = "GET", body, retry = true } = {}) {
   }
   return d.data;
 }
-export async function login(login, password) {
+export async function login(login, password, mfaCode) {
   clearSession();
   const d = await api("/auth/login", {
     method: "POST",
-    body: { login, password, deviceName: "WorkSphere Web" },
+    body: { login, password, mfaCode, deviceName: "WorkSphere Web" },
   });
   remember(d);
   return d;

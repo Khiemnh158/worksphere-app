@@ -2,13 +2,15 @@
 
 Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh nghiệp. Đây là **nguồn ứng dụng chuẩn** của ba học phần.
 
-**Trạng thái: web đã nối API và PostgreSQL, có đăng nhập thật, quyền theo phòng, hỗ trợ, công việc/bàn giao, quản trị và đối soát công/thu nhập. 120 backend tests trong tập chọn + 5 client session tests đạt; chưa phải bản production hoặc toàn bộ test suite.**
+**Trạng thái: web đã nối API và PostgreSQL, có đăng nhập thật, quyền theo phòng, hỗ trợ, công việc/bàn giao, quản trị và đối soát công/thu nhập. 140 backend tests trong tập chọn + 5 client session tests đạt; chưa phải bản production hoặc toàn bộ test suite.**
 
 | Học phần | Repository | Phạm vi |
 | --- | --- | --- |
 | Kỹ năng lập trình nâng cao | [worksphere-app](https://github.com/Khiemnh158/worksphere-app) | Backend, web, mobile kế thừa, hợp đồng API, nghiệp vụ, tests |
 | An toàn thông tin | [worksphere-security](https://github.com/Khiemnh158/worksphere-security) | Mô hình đe dọa, test quyền/session, scan, báo cáo trước/sau |
 | Triển khai phần mềm | [worksphere-deployment](https://github.com/Khiemnh158/worksphere-deployment) | Jenkins, Docker Compose, Sonar, Prom/Graf, vận hành và minh chứng |
+
+Giai đoạn 2: [Hợp đồng hiện hành](docs/WEB_PHASE2_CONTRACT.md), [kết quả nghiệm thu](reports/WEB_PHASE2_IMPLEMENTATION.md). Thư thử local, QR web và TOTP đã có; mobile chờ người dùng kiểm tra web.
 
 ## Đọc trước khi bắt đầu
 
@@ -26,7 +28,7 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 
 ## Có sẵn
 
-- `backend/`: Spring Boot modular monolith, PostgreSQL, Flyway V001-V022; identity, organization, project, task, service_request, asset, file, notification.
+- `backend/`: Spring Boot modular monolith, PostgreSQL, Flyway V001-V026; identity, organization, project, task, service_request, asset, file, notification.
 - `mobile/`: React Native/TypeScript; auth, dashboard, project/task; ServiceRequest mới có foundation/API, UI chưa trọn luồng.
 - `design/`: thiết kế/prototype kế thừa, **không phải web frontend đang vận hành**.
 - `docs/legacy/`, `reports/legacy/`: tài liệu lịch sử của source bốn môn cũ, giữ để truy vết.
@@ -34,10 +36,10 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 
 ## Chưa có, không coi là đã làm
 
-- Chấm công QR/GPS và kết nối máy vân tay thật, ca đêm/qua ngày, thuế/BHXH/lương thực nhận, xử lý pháp lý bồi thường, lịch ngừng việc tương lai, email khôi phục và hardening production.
+- Client mobile quét QR, GPS và kết nối máy vân tay thật, ca đêm/qua ngày, thuế/BHXH/lương thực nhận, xử lý pháp lý bồi thường, hardening production.
 - Các phát hiện còn lại ngoài phạm vi đợt 1; xem STATUS và kết quả kiểm thử mới.
 - Pipeline CI/CD hoàn chỉnh, Dockerfile/Compose, Sonar, Prometheus/Grafana và bản release mobile.
-- Audit writer/onboarding email đầy đủ.
+- SMTP/SMS thật và audit bao phủ toàn bộ module kế thừa; kích hoạt/khôi phục qua hộp thư thử local đã có.
 
 Source cũ có GitHub workflow skeleton; bản lưu nằm ở `docs/legacy/UPSTREAM_ci.yml.disabled`. Không kích hoạt pipeline cũ để tạo trạng thái xanh gây hiểu nhầm khi backend chưa được build/test trong CI.
 

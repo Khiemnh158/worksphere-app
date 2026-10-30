@@ -1,3 +1,11 @@
+# Cập nhật 30/10/2026 — chờ nghiệm thu web trước mobile
+
+Web giai đoạn 2 đã triển khai: Admin tách riêng, danh bạ phòng, kích hoạt/reset qua hộp thư thử, TOTP opt-in, lãnh đạo/phụ trách thay, hồ sơ nhân sự/cutoff, bảng tính duyệt độc lập và điểm QR. Hợp đồng hiện hành: docs/WEB_PHASE2_CONTRACT.md. Kết quả: reports/WEB_PHASE2_IMPLEMENTATION.md.
+
+140 backend tests chọn lọc đạt (gồm 50 PostgreSQL integration), 5 tests phiên web đạt. Chưa xác nhận toàn bộ legacy suite hoặc production. Mobile chưa thay đổi, theo yêu cầu đợi người dùng kiểm tra web. Thư chỉ local, lương/lịch cần dữ liệu có thẩm quyền; không có chuyển tiền.
+
+## Lịch sử trước cập nhật này
+
 # Bàn giao web
 
 Repo worksphere-app, nhánh feat/authorization-foundation, draft PR #1. Đọc docs/WEB_WORKFLOWS.md, docs/WEB_RUNNING.md và reports/WEB_IMPLEMENTATION.md trước khi sửa.

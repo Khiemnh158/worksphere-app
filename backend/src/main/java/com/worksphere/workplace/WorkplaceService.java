@@ -20,6 +20,13 @@ import java.util.*;
 @Transactional
 public class WorkplaceService {
     private final JdbcTemplate db;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.application.RecoveryService recovery;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.organization.application.ApprovalPolicy authority;
+
     private final DepartmentRouting routing;
     private final UserRepository users;
     private final RoleRepository roles;
@@ -53,7 +60,8 @@ public class WorkplaceService {
             String description,
             String priority,
             UUID assigneeId,
-            Instant dueAt) {}
+            Instant dueAt) {
+}
 
     public record Command(
             Long version,
@@ -61,7 +69,8 @@ public class WorkplaceService {
             String content,
             Integer progress,
             UUID userId,
-            List<UUID> fileIds) {}
+            List<UUID> fileIds) {
+}
 
     public record DepartmentInput(
             String code,
@@ -69,7 +78,8 @@ public class WorkplaceService {
             String description,
             UUID managerId,
             boolean active,
-            Long version) {}
+            Long version) {
+}
 
     public record StaffInput(
             String username,
@@ -77,16 +87,28 @@ public class WorkplaceService {
             String fullName,
             UUID departmentId,
             String role,
-            String password) {}
+            String password) {
+}
 
     public record StaffChange(
             UUID departmentId,
             String role,
             List<String> capabilities,
             Long version,
-            String reason) {}
+            String reason,
+            String jobTitle) {
+        public StaffChange(
+                UUID departmentId,
+                String role,
+                List<String> capabilities,
+                Long version,
+                String reason) {
+            this(departmentId, role, capabilities, version, reason, null);
+        }
+    }
 
-    public record RouteInput(UUID departmentId, Long version) {}
+    public record RouteInput(UUID departmentId, Long version) {
+}
 
     UUID actor(WorkSphereUserPrincipal p) {
         if (p == null
@@ -94,7 +116,8 @@ public class WorkplaceService {
                 || !Boolean.TRUE.equals(
                         db.queryForObject(
                                 "SELECT EXISTS(SELECT 1 FROM users WHERE id=? AND status='ACTIVE'"
-                                        + " AND NOT is_deleted)",
+                                        + " AND NOT is_deleted AND NOT activation_required AND"
+                                        + " (access_ends_at IS NULL OR access_ends_at>now()))",
                                 Boolean.class,
                                 p.userId())))
             throw new AccessDeniedException("Tài khoản không hoạt động");
@@ -190,7 +213,7 @@ public class WorkplaceService {
 
     private void requireManager(UUID dept, UUID id) {
         db.queryForList("SELECT id FROM departments WHERE id=? FOR UPDATE", dept);
-        if (!routing.manages(dept, id))
+        if (!routing.manages(dept, id) && !authority.oversees(dept, id))
             throw new AccessDeniedException("Chỉ trưởng phòng phụ trách được thực hiện");
     }
 
@@ -207,12 +230,31 @@ public class WorkplaceService {
                 "user",
                 one(
                         "SELECT"
-                            + " u.id,u.username,u.email,u.full_name,u.department_id,u.status,u.version,d.name"
+                            + " u.id,u.username,u.email,u.full_name,u.employee_code,u.job_title,u.activation_required,u.department_id,u.status,u.version,d.name"
                             + " department_name FROM users u LEFT JOIN departments d ON"
                             + " d.id=u.department_id WHERE u.id=?",
                         id));
         result.put("admin", admin(id));
-        result.put("managedDepartments", routing.managed(id));
+        result.put(
+                "authorities",
+                db.queryForList("SELECT department_id,executive_id FROM department_authority"));
+        result.put("managedDepartments", authority.managed(id, "OPERATIONS", true));
+        result.put("timeDepartments", authority.managed(id, "TIME", true));
+        result.put("supportDepartments", routing.managed(id));
+        result.put("executive", authority.executive(id));
+        result.put(
+                "assignedSupport",
+                db.queryForObject(
+                        "SELECT count(*) FROM service_assignments a JOIN service_requests r ON"
+                                + " r.id=a.request_id WHERE a.assignee_id=? AND a.is_active AND"
+                                + " r.status NOT IN ('CLOSED','CANCELLED','REJECTED')",
+                        Integer.class,
+                        id));
+        result.put(
+                "peopleCount",
+                db.queryForObject(
+                        "SELECT count(*) FROM users WHERE status='ACTIVE' AND NOT is_deleted",
+                        Integer.class));
         result.put(
                 "capabilities",
                 db.queryForList(
@@ -227,8 +269,20 @@ public class WorkplaceService {
         result.put(
                 "people",
                 db.queryForList(
-                        "SELECT id,full_name,department_id,status FROM users WHERE NOT is_deleted"
-                                + " AND status='ACTIVE' ORDER BY full_name"));
+                        "SELECT id,full_name,department_id,status FROM users u WHERE NOT is_deleted"
+                            + " AND status='ACTIVE' AND (department_id=(SELECT department_id FROM"
+                            + " users WHERE id=?) OR department_id IN (SELECT id FROM departments"
+                            + " WHERE manager_id=?) OR EXISTS(SELECT 1 FROM approval_delegations a"
+                            + " WHERE a.department_id=u.department_id AND a.delegate_id=? AND"
+                            + " a.revoked_at IS NULL AND a.starts_at<=now() AND a.ends_at>now()) OR"
+                            + " EXISTS(SELECT 1 FROM department_authority a JOIN staff_capabilities"
+                            + " c ON c.user_id=a.executive_id AND c.capability='EXECUTIVE' WHERE"
+                            + " a.department_id=u.department_id AND a.executive_id=?)) ORDER BY"
+                            + " full_name",
+                        id,
+                        id,
+                        id,
+                        id));
         result.put(
                 "categories",
                 db.queryForList(
@@ -244,15 +298,17 @@ public class WorkplaceService {
     @Transactional(readOnly = true)
     public List<Map<String, Object>> work(WorkSphereUserPrincipal p) {
         UUID id = actor(p);
+        String depts =
+                authority.managed(id, "OPERATIONS", true).stream()
+                        .map(UUID::toString)
+                        .collect(java.util.stream.Collectors.joining(","));
         return db.queryForList(
                 WORK_SELECT
-                        + "WHERE w.assignee_id=? OR w.reviewer_id=? OR EXISTS(SELECT 1 FROM"
-                        + " departments md WHERE md.id=w.department_id AND md.manager_id=? AND"
-                        + " md.is_active AND NOT md.is_deleted) ORDER BY w.due_at,w.created_at"
-                        + " DESC",
+                        + " WHERE w.assignee_id=? OR w.reviewer_id=? OR w.department_id IN (SELECT"
+                        + " unnest(string_to_array(?,',')::uuid[])) ORDER BY w.due_at,w.id",
                 id,
                 id,
-                id);
+                depts);
     }
 
     @Transactional(readOnly = true)
@@ -265,9 +321,7 @@ public class WorkplaceService {
         if ("mine".equals(scope)) filter = "r.requester_id=?";
         else if ("assigned".equals(scope)) filter = "a.assignee_id=?";
         else if ("queue".equals(scope))
-            filter =
-                    "EXISTS(SELECT 1 FROM departments md WHERE md.id=r.receiving_department_id AND"
-                            + " md.manager_id=? AND md.is_active AND NOT md.is_deleted)";
+            filter = "r.receiving_department_id IN (SELECT unnest(string_to_array(?,',')::uuid[]))";
         else throw invalid("Phạm vi yêu cầu không hợp lệ");
         String from =
                 " FROM service_requests r JOIN service_categories c ON c.id=r.category_id LEFT JOIN"
@@ -278,7 +332,14 @@ public class WorkplaceService {
                         + filter
                         + " AND (lower(r.title) LIKE ? OR lower(r.request_number) LIKE ?)";
         String term = "%" + (search == null ? "" : search.trim().toLowerCase(Locale.ROOT)) + "%";
-        long total = db.queryForObject("SELECT count(*)" + from, Long.class, id, term, term);
+        Object scopeActor =
+                "queue".equals(scope)
+                        ? routing.managed(id).stream()
+                                .map(UUID::toString)
+                                .collect(java.util.stream.Collectors.joining(","))
+                        : id;
+        long total =
+                db.queryForObject("SELECT count(*)" + from, Long.class, scopeActor, term, term);
         var items =
                 db.queryForList(
                         "SELECT"
@@ -288,7 +349,7 @@ public class WorkplaceService {
                             + " assignee_status"
                                 + from
                                 + " ORDER BY r.created_at DESC,r.id LIMIT 20 OFFSET ?",
-                        id,
+                        scopeActor,
                         term,
                         term,
                         offset);
@@ -309,31 +370,48 @@ public class WorkplaceService {
     public Map<String, Object> detail(UUID work, WorkSphereUserPrincipal p) {
         UUID id = actor(p);
         var row = one(WORK_SELECT + "WHERE w.id=?", work);
-        boolean manager = routing.manages(uuid(row, "department_id"), id),
+        boolean
+                manager =
+                        routing.manages(uuid(row, "department_id"), id)
+                                || authority.oversees(uuid(row, "department_id"), id),
                 assignee = id.equals(uuid(row, "assignee_id")),
                 reviewer = id.equals(uuid(row, "reviewer_id"));
         if (!manager && !assignee && !reviewer)
             throw new AccessDeniedException("Công việc ngoài phạm vi của bạn");
         Set<String> actions = new LinkedHashSet<>();
         String status = (String) row.get("status");
-        if (!"COMPLETED".equals(status)) {
+        if (!Set.of("COMPLETED", "CANCELLED").contains(status)) {
             actions.add("COMMENT");
-            if (manager) actions.add("EDIT");
+            if (manager) {
+                actions.add("EDIT");
+                actions.add("CANCEL");
+            }
             if (manager
                     && !"REVIEW".equals(status)
                     && db.queryForList(
-                                    "SELECT id FROM work_handovers WHERE work_id=? AND accepted_at"
-                                            + " IS NULL",
+                                    "SELECT id FROM work_handovers WHERE work_id=? AND cancelled_at"
+                                            + " IS NULL AND accepted_at IS NULL",
                                     work)
                             .isEmpty()) actions.add("HANDOVER");
+            if (assignee && "BLOCKED".equals(status)) actions.add("RESUME");
             if (assignee && "ASSIGNED".equals(status)) actions.add("START");
             if (assignee && "IN_PROGRESS".equals(status)) {
                 actions.add("PROGRESS");
+                actions.add("BLOCK");
                 actions.add("SUBMIT");
             }
-            if (reviewer && !assignee && "REVIEW".equals(status)) {
+            if ((reviewer
+                            || authority.delegated(uuid(row, "department_id"), id, "OPERATIONS")
+                            || authority.oversees(uuid(row, "department_id"), id))
+                    && !assignee
+                    && "REVIEW".equals(status)) {
                 actions.add("APPROVE");
                 actions.add("RETURN");
+            }
+            if (authority.manager(uuid(row, "department_id"), uuid(row, "assignee_id"))
+                    && !authority.oversees(uuid(row, "department_id"), id)) {
+                actions.remove("APPROVE");
+                actions.remove("RETURN");
             }
             if (assignee && "HANDOVER".equals(status)) actions.add("ACCEPT_HANDOVER");
         }
@@ -366,6 +444,9 @@ public class WorkplaceService {
         requireManager(input.departmentId(), id);
         requireReady(input.departmentId());
         requireMember(input.departmentId(), input.assigneeId());
+        if (authority.manager(input.departmentId(), input.assigneeId())
+                && !authority.oversees(input.departmentId(), id))
+            throw invalid("Công việc của trưởng phòng cần cấp trên phụ trách");
         if (id.equals(input.assigneeId()))
             throw invalid("Không tự giao và tự nghiệm thu; cần người quản lý khác phụ trách");
         if (input.dueAt() == null || input.dueAt().isBefore(Instant.now()))
@@ -374,6 +455,14 @@ public class WorkplaceService {
                 .contains(input.priority() == null ? "" : input.priority()))
             throw invalid("Ưu tiên không hợp lệ");
         UUID work = UUID.randomUUID();
+        UUID reviewer =
+                (authority.oversees(input.departmentId(), id)
+                                || authority.manager(input.departmentId(), id))
+                        ? id
+                        : db.queryForObject(
+                                "SELECT manager_id FROM departments WHERE id=?",
+                                UUID.class,
+                                input.departmentId());
         db.update(
                 "INSERT INTO"
                     + " department_work(id,department_id,title,description,priority,assignee_id,reviewer_id,due_at,created_by)"
@@ -384,7 +473,7 @@ public class WorkplaceService {
                 text(input.description(), 10000, "Nội dung"),
                 input.priority(),
                 input.assigneeId(),
-                id,
+                reviewer,
                 java.sql.Timestamp.from(input.dueAt()),
                 id);
         event(work, id, "CREATED", "Giao công việc");
@@ -410,6 +499,32 @@ public class WorkplaceService {
         switch (input.action()) {
             case "EDIT" -> throw invalid("Dùng biểu mẫu chỉnh sửa công việc");
             case "START" -> next = "IN_PROGRESS";
+            case "BLOCK" -> {
+                note = text(note, 10000, "Vấn đề đang vướng và hỗ trợ cần thiết");
+                next = "BLOCKED";
+                routing.notice(
+                        uuid(row, "reviewer_id"),
+                        "Công việc đang vướng: " + row.get("title"),
+                        "WORK",
+                        work);
+            }
+            case "RESUME" -> {
+                note = text(note, 10000, "Nội dung đã gỡ vướng");
+                next = "IN_PROGRESS";
+            }
+            case "CANCEL" -> {
+                note = text(note, 10000, "Căn cứ hủy công việc");
+                next = "CANCELLED";
+                db.update(
+                        "UPDATE work_handovers SET cancelled_at=now() WHERE work_id=? AND"
+                                + " accepted_at IS NULL AND cancelled_at IS NULL",
+                        work);
+                routing.notice(
+                        uuid(row, "assignee_id"),
+                        "Công việc đã hủy: " + row.get("title"),
+                        "WORK",
+                        work);
+            }
             case "COMMENT" -> note = text(note, 10000, "Trao đổi");
             case "PROGRESS" -> {
                 if (input.progress() == null || input.progress() < 0 || input.progress() > 100)
@@ -448,8 +563,8 @@ public class WorkplaceService {
                         || input.userId().equals(uuid(row, "reviewer_id")))
                     throw invalid("Chọn người nhận khác người đang giữ việc và người nghiệm thu");
                 if (!db.queryForList(
-                                "SELECT id FROM work_handovers WHERE work_id=? AND accepted_at IS"
-                                        + " NULL",
+                                "SELECT id FROM work_handovers WHERE work_id=? AND cancelled_at IS"
+                                        + " NULL AND accepted_at IS NULL",
                                 work)
                         .isEmpty()) throw invalid("Bàn giao trước chưa được xác nhận");
                 note = text(note, 10000, "Nội dung bàn giao");
@@ -477,7 +592,8 @@ public class WorkplaceService {
                 note = text(note, 10000, "Ghi nhận rà soát và phần việc tiếp tục");
                 if (db.update(
                                 "UPDATE work_handovers SET review_note=?,accepted_at=now() WHERE"
-                                        + " work_id=? AND to_user_id=? AND accepted_at IS NULL",
+                                        + " work_id=? AND to_user_id=? AND accepted_at IS NULL AND"
+                                        + " cancelled_at IS NULL",
                                 note,
                                 work,
                                 id)
@@ -530,7 +646,8 @@ public class WorkplaceService {
             String priority,
             Instant dueAt,
             String reason,
-            Long version) {}
+            Long version) {
+}
 
     public Map<String, Object> editWork(UUID work, WorkEdit input, WorkSphereUserPrincipal p) {
         UUID id = actor(p);
@@ -604,7 +721,7 @@ public class WorkplaceService {
                 db.update(
                         "UPDATE department_work SET"
                                 + " reviewer_id=?,version=version+1,updated_at=now() WHERE"
-                                + " department_id=? AND status<>'COMPLETED'",
+                                + " department_id=? AND status NOT IN ('COMPLETED','CANCELLED')",
                         input.managerId(),
                         department);
                 routing.notice(
@@ -631,8 +748,8 @@ public class WorkplaceService {
         return Boolean.TRUE.equals(
                 db.queryForObject(
                         "SELECT EXISTS(SELECT 1 FROM department_work WHERE department_id=? AND"
-                            + " status<>'COMPLETED') OR EXISTS(SELECT 1 FROM service_requests WHERE"
-                            + " receiving_department_id=? AND status NOT IN"
+                            + " status NOT IN ('COMPLETED','CANCELLED')) OR EXISTS(SELECT 1 FROM"
+                            + " service_requests WHERE receiving_department_id=? AND status NOT IN"
                             + " ('CLOSED','CANCELLED','REJECTED') AND NOT is_deleted)",
                         Boolean.class,
                         dept,
@@ -652,6 +769,10 @@ public class WorkplaceService {
             throw invalid(
                     "Dùng cổng phòng ban để chuyển đồng thời trách nhiệm kiểm tra công việc cho"
                             + " trưởng phòng mới");
+    }
+
+    public void checkHandoverComplete(UUID target) {
+        requireNoResponsibilities(target);
     }
 
     public void validateStaffTransfer(UUID target) {
@@ -680,7 +801,7 @@ public class WorkplaceService {
         var result =
                 db.queryForList(
                         "SELECT"
-                            + " u.id,u.username,u.email,u.full_name,u.department_id,u.status,u.version,d.name"
+                            + " u.id,u.username,u.email,u.full_name,u.employee_code,u.job_title,u.activation_required,u.department_id,u.status,u.version,d.name"
                             + " department_name FROM users u LEFT JOIN departments d ON"
                             + " d.id=u.department_id WHERE NOT u.is_deleted ORDER BY u.full_name");
         for (var row : result) {
@@ -718,7 +839,7 @@ public class WorkplaceService {
         if (!username.matches("[a-zA-Z0-9._-]{3,50}")
                 || !email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+"))
             throw invalid("Tên đăng nhập hoặc email không hợp lệ");
-        validatePassword(input.password());
+
         if (!db.queryForList(
                         "SELECT id FROM users WHERE lower(username)=lower(?) OR lower(email)=?",
                         username,
@@ -731,13 +852,13 @@ public class WorkplaceService {
                         UUID.randomUUID(),
                         username,
                         email,
-                        encoder.encode(input.password()),
+                        encoder.encode(UUID.randomUUID().toString() + UUID.randomUUID()),
                         text(input.fullName(), 150, "Họ tên"));
         user.updateDepartmentId(input.departmentId());
-        user.lock();
-        user.unlock();
         users.saveAndFlush(user);
         userRoles.saveAndFlush(new UserRole(user.getId(), role.getId(), Instant.now(), id));
+        db.update("UPDATE users SET activation_required=true WHERE id=?", user.getId());
+        recovery.issue(user.getId(), "ACTIVATE");
         audit(id, user.getId(), "USER_CREATED", "Tạo tài khoản và cấp vai trò " + role.getCode());
         if (input.departmentId() != null)
             routing.notifyManager(input.departmentId(), "Nhân viên mới: " + input.fullName(), null);
@@ -772,12 +893,25 @@ public class WorkplaceService {
             db.update("DELETE FROM staff_capabilities WHERE user_id=?", target);
         }
         String role = validRole(input.role());
+        if ("ADMIN".equals(role) && input.departmentId() != null)
+            throw invalid("Tài khoản quản trị kỹ thuật không gắn phòng nghiệp vụ");
+        if ("ADMIN".equals(role) && !admin(target)) requireNoResponsibilities(target);
+        if (input.jobTitle() != null) {
+            String title = text(input.jobTitle(), 100, "Chức danh");
+            db.update("UPDATE users SET job_title=? WHERE id=?", title, target);
+        }
+
         if (id.equals(target) && !"ADMIN".equals(role))
             throw invalid("Không tự thu hồi quyền quản trị trong phiên hiện tại");
         if (!"ADMIN".equals(role)) guardLastAdmin(target);
         List<String> caps = input.capabilities() == null ? List.of() : input.capabilities();
-        if (!Set.of("HR_MANAGE", "TIME_REVIEW", "PAYROLL_MANAGE").containsAll(caps))
-            throw invalid("Quyền chuyên trách không hợp lệ");
+        if ("ADMIN".equals(role) && !caps.isEmpty())
+            throw invalid(
+                    "Tài khoản quản trị kỹ thuật không kiêm nhiệm quyền nghiệp vụ; dùng tài khoản"
+                            + " làm việc riêng");
+        if (id.equals(target) && !caps.isEmpty()) throw invalid("Không tự cấp quyền nghiệp vụ");
+        if (!Set.of("HR_MANAGE", "TIME_REVIEW", "PAYROLL_MANAGE", "PAYROLL_APPROVE", "EXECUTIVE")
+                .containsAll(caps)) throw invalid("Quyền chuyên trách không hợp lệ");
         db.update("DELETE FROM staff_capabilities WHERE user_id=?", target);
         for (String cap : new HashSet<>(caps))
             db.update(
@@ -831,10 +965,11 @@ public class WorkplaceService {
         if (Boolean.TRUE.equals(
                 db.queryForObject(
                         "SELECT EXISTS(SELECT 1 FROM department_work WHERE (assignee_id=? OR"
-                            + " reviewer_id=?) AND status<>'COMPLETED') OR EXISTS(SELECT 1 FROM"
-                            + " service_assignments a JOIN service_requests r ON r.id=a.request_id"
-                            + " WHERE a.assignee_id=? AND a.is_active AND r.status NOT IN"
-                            + " ('CLOSED','CANCELLED','REJECTED') AND NOT r.is_deleted)",
+                            + " reviewer_id=?) AND status NOT IN ('COMPLETED','CANCELLED')) OR"
+                            + " EXISTS(SELECT 1 FROM service_assignments a JOIN service_requests r"
+                            + " ON r.id=a.request_id WHERE a.assignee_id=? AND a.is_active AND"
+                            + " r.status NOT IN ('CLOSED','CANCELLED','REJECTED') AND NOT"
+                            + " r.is_deleted)",
                         Boolean.class,
                         target,
                         target,
@@ -867,6 +1002,14 @@ public class WorkplaceService {
                         target);
             }
             case "DISABLE" -> {
+                if (db.queryForObject(
+                                "SELECT count(*) FROM personnel_cases WHERE user_id=? AND"
+                                        + " status='APPROVED' AND effective_at<=now()",
+                                Integer.class,
+                                target)
+                        == 0)
+                    throw new AccessDeniedException(
+                            "Cần hồ sơ nhân sự đã phê duyệt và đến mốc hiệu lực");
                 requireCapability(id, "HR_MANAGE");
                 guardLastAdmin(target);
                 if (!db.queryForList(
@@ -891,7 +1034,7 @@ public class WorkplaceService {
                 for (var work :
                         db.queryForList(
                                 "SELECT * FROM department_work WHERE assignee_id=? AND"
-                                        + " status<>'COMPLETED' FOR UPDATE",
+                                        + " status NOT IN ('COMPLETED','CANCELLED') FOR UPDATE",
                                 target)) {
                     if ("HANDOVER".equals(work.get("status")))
                         throw invalid("Cần xử lý bàn giao đang chờ của người nghỉ trước");

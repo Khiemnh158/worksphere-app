@@ -51,6 +51,8 @@ public class SecurityConfig {
                         auth ->
                                 auth
                                         // Public auth endpoints
+                                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/activate")
+                                        .permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login")
                                         .permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh")

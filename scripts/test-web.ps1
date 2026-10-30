@@ -7,7 +7,7 @@ if (!$env:WORKSPHERE_AUTHZ_TEST_DB_USER -or !$env:WORKSPHERE_AUTHZ_TEST_DB_PASSW
     throw 'Cần cấp tài khoản và mật khẩu database kiểm thử qua biến môi trường.'
 }
 $backend = Join-Path (Split-Path $PSScriptRoot -Parent) 'backend'
-$tests = 'AuthorizationPostgresTest,WorkplacePostgresTest,ProjectAccessPolicyTest,SessionAuthorizationTest,ServiceRequestAccessPolicyTest,TaskTest,TaskWorkflowTest,E2eUserProvisionerTest,FileValidationServiceTest,FilenameSanitizerTest,StoredFileTest'
+$tests = 'AuthorizationPostgresTest,WorkplacePostgresTest,ProjectAccessPolicyTest,SessionAuthorizationTest,ServiceRequestAccessPolicyTest,TaskTest,TaskWorkflowTest,E2eUserProvisionerTest,FileValidationServiceTest,FilenameSanitizerTest,StoredFileTest,TwoFactorServiceTest'
 Push-Location $backend
 try {
     & '.\mvnw.cmd' "-Dtest=$tests" test

@@ -31,3 +31,17 @@ Proxy chỉ phục vụ web và chuyển `/api/v1/` tới loopback 18120. Có th
 Tạo một database PostgreSQL local riêng có tên worksphere_authz*, worksphere_test* hoặc worksphere_web_test*. Cấp `WORKSPHERE_AUTHZ_TEST_JDBC_URL`, `WORKSPHERE_AUTHZ_TEST_DB_USER`, `WORKSPHERE_AUTHZ_TEST_DB_PASSWORD`, chạy `scripts/test-web.ps1`. Các integration test tạo dữ liệu ngẫu nhiên; chỉ chạy với database dùng riêng cho kiểm thử.
 
 Hai lớp PostgreSQL mới có opt-in: không cấp URL thì bị skip. Cần kiểm tra số ca thực chạy, không coi skip là đã xác minh tích hợp. Các test Testcontainers kế thừa yêu cầu Docker và chưa được thay bằng kết quả của tập kiểm thử web.
+
+## Giai đoạn 2 — 30/10/2026
+
+Xem WEB_PHASE2_CONTRACT.md và reports/WEB_PHASE2_IMPLEMENTATION.md. Không bật dữ liệu demo ở production.
+
+Hộp thư thử: profile dev và worksphere.mail.local-enabled=true, worksphere.mail.local-path trỏ tới thư mục riêng ngoài repo. Tác vụ nền ghi từng thư .txt; không có trang HTTP đọc thư. Thư chứa link kích hoạt/reset có hạn, không upload Git. Cấu hình worksphere.public-url theo URL frontend khi cần thử trên địa chỉ khác. Hiện chưa có SMTP/SMS thật.
+
+EXECUTIVE cần department_authority để phụ trách phòng; PAYROLL_APPROVE cấp riêng. Demo local thêm giamdoc.web, mật khẩu lấy từ biến ngoài repo như các tài khoản mẫu; không ghi mật khẩu trong tài liệu Git. Tài khoản mới bình thường luôn PENDING và phải kích hoạt qua thư.
+
+TOTP thiết lập ở Bảo mật bằng ứng dụng xác thực theo thời gian; lưu mã dự phòng ở nơi riêng. Quên mật khẩu không bỏ qua TOTP. Mã nhân viên không đổi khi đổi tên đăng nhập.
+
+Màn QR ở tài khoản TIME_REVIEW. Mã đổi 30 giây, hết hạn 40 giây, điểm có thể đóng. Chưa dùng camera/máy vân tay/mobile mới. Không thử chấm bằng cách sửa đồng hồ trên trình duyệt.
+
+Database test phải riêng và được guard trong scripts/test-web.ps1. Chạy thêm scripts/test-web-session.mjs bằng Node --experimental-vm-modules. Native mobile chưa có lượt kiểm thử mới trong đợt này.

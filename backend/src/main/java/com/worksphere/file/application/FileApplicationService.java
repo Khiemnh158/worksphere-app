@@ -336,6 +336,9 @@ public class FileApplicationService {
         }
     }
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.organization.application.ApprovalPolicy departmentAuthority;
+
     private void verifyDownloadAccess(StoredFile file, WorkSphereUserPrincipal principal) {
         // Department resources are scoped before the legacy ADMIN/project shortcut.
         try {
@@ -346,6 +349,13 @@ public class FileApplicationService {
                             java.util.UUID.class,
                             file.getId());
             if (!workFiles.isEmpty()) {
+                var dept =
+                        jdbcTemplate.queryForObject(
+                                "SELECT department_id FROM department_work WHERE id=?",
+                                java.util.UUID.class,
+                                workFiles.getFirst());
+                if (departmentAuthority.operations(dept, principal.userId())
+                        || departmentAuthority.oversees(dept, principal.userId())) return;
                 Integer n =
                         jdbcTemplate.queryForObject(
                                 "SELECT count(*) FROM department_work w LEFT JOIN departments d ON"
@@ -369,6 +379,12 @@ public class FileApplicationService {
                             java.util.UUID.class,
                             file.getId());
             if (!routed.isEmpty()) {
+                var dept =
+                        jdbcTemplate.queryForObject(
+                                "SELECT receiving_department_id FROM service_requests WHERE id=?",
+                                java.util.UUID.class,
+                                routed.getFirst());
+                if (departmentAuthority.operations(dept, principal.userId())) return;
                 Integer n =
                         jdbcTemplate.queryForObject(
                                 "SELECT count(*) FROM service_requests sr LEFT JOIN"
@@ -484,5 +500,6 @@ public class FileApplicationService {
     }
 
     /** Download outcome record containing Resource and metadata. */
-    public record FileDownloadResult(Resource resource, StoredFile file) {}
+    public record FileDownloadResult(Resource resource, StoredFile file) {
+}
 }

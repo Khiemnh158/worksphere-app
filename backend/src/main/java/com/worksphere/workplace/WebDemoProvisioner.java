@@ -64,7 +64,10 @@ public class WebDemoProvisioner implements ApplicationRunner {
             throw new IllegalStateException(
                     "Web demo requires dedicated local worksphere_web database and external"
                             + " password (12+ chars)");
-        if (users.existsByUsernameAndDeletedFalse("admin.web")) return;
+        if (users.existsByUsernameAndDeletedFalse("admin.web")) {
+            provisionLeadership();
+            return;
+        }
         if (db.queryForObject("SELECT count(*) FROM users", Integer.class) != 0)
             throw new IllegalStateException("Web demo only initializes an empty practice database");
         String hash = encoder.encode(password);
@@ -172,6 +175,41 @@ public class WebDemoProvisioner implements ApplicationRunner {
                             ? "Đã chuẩn bị 65%. Còn kiểm tra phần mềm và cấu hình tài khoản."
                             : "Đã rà soát các hạng mục ban đầu.");
         }
+        provisionLeadership();
+    }
+
+    private void provisionLeadership() {
+        if (users.existsByUsernameAndDeletedFalse("giamdoc.web")) return;
+        UUID admin =
+                db.queryForObject("SELECT id FROM users WHERE username='admin.web'", UUID.class);
+        User leader =
+                user(
+                        "giamdoc.web",
+                        "Lãnh đạo · dữ liệu thực hành",
+                        null,
+                        "EMPLOYEE",
+                        encoder.encode(password));
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability,granted_by) VALUES"
+                        + " (?,'EXECUTIVE',?),(?,'PAYROLL_APPROVE',?)",
+                leader.getId(),
+                admin,
+                leader.getId(),
+                admin);
+        for (UUID dept :
+                db.queryForList(
+                        "SELECT id FROM departments WHERE is_active AND NOT is_deleted",
+                        UUID.class))
+            db.update(
+                    "INSERT INTO department_authority(department_id,executive_id,reason,changed_by)"
+                            + " VALUES (?,?,?,?) ON CONFLICT(department_id) DO NOTHING",
+                    dept,
+                    leader.getId(),
+                    "Cấu hình công ty thực hành; không phải dữ liệu doanh nghiệp thật",
+                    admin);
+        db.update(
+                "UPDATE users SET email_verified_at=now() WHERE email LIKE '%@anphat.example' AND"
+                        + " email_verified_at IS NULL");
     }
 
     private User user(String username, String name, UUID department, String role, String hash) {

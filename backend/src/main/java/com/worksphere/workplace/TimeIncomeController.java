@@ -53,6 +53,15 @@ public class TimeIncomeController {
         return ApiResponse.successNoContent("Đã nhập công, chờ đối soát");
     }
 
+    @PostMapping("/corrections")
+    public ApiResponse<?> correction(
+            @RequestBody TimeIncomeService.CorrectionInput r,
+            @AuthenticationPrincipal WorkSphereUserPrincipal p) {
+        service.correctionFor(r, p);
+        return ApiResponse.successNoContent(
+                "Đã gửi đề nghị đối soát thay, chờ người khác kiểm tra");
+    }
+
     @PostMapping("/requests")
     public ApiResponse<?> request(
             @RequestBody TimeIncomeService.TimeInput r,

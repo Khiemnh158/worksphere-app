@@ -36,7 +36,14 @@ import java.util.stream.Collectors;
  */
 @Service
 public class AuthApplicationService {
+    @org.springframework.beans.factory.annotation.Autowired private IdentityRateLimiter rate;
 
+    @org.springframework.beans.factory.annotation.Autowired private RecoveryService recovery;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.jdbc.core.JdbcTemplate identityDb;
+
+    @org.springframework.beans.factory.annotation.Autowired private TwoFactorService twoFactor;
     private static final Logger log = LoggerFactory.getLogger(AuthApplicationService.class);
 
     private static final long REFRESH_TOKEN_EXPIRY_DAYS = 30L;
@@ -74,6 +81,9 @@ public class AuthApplicationService {
     /** TASK-407: Login flow. Per API Contract section 8.1 and Roadmap section 8.3. */
     @Transactional
     public AuthResponse login(LoginRequest request, String ipAddress, String userAgent) {
+        if (!rate.allowed("login", request.login(), 20))
+            throw new BusinessRuleException(
+                    "LOGIN_RATE_LIMIT", "Quá nhiều lần thử tài khoản. Thử lại sau 15 phút.");
         User user =
                 userRepository
                         .findActiveByUsernameOrEmail(request.login())
@@ -83,6 +93,7 @@ public class AuthApplicationService {
                                                 "INVALID_CREDENTIALS",
                                                 "Thông tin đăng nhập không chính xác"));
 
+        guardCurrentAccount(user.getId());
         // Domain validates status - throws if not ACTIVE
         user.validateCanLogin();
 
@@ -92,6 +103,7 @@ public class AuthApplicationService {
                     "INVALID_CREDENTIALS", "Thông tin đăng nhập không chính xác");
         }
 
+        twoFactor.verify(user.getId(), request.mfaCode());
         // Create login session first
         UUID sessionId = UUID.randomUUID();
         LoginSession session =
@@ -171,6 +183,7 @@ public class AuthApplicationService {
         }
 
         user.validateCanLogin();
+        guardCurrentAccount(user.getId());
 
         // Find session associated with old token
         LoginSession session =
@@ -285,95 +298,21 @@ public class AuthApplicationService {
      */
     @Transactional
     public void forgotPassword(ForgotPasswordRequest request, String requestIp, String userAgent) {
-        userRepository
-                .findActiveByEmail(request.email())
-                .ifPresent(
-                        user -> {
-                            // Revoke any existing unused reset tokens
-                            passwordResetTokenRepository.revokeAllUnusedByUserId(
-                                    user.getId(), Instant.now());
-
-                            // Generate raw token, store only hash
-                            String rawToken = generateSecureToken();
-                            String tokenHash = hashToken(rawToken);
-                            Instant expiry =
-                                    Instant.now()
-                                            .plus(RESET_TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES);
-
-                            PasswordResetToken resetToken =
-                                    PasswordResetToken.create(
-                                            UUID.randomUUID(),
-                                            user.getId(),
-                                            tokenHash,
-                                            expiry,
-                                            requestIp,
-                                            userAgent);
-                            passwordResetTokenRepository.save(resetToken);
-
-                            // In production: send rawToken via email. For Phase 4, we log the token
-                            // ONLY in a safe way - to trace ID only, not the token itself.
-                            log.info(
-                                    "Password reset token created for userId={}. Token sent via"
-                                            + " out-of-band channel.",
-                                    user.getId());
-                        });
-        // Always returns without revealing if email exists
+        recovery.forgot(request.email());
     }
 
     /** TASK-409: Reset password with token. Per API Contract section 8.6. */
     @Transactional
     public void resetPassword(ResetPasswordRequest request) {
-        if (!request.newPassword().equals(request.confirmPassword())) {
-            throw new BusinessRuleException(
-                    "PASSWORD_CONFIRMATION_MISMATCH", "Mật khẩu xác nhận không khớp");
-        }
-
-        String tokenHash = hashToken(request.resetToken());
-
-        PasswordResetToken resetToken =
-                passwordResetTokenRepository
-                        .findByTokenHash(tokenHash)
-                        .orElseThrow(
-                                () ->
-                                        new BusinessRuleException(
-                                                "RESET_TOKEN_INVALID",
-                                                "Token đặt lại mật khẩu không hợp lệ"));
-
-        if (!resetToken.isValid()) {
-            if (resetToken.isExpired()) {
-                throw new BusinessRuleException(
-                        "RESET_TOKEN_EXPIRED", "Token đặt lại mật khẩu đã hết hạn");
-            }
-            throw new BusinessRuleException(
-                    "RESET_TOKEN_INVALID", "Token đặt lại mật khẩu không hợp lệ");
-        }
-
-        User user =
-                userRepository
-                        .findActiveById(resetToken.getUserId())
-                        .orElseThrow(
-                                () ->
-                                        new BusinessRuleException(
-                                                "RESET_TOKEN_INVALID",
-                                                "Token đặt lại mật khẩu không hợp lệ"));
-
-        // Enforce password policy: at least 8 chars
-        if (request.newPassword().length() < 8 || request.newPassword().length() > 128) {
-            throw new BusinessRuleException(
-                    "PASSWORD_POLICY_VIOLATION", "Mật khẩu phải có từ 8 đến 128 ký tự");
-        }
-
-        user.updatePassword(passwordEncoder.encode(request.newPassword()));
-        userRepository.save(user);
-
-        resetToken.markUsed();
-        passwordResetTokenRepository.save(resetToken);
-
-        // Per security policy: revoke all active sessions after password reset
-        loginSessionRepository.revokeAllActiveByUserId(user.getId(), Instant.now());
-        refreshTokenRepository.revokeAllByUserId(user.getId(), Instant.now());
-
-        log.info("Password reset completed. userId={}", user.getId());
+        recovery.complete(
+                new RecoveryService.Complete(
+                        request.resetToken(),
+                        request.newPassword(),
+                        request.confirmPassword(),
+                        null,
+                        null,
+                        null),
+                "RESET");
     }
 
     /** TASK-405: Change password for authenticated user. Per API Contract section 9.3. */
@@ -400,9 +339,11 @@ public class AuthApplicationService {
                     "NEW_PASSWORD_SAME_AS_CURRENT",
                     "Mật khẩu mới không được trùng mật khẩu hiện tại");
         }
-        if (request.newPassword().length() < 8 || request.newPassword().length() > 128) {
+        if (request.newPassword().length() < 12
+                || request.newPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8).length
+                        > 72) {
             throw new BusinessRuleException(
-                    "PASSWORD_POLICY_VIOLATION", "Mật khẩu phải có từ 8 đến 128 ký tự");
+                    "PASSWORD_POLICY_VIOLATION", "Mật khẩu cần từ 12 ký tự và tối đa 72 byte");
         }
 
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
@@ -464,6 +405,17 @@ public class AuthApplicationService {
                                                 new UserProfileResponse.DepartmentInfo(
                                                         d.getId(), d.getCode(), d.getName()))
                                 .orElse(null));
+    }
+
+    private void guardCurrentAccount(UUID id) {
+        if (!Boolean.TRUE.equals(
+                identityDb.queryForObject(
+                        "SELECT NOT activation_required AND (access_ends_at IS NULL OR"
+                                + " access_ends_at>now()) FROM users WHERE id=?",
+                        Boolean.class,
+                        id)))
+            throw new BusinessRuleException(
+                    "ACCOUNT_UNAVAILABLE", "Tài khoản chưa kích hoạt hoặc đã hết quyền truy cập");
     }
 
     // ---- Private helpers ----

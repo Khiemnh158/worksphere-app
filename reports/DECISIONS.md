@@ -16,3 +16,9 @@
 - D-012: Công và thu nhập dùng cấu hình có đầu vào xác nhận; không seed lương/lịch, không tự phạt hoặc coi tăng ca đăng ký là tiền đã được hưởng.
 - D-013: Đối soát hiện hỗ trợ ca ngày/gross; thiếu dữ liệu chặn chốt, khóa snapshot và nguồn khi chốt. Chưa có engine pháp lý/thuế/BHXH, thiết bị thật hoặc mở lại kỳ.
 - D-014: Xác minh chọn lọc 120 backend (31 PostgreSQL integration) + 5 client session; không suy rộng thành toàn bộ suite hoặc production-ready.
+
+- D015 (30/10): Admin kỹ thuật tách tài khoản nghiệp vụ; thêm lãnh đạo theo phòng và người thay thế có phạm vi/thời hạn.
+- D016: Email thử local trước; kích hoạt/reset một lần, TOTP opt-in, không SMS/SMTP thật trong đợt này.
+- D017: Nhân sự tách quyết định/cutoff/bàn giao/đối soát; JWT và refresh kiểm tra cutoff, không xóa lịch sử.
+- D018: Người lập–duyệt bảng tính độc lập; phát hành kiểm tra nguồn và giữ phiếu gốc khi điều chỉnh.
+- D019: Người dùng chọn QR xoay vòng; chỉ làm web/backend trước, mobile đợi nghiệm thu.

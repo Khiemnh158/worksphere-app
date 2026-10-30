@@ -1,3 +1,4 @@
+import { createPeopleUI } from "./people.js";
 import { api, login, logout, restore, clearSession, download } from "./api.js";
 const $ = (s) => document.querySelector(s),
   app = $("#app"),
@@ -44,6 +45,10 @@ const icon = (n) =>
     paths[n] || paths.file
   }"/></svg>`;
 const labels = {
+  BLOCKED: "Đang vướng",
+  BLOCK: "Báo vướng mắc",
+  RESUME: "Tiếp tục thực hiện",
+  CANCEL: "Hủy công việc",
   REQUEST_CANCEL: "Đề nghị hủy",
   APPROVE_CANCEL: "Đồng ý hủy",
   DENY_CANCEL: "Không chấp nhận hủy",
@@ -137,7 +142,7 @@ const btn = (action, text, cls = "", id = "") =>
       : ""
   }${id ? ` data-id="${esc(id)}"` : ""}>${text}</button>`;
 const empty = (text) => `<div class="empty">${icon("work")}${esc(text)}</div>`;
-const brand = `<a class="brand" href="#home"><span class="brand-mark">w·</span><span class="brand-text">worksphere<small>KHÔNG GIAN NỘI BỘ</small></span></a>`;
+const brand = `<button type="button" class="brand" data-action="sidebar" aria-label="Mở hoặc thu gọn điều hướng"><span class="brand-mark">w·</span><span class="brand-text">worksphere<small>KHÔNG GIAN NỘI BỘ</small></span></button>`;
 let periodValue = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "Asia/Ho_Chi_Minh",
   year: "numeric",
@@ -186,6 +191,7 @@ function loginView(message = "") {
   authEpoch++;
   routeSerial++;
   C = null;
+  peopleUI.reset();
   current = null;
   works = [];
   notices = [];
@@ -193,16 +199,17 @@ function loginView(message = "") {
   $("#toast").className = "";
   $("#toast").textContent = "";
   dialog.close();
+  dialog.innerHTML = "";
   document.body.className = "";
   app.innerHTML = `<div class="login"><section class="login-story">${brand}<div><span class="eyebrow">AN PHÁT · KHÔNG GIAN LÀM VIỆC</span><h1>Công việc rõ ràng.<br><em>Phối hợp nhịp nhàng.</em></h1><p>Một nơi để tiếp nhận yêu cầu, cùng xử lý công việc và tiếp nối những điều đang làm.</p><div class="flow-preview"><div class="row between"><span class="pill purple">Cùng một tiến độ</span>${icon(
     "handover"
   )}</div><h3 style="margin-top:18px">Bàn giao để tiếp tục.</h3><p style="font-size:12px;margin-top:7px">Giữ lịch sử. Rà soát phần đã làm. Rõ người phụ trách.</p><div class="progress"><span style="width:65%"></span></div><footer><span>Tiếp nối công việc</span><span>Rõ trách nhiệm ${icon(
     "check"
-  )}</span></footer></div></div><small>KẾT NỐI CON NGƯỜI · TIẾP NỐI CÔNG VIỆC</small></section><section class="login-main">${themeButton()}<div class="login-form"><span class="eyebrow">CHÀO MỪNG BẠN TRỞ LẠI</span><h2>Đăng nhập</h2><p>Vào không gian làm việc bằng tài khoản do doanh nghiệp cấp.</p><form id="login-form"><label class="field">Tên đăng nhập hoặc email<input name="login" autocomplete="username" required maxlength="255" placeholder="Nhập tài khoản của bạn"></label><label class="field">Mật khẩu<input name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="Nhập mật khẩu"></label><div class="form-error" role="alert">${esc(
+  )}</span></footer></div></div><small>KẾT NỐI CON NGƯỜI · TIẾP NỐI CÔNG VIỆC</small></section><section class="login-main">${themeButton()}<div class="login-form"><span class="eyebrow">CHÀO MỪNG BẠN TRỞ LẠI</span><h2>Đăng nhập</h2><p>Vào không gian làm việc bằng tài khoản do doanh nghiệp cấp.</p><form id="login-form"><label class="field">Tên đăng nhập hoặc email<input name="login" autocomplete="username" required maxlength="255" placeholder="Nhập tài khoản của bạn"></label><label class="field">Mật khẩu<input name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="Nhập mật khẩu"></label><label class="field">Mã xác thực hai bước (nếu đã bật)<input name="mfaCode" autocomplete="one-time-code" maxlength="64" placeholder="Mã ứng dụng xác thực hoặc mã dự phòng"></label><div class="form-error" role="alert">${esc(
     message
   )}</div><button class="btn primary" type="submit">Đăng nhập ${icon(
     "arrow"
-  )}</button></form><p class="login-foot">Chưa có tài khoản hoặc cần khôi phục truy cập?<br>Liên hệ người quản trị nội bộ của bạn.</p></div></section></div>`;
+  )}</button></form><p class="login-foot"><a href="#forgot">Quên mật khẩu?</a><br>Tài khoản mới: mở liên kết kích hoạt trong email.</p></div></section></div>`;
   $("#login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const f = e.currentTarget,
@@ -210,11 +217,15 @@ function loginView(message = "") {
     b.disabled = true;
     f.querySelector(".form-error").textContent = "";
     try {
-      await login(f.login.value.trim(), f.password.value);
+      await login(
+        f.login.value.trim(),
+        f.password.value,
+        f.mfaCode.value.trim()
+      );
       f.password.value = "";
       if (!(await loadContext())) return;
-      if (!location.hash) location.hash = "home";
-      await route();
+      if (location.hash !== "#home") location.hash = "home";
+      else await route();
     } catch (err) {
       f.querySelector(".form-error").textContent = err.message;
     } finally {
@@ -241,7 +252,10 @@ function navItem(key, label, ico) {
     view === key ? ' aria-current="page"' : ""
   }>${icon(ico)}<span class="nav-text">${label}</span></a>`;
 }
+let navigationScroll = 0;
 function shell() {
+  navigationScroll =
+    document.querySelector(".sidebar-scroll")?.scrollTop ?? navigationScroll;
   const managed = C.managedDepartments.length > 0;
   document.body.classList.toggle("sidebar-collapsed", collapsed);
   const title =
@@ -259,7 +273,14 @@ function shell() {
       audit: "Nhật ký quản trị",
       notifications: "Thông báo",
       profile: "Hồ sơ cá nhân",
-      people: "Danh bạ nội bộ",
+      stations: "Điểm chấm công QR",
+      people: "Phòng ban của tôi",
+      personnel: "Hồ sơ nhân sự",
+      access: "Yêu cầu quản trị",
+      delegations: "Phụ trách thay",
+      approvals: "Việc cần phê duyệt",
+      security: "Bảo mật",
+      import: "Nhập tài khoản",
       hr: "Hồ sơ ngừng làm việc",
       time: "Công & tăng ca",
       salary: "Thu nhập của tôi",
@@ -268,71 +289,19 @@ function shell() {
   app.innerHTML = `<button class="mobile-cover" data-action="sidebar" aria-label="Đóng điều hướng"></button><aside class="sidebar">${brand}<div class="company">${avatar(
     "An Phát",
     "lime"
-  )}<span><strong>An Phát</strong><small>Thương mại & dịch vụ</small></span></div><p class="nav-label">KHÔNG GIAN CỦA BẠN</p><nav class="nav-group" aria-label="Cá nhân">${navItem(
-    "home",
-    "Tổng quan",
-    "home"
-  )}${navItem(
-    "work",
-    managed ? "Công việc của phòng" : "Việc của tôi",
-    "work"
-  )}${navItem("calendar", "Lịch công việc", "calendar")}${navItem(
-    "requests",
-    "Yêu cầu của tôi",
-    "request"
-  )}${navItem("assigned", "Yêu cầu tôi xử lý", "settings")}${navItem(
-    "handover",
-    "Bàn giao",
-    "handover"
-  )}${navItem("people", "Danh bạ nội bộ", "people")}${navItem(
-    "time",
-    "Công, nghỉ & tăng ca",
-    "clock"
-  )}${navItem("salary", "Thu nhập của tôi", "money")}</nav>${
-    managed
-      ? `<p class="nav-label">ĐIỀU PHỐI PHÒNG</p><nav class="nav-group">${navItem(
-          "queue",
-          "Hàng đợi của phòng",
-          "queue"
-        )}</nav>`
-      : ""
-  }${
-    C.capabilities.includes("HR_MANAGE")
-      ? `<p class="nav-label">QUYỀN CHUYÊN TRÁCH</p><nav class="nav-group">${navItem(
-          "hr",
-          "Hồ sơ ngừng làm việc",
-          "people"
-        )}</nav>`
-      : ""
-  }${
-    C.capabilities.includes("PAYROLL_MANAGE")
-      ? `<nav class="nav-group">${navItem(
-          "payroll",
-          "Đối soát thu nhập",
-          "money"
-        )}</nav>`
-      : ""
-  }${
-    C.admin
-      ? `<p class="nav-label">QUẢN TRỊ</p><nav class="nav-group">${navItem(
-          "accounts",
-          "Tài khoản & quyền",
-          "shield"
-        )}${navItem("departments", "Phòng ban", "building")}${navItem(
-          "categories",
-          "Loại yêu cầu",
-          "settings"
-        )}${navItem("audit", "Nhật ký quản trị", "file")}</nav>`
-      : ""
-  }<div class="sidebar-bottom"><div class="row">${avatar(
+  )}<span><strong>An Phát</strong><small>Thương mại & dịch vụ</small></span></div><div class="sidebar-scroll" tabindex="0" aria-label="Điều hướng chức năng">${navigation()}</div><div class="sidebar-bottom"><div class="row">${avatar(
     C.user.full_name
   )}<div class="user-copy"><div class="person-name">${esc(
     C.user.full_name
   )}</div><small class="muted">${esc(
     C.admin
       ? "Quản trị hệ thống"
-      : managed
+      : C.executive
+      ? "Ban lãnh đạo"
+      : C.departments.some((d) => d.manager_id === C.user.id)
       ? "Trưởng phòng"
+      : managed
+      ? "Phụ trách thay"
       : C.user.department_name || "Chưa gán phòng"
   )}</small></div><button class="icon-btn" data-action="logout" aria-label="Đăng xuất" title="Đăng xuất">${icon(
     "logout"
@@ -354,8 +323,89 @@ function shell() {
     C.user.full_name,
     "lime"
   )}</a></div></header><main id="main" class="main" tabindex="-1"><div class="view-loading"><span class="spinner"></span>Đang tải dữ liệu…</div></main></div>`;
+  const navigationNode = document.querySelector(".sidebar-scroll");
+  if (navigationNode) navigationNode.scrollTop = navigationScroll;
+  syncNavigationState();
   applyTheme();
 }
+function syncNavigationState() {
+  const aside = document.querySelector(".sidebar");
+  if (!aside) return;
+  const narrow = matchMedia("(max-width:760px)").matches,
+    opened = narrow
+      ? document.body.classList.contains("mobile-open")
+      : !collapsed;
+  aside.inert = narrow && !opened;
+  document
+    .querySelectorAll('[data-action="sidebar"]:not(.mobile-cover)')
+    .forEach((b) => b.setAttribute("aria-expanded", String(opened)));
+}
+window.addEventListener("resize", syncNavigationState);
+function navigation() {
+  const group = (label, items) =>
+    `<p class="nav-label">${label}</p><nav class="nav-group">${items
+      .filter(Boolean)
+      .map(([v, t, i]) => navItem(v, t, i))
+      .join("")}</nav>`;
+  if (C.admin)
+    return group("QUẢN TRỊ HỆ THỐNG", [
+      ["home", "Tổng quan", "home"],
+      ["accounts", "Tài khoản & quyền", "shield"],
+      ["import", "Nhập tài khoản", "people"],
+      ["departments", "Phòng ban & chức vụ", "building"],
+      ["access", "Yêu cầu quản trị", "queue"],
+      ["categories", "Danh mục tiếp nhận", "settings"],
+      ["audit", "Nhật ký quản trị", "file"],
+      ["security", "Bảo mật", "shield"],
+    ]);
+  const management = C.managedDepartments.length > 0;
+  return (
+    group("KHÔNG GIAN LÀM VIỆC", [
+      ["home", "Tổng quan", "home"],
+      [
+        "work",
+        management ? "Công việc phụ trách" : "Công việc của tôi",
+        "work",
+      ],
+      ["calendar", "Lịch công việc", "calendar"],
+      ["requests", "Yêu cầu hỗ trợ đã gửi", "request"],
+      C.assignedSupport > 0 && ["assigned", "Hỗ trợ được giao", "settings"],
+      ["people", "Phòng ban của tôi", "people"],
+      ["time", "Công, nghỉ & tăng ca", "clock"],
+      [
+        "personnel",
+        C.capabilities.includes("HR_MANAGE") || C.executive
+          ? "Hồ sơ nhân sự"
+          : "Đề nghị nhân sự",
+        "people",
+      ],
+      ["access", "Đề nghị truy cập", "shield"],
+      ["security", "Bảo mật", "shield"],
+    ]) +
+    (management
+      ? group("ĐIỀU PHỐI & PHÊ DUYỆT", [
+          C.supportDepartments.length > 0 && [
+            "queue",
+            "Hàng đợi hỗ trợ",
+            "queue",
+          ],
+          ["handover", "Bàn giao công việc", "handover"],
+          ["delegations", "Phụ trách thay", "people"],
+          C.executive && ["approvals", "Việc cần phê duyệt", "check"],
+        ])
+      : "") +
+    (C.capabilities.includes("TIME_REVIEW")
+      ? group("ĐIỂM CHẤM CÔNG", [["stations", "Điểm chấm công QR", "clock"]])
+      : "") +
+    (C.capabilities.includes("PAYROLL_MANAGE") ||
+    C.capabilities.includes("PAYROLL_APPROVE")
+      ? group("NGHIỆP VỤ CHUYÊN TRÁCH", [
+          ["payroll", "Bảng tính lương", "money"],
+        ])
+      : "")
+  );
+}
+
 function heading(title, description = "", action = "") {
   return `<div class="page-head"><div><p class="eyebrow" style="margin:0 0 8px">${esc(
     C.user.department_name || "AN PHÁT"
@@ -364,7 +414,9 @@ function heading(title, description = "", action = "") {
   }</div>${action}</div>`;
 }
 function workCard(w) {
-  const overdue = new Date(w.due_at) < new Date() && w.status !== "COMPLETED";
+  const overdue =
+    new Date(w.due_at) < new Date() &&
+    !["COMPLETED", "CANCELLED"].includes(w.status);
   return `<a class="work-card" href="#work/${
     w.id
   }"><div class="row between">${pill(w.priority)}${icon(
@@ -396,7 +448,9 @@ function metric(label, value, ico, accent = false) {
 }
 function home() {
   if (C.admin) return adminHome();
-  const open = works.filter((w) => w.status !== "COMPLETED"),
+  const open = works.filter(
+      (w) => !["COMPLETED", "CANCELLED"].includes(w.status)
+    ),
     handover = works.filter((w) => w.status === "HANDOVER"),
     review = works.filter((w) => w.status === "REVIEW"),
     overdue = open.filter((w) => new Date(w.due_at) < new Date());
@@ -877,9 +931,9 @@ function departmentsView() {
             d.description || "Chưa có mô tả."
           )}</p><div class="row between"><small class="muted">${esc(
             d.manager_name || "Chưa chỉ định trưởng phòng"
-          )}</small>${btn(
-            "edit-department",
-            "Cấu hình",
+          )}</small>${btn("edit-department", "Cấu hình", "small", d.id)}${btn(
+            "p-authority",
+            "Lãnh đạo phụ trách",
             "small",
             d.id
           )}</div></section>`
@@ -925,7 +979,9 @@ async function accountsView() {
                 ({
                   HR_MANAGE: "Nhân sự",
                   TIME_REVIEW: "Đối soát công",
-                  PAYROLL_MANAGE: "Đối soát thu nhập",
+                  PAYROLL_MANAGE: "Lập bảng tính lương",
+                  PAYROLL_APPROVE: "Phê duyệt bảng tính",
+                  EXECUTIVE: "Ban lãnh đạo",
                 }[c])
             )
             .join(", ")}</small></td><td>${pill(
@@ -936,7 +992,9 @@ async function accountsView() {
             "small",
             u.id
           )}${
-            u.status === "ACTIVE"
+            u.status === "PENDING"
+              ? btn("p-invite", "Gửi lại kích hoạt", "small", u.id)
+              : u.status === "ACTIVE"
               ? btn("lock-account", "Khóa", "danger small", u.id)
               : u.status === "LOCKED"
               ? btn("unlock-account", "Mở khóa", "small", u.id)
@@ -951,7 +1009,7 @@ async function categoriesView() {
   current = { type: "categories", data: list };
   return (
     heading(
-      "Loại yêu cầu",
+      "Danh mục hỗ trợ & nơi tiếp nhận",
       "Đổi cấu hình chỉ áp dụng cho yêu cầu mới; lịch sử phòng nhận của yêu cầu cũ được giữ.",
       btn("new-category", icon("plus") + " Thêm loại yêu cầu", "primary")
     ) +
@@ -994,29 +1052,6 @@ function noticesView() {
         )
         .join("") || empty("Bạn chưa có thông báo.")
     }</div>`
-  );
-}
-function peopleView() {
-  return (
-    heading(
-      "Danh bạ nội bộ",
-      "Thông tin cơ bản để tìm đúng đồng nghiệp và phòng phụ trách."
-    ) +
-    `<div class="cards">${C.people
-      .map(
-        (u) =>
-          `<div class="panel row">${avatar(u.full_name)}<div><h3>${esc(
-            u.full_name
-          )}</h3><small class="muted">${esc(
-            C.departments.find((d) => d.id === u.department_id)?.name ||
-              "Chưa gán phòng"
-          )}${
-            C.departments.some((d) => d.manager_id === u.id)
-              ? " · Trưởng phòng"
-              : ""
-          }</small></div></div>`
-      )
-      .join("")}</div>`
   );
 }
 function profileView() {
@@ -1068,13 +1103,34 @@ async function auditView() {
   );
 }
 async function route() {
+  peopleUI.stop();
   if (!C) return;
   const serial = ++routeSerial;
   const [target, id] = location.hash.replace(/^#/, "").split("/");
   view = target || "home";
+  if (["forgot", "reset", "activate"].includes(view))
+    return recoveryView(view, id);
   document.body.classList.remove("mobile-open");
   shell();
   try {
+    if (
+      C.admin &&
+      ![
+        "home",
+        "accounts",
+        "departments",
+        "categories",
+        "audit",
+        "access",
+        "profile",
+        "security",
+        "notifications",
+        "import",
+      ].includes(view)
+    )
+      throw new Error(
+        "Tài khoản quản trị dùng cho quản trị hệ thống. Dùng tài khoản làm việc riêng để xử lý nghiệp vụ."
+      );
     if (
       ["accounts", "departments", "categories", "audit"].includes(view) &&
       !C.admin
@@ -1089,7 +1145,8 @@ async function route() {
       html = requestDetail(
         await api("/service-requests/" + encodeURIComponent(id))
       );
-    else if (view === "home") html = home();
+    else if (view === "home")
+      html = C.executive ? await peopleUI.render("approvals") : home();
     else if (view === "work" || view === "handover")
       html = workList(view === "handover");
     else if (view === "calendar") html = calendar();
@@ -1099,11 +1156,25 @@ async function route() {
     else if (view === "accounts") html = await accountsView();
     else if (view === "categories") html = await categoriesView();
     else if (view === "notifications") html = noticesView();
-    else if (view === "people") html = peopleView();
+    else if (
+      [
+        "people",
+        "stations",
+        "delegations",
+        "personnel",
+        "access",
+        "approvals",
+        "security",
+        "import",
+      ].includes(view)
+    )
+      html = await peopleUI.render(view);
     else if (view === "profile") html = profileView();
     else if (view === "audit") html = await auditView();
-    else if (view === "hr") html = await hrView();
-    else if (view === "time") html = await timeView();
+    else if (view === "hr") {
+      location.hash = "personnel";
+      return;
+    } else if (view === "time") html = await timeView();
     else if (view === "salary" || view === "payroll") html = await incomeView();
     else html = empty("Không tìm thấy trang này.");
     if (serial === routeSerial && C) {
@@ -1165,9 +1236,7 @@ function form(
   onSubmit,
   { submit = "Xác nhận", intro = "", after } = {}
 ) {
-  $(
-    "#dialog-content"
-  ).innerHTML = `<div class="dialog-head"><h2 id="dialog-title">${esc(
+  dialog.innerHTML = `<div id="dialog-content"><div class="dialog-head"><h2 id="dialog-title">${esc(
     title
   )}</h2><button class="icon-btn" data-action="close" aria-label="Đóng">${icon(
     "close"
@@ -1175,7 +1244,7 @@ function form(
     intro ? `<p class="muted" style="font-size:12px">${esc(intro)}</p>` : ""
   }${fields}<div class="form-error" role="alert"></div><div class="form-actions"><button type="button" class="btn" data-action="close">Hủy</button><button type="submit" class="btn primary">${esc(
     submit
-  )}</button></div></form>`;
+  )}</button></div></form></div>`;
   dialog.setAttribute("aria-labelledby", "dialog-title");
   dialog.showModal();
   $("#action-form").addEventListener("submit", async (e) => {
@@ -1578,7 +1647,17 @@ function requestComment() {
     { submit: "Gửi trao đổi" }
   );
 }
-function departmentForm(id) {
+async function departmentForm(id) {
+  const staff = await api("/workplace/staff");
+  const members = (dept) =>
+    staff
+      .filter(
+        (u) =>
+          u.status === "ACTIVE" &&
+          u.department_id === dept &&
+          !u.roles.includes("ADMIN")
+      )
+      .map((u) => ({ value: u.id, label: u.full_name }));
   const d = C.departments.find((x) => x.id === id);
   form(
     d ? "Cấu hình phòng ban" : "Thêm phòng ban",
@@ -1592,10 +1671,7 @@ function departmentForm(id) {
       (d
         ? field("managerId", "Trưởng phòng", "select", {
             value: d.manager_id || "",
-            choices: [
-              { value: "", label: "Chưa chỉ định" },
-              ...peopleOptions(d.id),
-            ],
+            choices: [{ value: "", label: "Chưa chỉ định" }, ...members(d.id)],
           })
         : "") +
       field("active", "Trạng thái", "select", {
@@ -1628,21 +1704,24 @@ function accountForm(id) {
   if (u) {
     form(
       "Phòng ban & quyền · " + u.full_name,
-      field("departmentId", "Phòng ban", "select", {
-        value: u.department_id || "",
-        choices: departmentsOptions(true),
-      }) +
+      field("jobTitle", "Chức danh", "text", { value: u.job_title, max: 100 }) +
+        field("departmentId", "Phòng ban", "select", {
+          value: u.department_id || "",
+          choices: departmentsOptions(true),
+        }) +
         field("role", "Vai trò hệ thống", "select", {
           value: u.roles.includes("ADMIN") ? "ADMIN" : "EMPLOYEE",
           choices: [
-            { value: "EMPLOYEE", label: "Nhân viên" },
+            { value: "EMPLOYEE", label: "Người dùng nghiệp vụ" },
             { value: "ADMIN", label: "Admin hệ thống" },
           ],
         }) +
-        `<div class="checks">${[
+        `<section class="business-capabilities"><p class="muted">Nhiệm vụ chuyên trách là tùy chọn, chỉ cấp theo phân công có căn cứ. Nhân viên không bắt buộc có các quyền dưới đây.</p><div class="checks">${[
           ["HR_MANAGE", "Xử lý hồ sơ nhân sự"],
           ["TIME_REVIEW", "Đối soát công"],
-          ["PAYROLL_MANAGE", "Đối soát thu nhập"],
+          ["PAYROLL_MANAGE", "Lập và đối soát bảng tính lương"],
+          ["PAYROLL_APPROVE", "Kiểm tra/phê duyệt bảng tính độc lập"],
+          ["EXECUTIVE", "Ban lãnh đạo — cần chỉ định phòng phụ trách"],
         ]
           .map(
             ([code, label]) =>
@@ -1650,7 +1729,11 @@ function accountForm(id) {
                 u.capabilities.includes(code) ? "checked" : ""
               }>${label}</label>`
           )
-          .join("")}</div>` +
+          .join("")}</div></section><p class="muted">Chức vụ quản lý: ${esc(
+          C.departments.some((d) => d.manager_id === u.id)
+            ? "Trưởng phòng"
+            : "Chưa được bổ nhiệm trưởng phòng"
+        )}. Bổ nhiệm/thay trưởng phòng tại Phòng ban & chức vụ; tên chức danh không tự cấp quyền.</p>` +
         field("reason", "Căn cứ/lý do thay đổi", "textarea", { max: 1000 }),
       async (v, f) => {
         await api("/workplace/staff/" + u.id, {
@@ -1670,6 +1753,7 @@ function accountForm(id) {
           "Chuyển phòng yêu cầu xử lý hết trách nhiệm đang giữ. Quyền chuyên trách phải được xem xét lại.",
       }
     );
+    syncRoleForm();
     return;
   }
   form(
@@ -1682,14 +1766,9 @@ function accountForm(id) {
       }) +
       field("role", "Vai trò hệ thống", "select", {
         choices: [
-          { value: "EMPLOYEE", label: "Nhân viên" },
+          { value: "EMPLOYEE", label: "Người dùng nghiệp vụ" },
           { value: "ADMIN", label: "Admin hệ thống" },
         ],
-      }) +
-      field("password", "Mật khẩu ban đầu", "password", {
-        min: 12,
-        max: 128,
-        hint: "Tối thiểu 12 ký tự. Chuyển riêng cho người nhận, không đưa vào nội dung công việc.",
       }),
     async (v) => {
       await api("/workplace/staff", {
@@ -1700,9 +1779,31 @@ function accountForm(id) {
     {
       submit: "Tạo tài khoản",
       intro:
-        "Gán nhân viên vào phòng trước. Chức vụ trưởng phòng được chỉ định tại màn Phòng ban, không suy ra từ vai trò dự án.",
+        "Tài khoản ở trạng thái chưa kích hoạt. Chủ tài khoản nhận email riêng để xác minh, chọn tên đăng nhập và đặt mật khẩu. Trưởng phòng được chỉ định tại Phòng ban.",
     }
   );
+  syncRoleForm();
+}
+function syncRoleForm() {
+  const role = document.querySelector("#f-role"),
+    dept = document.querySelector("#f-departmentId"),
+    specialties = document.querySelector(".business-capabilities");
+  const sync = () => {
+    const admin = role.value === "ADMIN";
+    if (specialties) {
+      specialties.hidden = admin;
+      if (admin)
+        specialties
+          .querySelectorAll("input")
+          .forEach((x) => (x.checked = false));
+    }
+    if (dept) {
+      dept.disabled = admin;
+      if (admin) dept.value = "";
+    }
+  };
+  role.addEventListener("change", sync);
+  sync();
 }
 function accountState(id, action) {
   const u = current.data.find((x) => x.id === id);
@@ -1728,34 +1829,6 @@ function accountState(id, action) {
     }
   );
 }
-async function hrView() {
-  const list = await api("/workplace/hr-staff");
-  current = { type: "hr", data: list };
-  return (
-    heading(
-      "Hồ sơ ngừng làm việc",
-      "Chỉ ghi nhận sau khi có quyết định đúng thẩm quyền. Không tự tính phạt hoặc bồi thường."
-    ) +
-    `<div class="table-wrap"><table><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>${list
-      .map(
-        (u) =>
-          `<tr><td><strong>${esc(u.full_name)}</strong></td><td>${esc(
-            u.department_name || "Chưa gán"
-          )}</td><td>${pill(u.status)}</td><td>${
-            u.status !== "DISABLED"
-              ? btn(
-                  "disable-account",
-                  "Ghi nhận ngừng truy cập",
-                  "danger small",
-                  u.id
-                )
-              : '<small class="muted">Đã ngừng truy cập</small>'
-          }</td></tr>`
-      )
-      .join("")}</tbody></table></div>`
-  );
-}
-
 function adminHome() {
   return (
     heading(
@@ -1765,7 +1838,7 @@ function adminHome() {
     ) +
     `<section class="hero"><div><span class="eyebrow">QUẢN TRỊ HỆ THỐNG</span><h2>Đúng quyền truy cập.<br>Rõ người phụ trách.</h2><p>Phòng ban có thể mở rộng. Quyền chuyên trách được cấp theo trách nhiệm, không suy ra từ tên vai trò.</p></div><div class="hero-art" aria-hidden="true"><div class="art-bar"></div><div class="art-bar"></div><div class="art-bar"></div></div></section><div class="metrics">${metric(
       "Tài khoản hoạt động",
-      C.people.length,
+      C.peopleCount,
       "people",
       true
     )}${metric(
@@ -1795,7 +1868,7 @@ function adminHome() {
       ],
       [
         "categories",
-        "Loại yêu cầu",
+        "Danh mục hỗ trợ & nơi tiếp nhận",
         "Cấu hình nơi tiếp nhận cho từng loại hỗ trợ.",
         "settings",
       ],
@@ -1837,10 +1910,16 @@ function periodControl() {
   )}</div>`;
 }
 function canReview(user, dept) {
+  if (user === C.user.id) return false;
+  if (C.departments.some((d) => d.id === dept && d.manager_id === user))
+    return (
+      C.executive &&
+      C.authorities.some(
+        (a) => a.department_id === dept && a.executive_id === C.user.id
+      )
+    );
   return (
-    user !== C.user.id &&
-    (C.managedDepartments.includes(dept) ||
-      C.capabilities.includes("TIME_REVIEW"))
+    C.timeDepartments.includes(dept) || C.capabilities.includes("TIME_REVIEW")
   );
 }
 async function timeView() {
@@ -1850,13 +1929,16 @@ async function timeView() {
     heading(
       "Công, nghỉ & tăng ca",
       "Bản ghi chờ kiểm tra được tách khỏi công đã xác nhận. Thiếu dữ liệu không tự kết luận là vắng.",
-      btn("time-request", icon("plus") + " Gửi đơn", "primary")
+      C.user.department_id
+        ? btn("time-request", icon("plus") + " Gửi đơn", "primary")
+        : ""
     ) +
     `<div class="filters">${periodControl()}${
       C.capabilities.includes("TIME_REVIEW")
         ? btn("calendar-config", "Cấu hình lịch công", "small") +
           btn("time-import", "Nhập bản ghi công", "small") +
-          btn("csv-import", "Nhập CSV", "small")
+          btn("csv-import", "Nhập CSV", "small") +
+          btn("correction-for", "Đề nghị điều chỉnh thay", "small")
         : ""
     }${
       C.capabilities.includes("HR_MANAGE")
@@ -1902,8 +1984,7 @@ async function timeView() {
                 )}</td><td>${hours(r.regular_minutes)}</td><td><small>${esc(
                   r.source_reference
                 )}</small><br>${pill(r.status)}</td><td>${
-                  r.status === "PENDING" &&
-                  canReview(r.user_id, r.department_id)
+                  r.status === "PENDING" && r.canReview
                     ? btn("review-attendance", "Kiểm tra", "small", r.id)
                     : `<small class="muted">${esc(
                         r.review_note || "Chờ người có quyền kiểm tra"
@@ -1931,10 +2012,9 @@ async function timeView() {
                     ? `<br><small>Thực tế: ${hours(r.actual_minutes)}</small>`
                     : ""
                 }</td><td>${
-                  canReview(r.user_id, r.department_id) &&
-                  r.status === "PENDING"
+                  r.canReview && r.status === "PENDING"
                     ? btn("review-time-request", "Xem xét", "small", r.id)
-                    : canReview(r.user_id, r.department_id) &&
+                    : r.canReview &&
                       r.status === "APPROVED" &&
                       r.request_type === "OVERTIME"
                     ? btn("confirm-overtime", "Xác nhận thực tế", "small", r.id)
@@ -1972,15 +2052,19 @@ async function timeView() {
   );
 }
 async function incomeView() {
-  if (view === "payroll" && !C.capabilities.includes("PAYROLL_MANAGE"))
+  if (
+    view === "payroll" &&
+    !C.capabilities.includes("PAYROLL_MANAGE") &&
+    !C.capabilities.includes("PAYROLL_APPROVE")
+  )
     throw new Error("Bạn chưa có quyền đối soát thu nhập.");
   const rows = await api("/workplace/time/incomes?period=" + periodValue);
   current = { type: "incomes", data: rows };
   return (
     heading(
-      view === "payroll" ? "Đối soát thu nhập" : "Thu nhập của tôi",
+      view === "payroll" ? "Bảng tính lương" : "Thu nhập của tôi",
       "Thu nhập theo lương công việc và tăng ca đã xác nhận; chưa phải lương thực nhận sau bảo hiểm, thuế và các khoản khác.",
-      view === "payroll"
+      view === "payroll" && C.capabilities.includes("PAYROLL_MANAGE")
         ? btn(
             "income-config",
             icon("plus") + " Khai báo mức lương kỳ",
@@ -2045,21 +2129,7 @@ async function incomeView() {
                   )
                   .join("")}</tbody></table></div></details>`
               : `<p class="detail-copy">${esc(c.message)}</p>`
-          }${
-            view === "payroll" && r.status === "DRAFT"
-              ? `<div class="row wrap" style="margin-top:18px">${btn(
-                  "edit-income",
-                  "Sửa thông số",
-                  "small",
-                  r.id
-                )}${btn(
-                  "lock-income",
-                  "Kiểm tra và chốt phiếu",
-                  "primary small",
-                  r.id
-                )}</div>`
-              : ""
-          }</section>`;
+          }${view === "payroll" ? incomeActions(r) : ""}</section>`;
         })
         .join("") ||
       empty(
@@ -2067,6 +2137,59 @@ async function incomeView() {
       )
     }`
   );
+}
+function incomeActions(r) {
+  const cap = (c) => C.capabilities.includes(c),
+    self = r.user_id === C.user.id;
+  let html = `<p class="muted">Quy trình: ${
+    {
+      DRAFT: "Nháp",
+      SUBMITTED: "Chờ kiểm tra",
+      APPROVED: "Đã được duyệt",
+      PUBLISHED: "Đã phát hành",
+    }[r.approval_state] || r.approval_state
+  } · ${esc(r.approval_reason || "")}</p><div class="row wrap">`;
+  if (!self && r.approval_state === "DRAFT" && cap("PAYROLL_MANAGE"))
+    html +=
+      btn("edit-income", "Sửa thông số", "small", r.id) +
+      btn("income-flow", "Gửi kiểm tra", "primary small", r.id + "|SUBMIT");
+  if (
+    !self &&
+    r.approval_state === "SUBMITTED" &&
+    cap("PAYROLL_APPROVE") &&
+    C.user.id !== r.configured_by &&
+    C.user.id !== r.submitted_by
+  )
+    html += btn("income-flow", "Phê duyệt", "primary small", r.id + "|APPROVE");
+  if (
+    !self &&
+    ["SUBMITTED", "APPROVED"].includes(r.approval_state) &&
+    cap("PAYROLL_APPROVE")
+  )
+    html += btn("income-flow", "Trả lại", "small", r.id + "|RETURN");
+  if (
+    !self &&
+    r.approval_state === "APPROVED" &&
+    cap("PAYROLL_MANAGE") &&
+    r.approved_by !== C.user.id
+  )
+    html += btn("lock-income", "Phát hành phiếu", "primary small", r.id);
+  if (!self && r.status === "LOCKED" && cap("PAYROLL_MANAGE"))
+    html += btn("income-flow", "Điều chỉnh bổ sung", "small", r.id + "|ADJUST");
+  html += "</div>";
+  for (const a of r.adjustments || [])
+    html += `<div class="list-row"><p>${money(a.amount)} · ${esc(
+      a.reason
+    )} · ${esc(a.status)}</p>${
+      !self &&
+      a.status === "PENDING" &&
+      cap("PAYROLL_APPROVE") &&
+      a.created_by !== C.user.id
+        ? btn("income-adjustment", "Duyệt", "small", a.id + "|APPROVE") +
+          btn("income-adjustment", "Từ chối", "small", a.id + "|REJECT")
+        : ""
+    }</div>`;
+  return html;
 }
 function dateFields() {
   return (
@@ -2157,10 +2280,43 @@ function calendarConfig() {
     }
   );
 }
-function importTime() {
+async function correctionFor() {
+  const list = await api("/workplace/time/people");
+  form(
+    "Đề nghị điều chỉnh công thay nhân viên",
+    field("userId", "Nhân viên", "select", {
+      choices: list
+        .filter((u) => u.id !== C.user.id)
+        .map((u) => ({ value: u.id, label: u.full_name })),
+    }) +
+      dateFields() +
+      field("requestedMinutes", "Số phút công đề nghị", "number", {
+        min: 1,
+        max: 480,
+      }) +
+      field("reason", "Căn cứ và nguồn đối chiếu", "textarea"),
+    (v) =>
+      api("/workplace/time/corrections", {
+        method: "POST",
+        body: {
+          ...v,
+          ...toInterval(v),
+          requestedMinutes: Number(v.requestedMinutes),
+        },
+      }),
+    {
+      intro:
+        "Khoảng công phải trước mốc kết thúc đã xác nhận. Người tạo đơn không tự duyệt.",
+    }
+  );
+}
+async function importTime() {
+  const eligiblePeople = await api("/workplace/time/people");
   form(
     "Nhập một bản ghi công",
-    field("userId", "Nhân viên", "select", { choices: peopleOptions() }) +
+    field("userId", "Nhân viên", "select", {
+      choices: eligiblePeople.map((u) => ({ value: u.id, label: u.full_name })),
+    }) +
       dateFields() +
       field("regularMinutes", "Số phút công thường theo nguồn", "number", {
         min: 0,
@@ -2234,8 +2390,11 @@ function reviewTime(action, id) {
     }
   );
 }
-function absenceForm() {
-  const candidates = C.people.filter((u) => canReview(u.id, u.department_id));
+async function absenceForm() {
+  const eligiblePeople = await api("/workplace/time/people");
+  const candidates = eligiblePeople.filter((u) =>
+    canReview(u.id, u.department_id)
+  );
   form(
     "Ghi nhận vắng sau xác minh",
     field("userId", "Nhân viên", "select", {
@@ -2258,11 +2417,14 @@ function absenceForm() {
     }
   );
 }
-function balanceForm() {
+async function balanceForm() {
+  const eligiblePeople = await api("/workplace/time/people");
   form(
     "Khai báo quỹ nghỉ hưởng lương",
     field("userId", "Nhân viên", "select", {
-      choices: peopleOptions(null, [C.user.id]),
+      choices: eligiblePeople
+        .filter((u) => u.id !== C.user.id)
+        .map((u) => ({ value: u.id, label: u.full_name })),
     }) +
       field("year", "Năm", "number", {
         value: periodValue.slice(0, 4),
@@ -2409,6 +2571,7 @@ document.addEventListener("click", async (e) => {
   const a = b.dataset.action,
     id = b.dataset.id;
   try {
+    if (await peopleUI.action(a, id)) return;
     if (a === "theme") {
       theme = theme === "dark" ? "light" : "dark";
       localStorage.setItem("worksphere.theme", theme);
@@ -2429,8 +2592,11 @@ document.addEventListener("click", async (e) => {
         document.body.classList.toggle("sidebar-collapsed", collapsed);
         b.setAttribute("aria-expanded", String(!collapsed));
       }
-    } else if (a === "close") dialog.close();
-    else if (a === "logout") {
+      syncNavigationState();
+    } else if (a === "close") {
+      dialog.close();
+      dialog.innerHTML = "";
+    } else if (a === "logout") {
       authEpoch++;
       routeSerial++;
       try {
@@ -2448,10 +2614,48 @@ document.addEventListener("click", async (e) => {
       await route();
     } else if (a === "time-request") timeRequest();
     else if (a === "calendar-config") calendarConfig();
-    else if (a === "time-import") importTime();
+    else if (a === "income-flow") {
+      const [key, action] = id.split("|");
+      const row = current.data.find((r) => r.id === key);
+      form(
+        "Bảng tính lương · " +
+          ({
+            SUBMIT: "Gửi kiểm tra",
+            APPROVE: "Phê duyệt",
+            RETURN: "Trả lại",
+            ADJUST: "Điều chỉnh bổ sung",
+          }[action] || action),
+        field("reason", "Căn cứ / giải thích", "textarea", { max: 2000 }) +
+          (action === "ADJUST"
+            ? field("amount", "Chênh lệch (không dùng làm tiền phạt)", "number")
+            : ""),
+        (v) =>
+          api("/workplace/time/incomes/" + key + "/commands", {
+            method: "POST",
+            body: {
+              ...v,
+              amount: v.amount ? Number(v.amount) : null,
+              action,
+              version: row.version,
+            },
+          })
+      );
+    } else if (a === "income-adjustment") {
+      const [key, action] = id.split("|");
+      const row = current.data
+        .flatMap((r) => r.adjustments || [])
+        .find((r) => r.id === key);
+      form("Xem xét điều chỉnh", field("reason", "Căn cứ", "textarea"), (v) =>
+        api("/workplace/time/adjustments/" + key + "/commands", {
+          method: "POST",
+          body: { ...v, action, version: row.version },
+        })
+      );
+    } else if (a === "correction-for") await correctionFor();
+    else if (a === "time-import") await importTime();
     else if (a === "csv-import") csvImport();
-    else if (a === "leave-balance") balanceForm();
-    else if (a === "confirm-absence") absenceForm();
+    else if (a === "leave-balance") await balanceForm();
+    else if (a === "confirm-absence") await absenceForm();
     else if (
       ["review-attendance", "review-time-request", "confirm-overtime"].includes(
         a
@@ -2463,7 +2667,7 @@ document.addEventListener("click", async (e) => {
     else if (a === "lock-income") {
       const row = current.data.find((r) => r.id === id);
       form(
-        "Chốt phiếu đối soát · " + row.full_name,
+        "Phát hành phiếu đã duyệt · " + row.full_name,
         field("reason", "Căn cứ kiểm tra và chốt", "textarea", { max: 2000 }),
         (v) =>
           api("/workplace/time/incomes/" + id + "/lock", {
@@ -2495,8 +2699,8 @@ document.addEventListener("click", async (e) => {
     } else if (a === "page-prev" || a === "page-next") {
       page += a === "page-next" ? 1 : -1;
       await route();
-    } else if (a === "new-department") departmentForm();
-    else if (a === "edit-department") departmentForm(id);
+    } else if (a === "new-department") await departmentForm();
+    else if (a === "edit-department") await departmentForm(id);
     else if (a === "new-account") accountForm();
     else if (a === "edit-account") accountForm(id);
     else if (
@@ -2557,7 +2761,15 @@ document.addEventListener("click", async (e) => {
       if (n.reference_id && n.reference_type === "WORK")
         location.hash = "work/" + n.reference_id;
       else if (n.reference_type === "TIME") location.hash = "time";
-      else if (n.reference_type === "INCOME") location.hash = "salary";
+      else if (n.reference_type === "INCOME")
+        location.hash =
+          C.capabilities.includes("PAYROLL_MANAGE") ||
+          C.capabilities.includes("PAYROLL_APPROVE")
+            ? "payroll"
+            : "profile";
+      else if (n.reference_type === "PERSONNEL") location.hash = "personnel";
+      else if (n.reference_type === "ACCESS") location.hash = "access";
+      else if (n.reference_type === "DELEGATION") location.hash = "delegations";
       else if (
         n.reference_id &&
         ["REQUEST", "SERVICE_REQUEST"].includes(n.reference_type)
@@ -2618,6 +2830,8 @@ document.addEventListener("input", (e) => {
   }
 });
 document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target.id === "directory-query")
+    document.querySelector('[data-action="p-directory-search"]').click();
   if (e.key === "Enter" && e.target.id === "request-search") {
     $('[data-action="request-search"]').click();
   }
@@ -2626,11 +2840,108 @@ window.addEventListener("hashchange", () => {
   filter = "all";
   search = "";
   page = 0;
-  route();
+  const [publicView, token] = location.hash.slice(1).split("/");
+  if (["forgot", "reset", "activate"].includes(publicView))
+    recoveryView(publicView, token);
+  else if (!C) loginView();
+  else route();
 });
 window.addEventListener("session-ended", () =>
   loginView("Phiên đã kết thúc. Vui lòng đăng nhập lại.")
 );
+const peopleUI = createPeopleUI({
+  api,
+  esc,
+  field,
+  form,
+  btn,
+  heading,
+  fmt,
+  parseCsv,
+  context: () => C,
+  route,
+  endSession: () => {
+    clearSession();
+    loginView("Phiên đã thu hồi. Vui lòng đăng nhập lại.");
+  },
+  showCodes: (codes) => {
+    dialog.innerHTML = `<div class="dialog-head"><h2 id="dialog-title">Lưu mã dự phòng ngay</h2><button class="icon-btn" data-action="close" aria-label="Đóng">×</button></div><div class="dialog-body"><p>Mỗi mã chỉ dùng một lần. Lưu ở nơi riêng an toàn; hệ thống không hiển thị lại.</p><pre class="secret-key">${esc(
+      codes.join("\n")
+    )}</pre></div>`;
+    dialog.showModal();
+  },
+});
+function recoveryView(mode, token) {
+  clearSession();
+  loginView();
+  const box = document.querySelector(".login-form");
+  const activate = mode === "activate",
+    forgot = mode === "forgot";
+  box.innerHTML = `<span class="eyebrow">KHÔI PHỤC & KÍCH HOẠT</span><h2>${
+    forgot
+      ? "Quên mật khẩu"
+      : activate
+      ? "Kích hoạt tài khoản"
+      : "Đặt mật khẩu mới"
+  }</h2><p>${
+    forgot
+      ? "Nhận liên kết qua email đã xác minh."
+      : "Liên kết có hạn và chỉ sử dụng một lần."
+  }</p><form id="recovery-form">${
+    forgot
+      ? field("email", "Email đã xác minh", "email")
+      : (activate
+          ? field("username", "Tên đăng nhập muốn dùng", "text", {
+              required: false,
+              max: 50,
+            }) +
+            field("fullName", "Họ tên", "text", { max: 150 }) +
+            field("phoneNumber", "Số liên hệ", "tel", {
+              required: false,
+              max: 20,
+            })
+          : "") +
+        field("password", "Mật khẩu mới (12–128 ký tự)", "password", {
+          max: 128,
+        }) +
+        field("confirmPassword", "Nhập lại mật khẩu", "password", { max: 128 })
+  }<div class="form-error" role="alert"></div><button class="btn primary" type="submit">${
+    forgot ? "Gửi liên kết" : "Xác nhận"
+  }</button></form><p class="login-foot"><a href="#login">Về đăng nhập</a></p>`;
+  document
+    .querySelector("#recovery-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const f = e.currentTarget,
+        b = f.querySelector("button");
+      b.disabled = true;
+      try {
+        const v = Object.fromEntries(new FormData(f));
+        if (forgot) {
+          await api("/auth/forgot-password", { method: "POST", body: v });
+          box.querySelector("p").textContent =
+            "Nếu tài khoản đủ điều kiện, thư khôi phục sẽ được gửi. Hãy kiểm tra hộp thư.";
+        } else {
+          await api(activate ? "/auth/activate" : "/auth/reset-password", {
+            method: "POST",
+            body: activate
+              ? { ...v, token }
+              : {
+                  resetToken: token,
+                  newPassword: v.password,
+                  confirmPassword: v.confirmPassword,
+                },
+          });
+          location.hash = "login";
+          loginView("Đã cập nhật. Vui lòng đăng nhập bằng mật khẩu mới.");
+        }
+      } catch (err) {
+        f.querySelector(".form-error").textContent = err.message;
+      } finally {
+        b.disabled = false;
+      }
+    });
+}
 applyTheme();
 if (await restore()) {
   try {
@@ -2638,4 +2949,8 @@ if (await restore()) {
   } catch (e) {
     loginView(e.message);
   }
-} else loginView();
+} else {
+  const [mode, token] = location.hash.slice(1).split("/");
+  if (["forgot", "reset", "activate"].includes(mode)) recoveryView(mode, token);
+  else loginView();
+}

@@ -1,4 +1,14 @@
 @import url("./theme.css");
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+body {
+  overflow-x: clip;
+}
 * {
   box-sizing: border-box;
 }
@@ -210,7 +220,93 @@ svg {
   flex-direction: column;
   z-index: 20;
   transition: width 0.22s, transform 0.22s;
+  overflow: hidden;
+}
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.sidebar .brand,
+.sidebar .company,
+.sidebar-bottom {
+  flex-shrink: 0;
+}
+.brand {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 18px 0;
+  color: var(--muted);
+}
+.secret-key {
+  display: block;
+  padding: 16px;
+  margin: 16px 0;
+  background: var(--bg);
+  color: var(--accenttext);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: var(--bg);
+}
+@keyframes welcome-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes welcome-glow {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .login-form,
+  .login-story > * {
+    animation: welcome-rise 0.55s ease-out both;
+  }
+  .login-story .handover-preview {
+    animation: welcome-rise 0.7s ease-out both;
+  }
+  .login-story .brand-mark {
+    animation: welcome-glow 6s ease-in-out infinite;
+  }
+  #main > * {
+    animation: welcome-rise 0.2s ease-out both;
+  }
+  dialog[open] {
+    animation: welcome-rise 0.18s ease-out both;
+  }
 }
 .brand {
   display: flex;
@@ -1304,4 +1400,28 @@ dialog::backdrop {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.station-display {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+.station-display img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 10px solid white;
+}
+.business-capabilities {
+  display: grid;
+  gap: 12px;
+}
+.business-capabilities[hidden] {
+  display: none;
+}
+.table-wrap table.compact {
+  min-width: 0;
 }

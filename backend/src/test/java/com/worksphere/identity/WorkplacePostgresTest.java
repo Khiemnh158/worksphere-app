@@ -46,6 +46,7 @@ class WorkplacePostgresTest {
                 () -> "authorization-integration-test-signing-key-not-for-production");
         p.add("worksphere.dev.e2e-user.enabled", () -> "false");
         p.add("worksphere.web-demo.enabled", () -> "false");
+        p.add("worksphere.people.scheduling.enabled", () -> "false");
         p.add("worksphere.notification.scheduling.enabled", () -> "false");
         p.add("worksphere.storage.path", () -> "target/authz-test-uploads");
     }
@@ -568,6 +569,15 @@ class WorkplacePostgresTest {
                         "version",
                         v);
         status(call("POST", "/workplace/staff/" + employee.getId() + "/state", a, body), 403);
+        UUID approvedCase = UUID.randomUUID();
+        db.update(
+                "INSERT INTO"
+                    + " personnel_cases(id,user_id,created_by,reason,effective_at,status,approved_by)"
+                    + " VALUES (?,?,?,'Authorized fixture',now()-interval '1 second','APPROVED',?)",
+                approvedCase,
+                employee.getId(),
+                manager.getId(),
+                otherManager.getId());
         status(call("POST", "/workplace/staff/" + employee.getId() + "/state", h, body), 200);
         status(call("GET", "/workplace/context", e, null), 401);
         var work = data(call("GET", "/workplace/work/" + id, m, null));
@@ -1014,7 +1024,8 @@ class WorkplacePostgresTest {
                                 "Practice request with evidence")),
                 200);
         return db.queryForObject(
-                "SELECT id FROM staff_time_requests WHERE user_id=? AND request_type=?",
+                "SELECT id FROM staff_time_requests WHERE user_id=? AND request_type=? ORDER BY"
+                        + " created_at DESC,id DESC LIMIT 1",
                 UUID.class,
                 employee.getId(),
                 type);
@@ -1059,17 +1070,11 @@ class WorkplacePostgresTest {
         var overtime = timeRequest("OVERTIME", "2020-02-03T11:00:00Z", "2020-02-03T13:00:00Z", 120);
         reviewTime(overtime, "APPROVE", 0, null);
         income("2020-02-03");
-        var before =
-                data(call("GET", "/workplace/time/incomes?period=2020-02", e, null))
-                        .get(0)
-                        .path("calculation");
+        var before = ownIncome().path("calculation");
         assertThat(before.path("overtimePay").asInt()).isZero();
         assertThat(before.path("pendingItems").asInt()).isPositive();
         reviewTime(overtime, "CONFIRM", 1, 120);
-        var after =
-                data(call("GET", "/workplace/time/incomes?period=2020-02", e, null))
-                        .get(0)
-                        .path("calculation");
+        var after = ownIncome().path("calculation");
         assertThat(after.path("basePay").asInt()).isEqualTo(500000);
         assertThat(after.path("overtimePay").asInt()).isEqualTo(187500);
         assertThat(after.path("grossEstimate").asInt()).isEqualTo(687500);
@@ -1080,10 +1085,7 @@ class WorkplacePostgresTest {
     void missingAttendanceCannotBeSilentlyClosedAsZeroPay() throws Exception {
         timeSetup();
         UUID income = income("2020-02-03");
-        var calculation =
-                data(call("GET", "/workplace/time/incomes?period=2020-02", e, null))
-                        .get(0)
-                        .path("calculation");
+        var calculation = ownIncome().path("calculation");
         assertThat(calculation.path("missingDays").asInt()).isEqualTo(1);
         status(
                 call(
@@ -1101,12 +1103,29 @@ class WorkplacePostgresTest {
                 timeRequest("TIME_CORRECTION", "2020-02-03T01:00:00Z", "2020-02-03T10:00:00Z", 480);
         reviewTime(correction, "APPROVE", 0, null);
         UUID income = income("2020-02-03");
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'PAYROLL_APPROVE')",
+                otherManager.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/incomes/" + income + "/commands",
+                        h,
+                        Map.of("action", "SUBMIT", "reason", "Independent review", "version", 0)),
+                200);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/incomes/" + income + "/commands",
+                        o,
+                        Map.of("action", "APPROVE", "reason", "Checked", "version", 1)),
+                200);
         status(
                 call(
                         "POST",
                         "/workplace/time/incomes/" + income + "/lock",
                         h,
-                        Map.of("reason", "Month checked", "version", 0)),
+                        Map.of("reason", "Month checked", "version", 2)),
                 200);
         var before =
                 db.queryForObject(
@@ -1207,13 +1226,7 @@ class WorkplacePostgresTest {
                 200);
         reviewTime(leave, "APPROVE", 0, null);
         income("2020-02-03");
-        assertThat(
-                        data(call("GET", "/workplace/time/incomes?period=2020-02", e, null))
-                                .get(0)
-                                .path("calculation")
-                                .path("basePay")
-                                .asInt())
-                .isEqualTo(500000);
+        assertThat(ownIncome().path("calculation").path("basePay").asInt()).isEqualTo(500000);
         status(
                 call(
                         "POST",
@@ -1303,5 +1316,925 @@ class WorkplacePostgresTest {
                                 1)),
                 422);
         reviewTime(overtime, "CONFIRM", 1, 0);
+    }
+
+    JsonNode ownIncome() throws Exception {
+        var rows = data(call("GET", "/workplace/time/incomes?period=2020-02", h, null));
+        return java.util.stream.StreamSupport.stream(rows.spliterator(), false)
+                .filter(r -> r.path("user_id").asText().equals(employee.getId().toString()))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    @Autowired com.worksphere.workplace.PeopleOperations peopleOperations;
+    @Autowired com.worksphere.identity.application.RecoveryService recoveryService;
+
+    String leadership() {
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'EXECUTIVE') ON"
+                        + " CONFLICT DO NOTHING",
+                otherManager.getId());
+        db.update(
+                "INSERT INTO department_authority(department_id,executive_id,reason,changed_by)"
+                    + " VALUES (?,?,'Test authorized structure',?) ON CONFLICT(department_id) DO"
+                    + " UPDATE SET executive_id=excluded.executive_id",
+                department,
+                otherManager.getId(),
+                admin.getId());
+        return o;
+    }
+
+    @Test
+    void directoryIsScopedAndPaginatedOnServer() throws Exception {
+        for (int i = 0; i < 22; i++)
+            db.update(
+                    "INSERT INTO"
+                        + " users(id,username,email,password_hash,full_name,status,department_id,created_at,updated_at)"
+                        + " VALUES (?,?,?,?,?,'ACTIVE',?,now(),now())",
+                    UUID.randomUUID(),
+                    "dir-" + UUID.randomUUID(),
+                    UUID.randomUUID() + "@example.invalid",
+                    "not-a-login-hash",
+                    "Directory fixture " + i,
+                    department);
+        var first = data(call("GET", "/workplace/directory", e, null));
+        assertThat(first.path("items").size()).isEqualTo(20);
+        assertThat(first.path("total").asInt()).isGreaterThan(20);
+        for (var person : first.path("items"))
+            assertThat(person.path("department_id").asText()).isEqualTo(department.toString());
+        var second = data(call("GET", "/workplace/directory?page=1", e, null));
+        assertThat(second.path("items").size()).isBetween(1, 20);
+        var context = data(call("GET", "/workplace/context", e, null));
+        assertThat(context.path("people").toString()).doesNotContain(outsider.getId().toString());
+    }
+
+    @Test
+    void delegatedOperationsExpireAndDoNotGrantTimeApproval() throws Exception {
+        var input =
+                Map.of(
+                        "departmentId",
+                        department,
+                        "delegateId",
+                        replacement.getId(),
+                        "scope",
+                        "OPERATIONS",
+                        "startsAt",
+                        Instant.now().minusSeconds(5).toString(),
+                        "endsAt",
+                        Instant.now().plusSeconds(3600).toString(),
+                        "reason",
+                        "Manager away");
+        status(call("POST", "/workplace/delegations", e, input), 403);
+        status(call("POST", "/workplace/delegations", m, input), 200);
+        status(call("GET", "/workplace/delegations", m, null), 200);
+        status(call("GET", "/workplace/delegations", b, null), 200);
+        UUID id = work();
+        status(call("GET", "/workplace/work/" + id, b, null), 200);
+        status(call("POST", "/workplace/delegations", b, input), 403);
+        db.update(
+                "UPDATE approval_delegations SET ends_at=now()-interval '1"
+                        + " second',starts_at=now()-interval '1 hour' WHERE delegate_id=?",
+                replacement.getId());
+        status(call("GET", "/workplace/work/" + id, b, null), 403);
+    }
+
+    @Test
+    void managerTimeRequestNeedsDesignatedExecutiveNotHrOverride() throws Exception {
+        timeSetup();
+        leadership();
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests",
+                        m,
+                        Map.of(
+                                "requestType",
+                                "LEAVE_UNPAID",
+                                "workDate",
+                                "2020-02-04",
+                                "startsAt",
+                                "2020-02-04T01:00:00Z",
+                                "endsAt",
+                                "2020-02-04T02:00:00Z",
+                                "requestedMinutes",
+                                60,
+                                "reason",
+                                "Manager request")),
+                200);
+        UUID id =
+                db.queryForObject(
+                        "SELECT id FROM staff_time_requests WHERE user_id=?",
+                        UUID.class,
+                        manager.getId());
+        var cmd = Map.of("action", "APPROVE", "reason", "Check", "version", 0);
+        status(call("POST", "/workplace/time/requests/" + id + "/review", m, cmd), 403);
+        status(call("POST", "/workplace/time/requests/" + id + "/review", h, cmd), 403);
+        status(call("POST", "/workplace/time/requests/" + id + "/review", o, cmd), 200);
+    }
+
+    @Test
+    void newAccountMustActivateAndCannotReuseActivation() throws Exception {
+        String name = "new-" + UUID.randomUUID().toString().substring(0, 10);
+        var result =
+                call(
+                        "POST",
+                        "/workplace/staff",
+                        a,
+                        Map.of(
+                                "username",
+                                name,
+                                "email",
+                                name + "@example.invalid",
+                                "fullName",
+                                "New employee",
+                                "departmentId",
+                                department,
+                                "role",
+                                "EMPLOYEE"));
+        status(result, 200);
+        UUID id = UUID.fromString(data(result).asText());
+        assertThat(db.queryForObject("SELECT status FROM users WHERE id=?", String.class, id))
+                .isEqualTo("PENDING");
+        var mail =
+                db.queryForObject(
+                        "SELECT encrypted_body FROM mail_outbox WHERE recipient=? ORDER BY"
+                                + " created_at DESC LIMIT 1",
+                        String.class,
+                        name + "@example.invalid");
+        String body = recoveryService.decrypt(mail);
+        String token = body.split("/#activate/")[1].split("\\s")[0];
+        var activate =
+                Map.of(
+                        "token",
+                        token,
+                        "username",
+                        name + "x",
+                        "fullName",
+                        "New verified employee",
+                        "password",
+                        "Personal-password-123",
+                        "confirmPassword",
+                        "Personal-password-123");
+        status(call("POST", "/auth/activate", null, activate), 200);
+        status(call("POST", "/auth/activate", null, activate), 422);
+        status(
+                call(
+                        "POST",
+                        "/auth/login",
+                        null,
+                        Map.of("login", name + "x", "password", "Personal-password-123")),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT email_verified_at IS NOT NULL FROM users WHERE id=?",
+                                Boolean.class,
+                                id))
+                .isTrue();
+    }
+
+    @Test
+    void resetIsSingleUseRevokesSessionsAndCannotUnlockDisabledAccount() throws Exception {
+        db.update("UPDATE users SET email_verified_at=now() WHERE id=?", employee.getId());
+        status(
+                call("POST", "/auth/forgot-password", null, Map.of("email", employee.getEmail())),
+                200);
+        String mail =
+                db.queryForObject(
+                        "SELECT encrypted_body FROM mail_outbox WHERE recipient=? ORDER BY"
+                                + " created_at DESC LIMIT 1",
+                        String.class,
+                        employee.getEmail());
+        String token = recoveryService.decrypt(mail).split("/#reset/")[1].split("\\s")[0];
+        var reset =
+                Map.of(
+                        "resetToken",
+                        token,
+                        "newPassword",
+                        "Updated-password-123",
+                        "confirmPassword",
+                        "Updated-password-123");
+        status(call("POST", "/auth/reset-password", null, reset), 200);
+        status(call("GET", "/workplace/context", e, null), 401);
+        status(call("POST", "/auth/reset-password", null, reset), 422);
+        recoveryService.forgot(employee.getEmail());
+        db.update("UPDATE users SET status='DISABLED' WHERE id=?", employee.getId());
+        String mail2 =
+                db.queryForObject(
+                        "SELECT encrypted_body FROM mail_outbox WHERE recipient=? AND subject LIKE"
+                                + " '%Đặt lại%' ORDER BY created_at DESC LIMIT 1",
+                        String.class, employee.getEmail());
+        String token2 = recoveryService.decrypt(mail2).split("/#reset/")[1].split("\\s")[0];
+        status(
+                call(
+                        "POST",
+                        "/auth/reset-password",
+                        null,
+                        Map.of(
+                                "resetToken",
+                                token2,
+                                "newPassword",
+                                "Updated-password-456",
+                                "confirmPassword",
+                                "Updated-password-456")),
+                422);
+    }
+
+    @Test
+    void importPreviewDoesNotCreateAndInvalidBatchDoesNotPartiallyCreate() throws Exception {
+        String name = "batch-" + UUID.randomUUID().toString().substring(0, 8);
+        var row =
+                Map.of(
+                        "username",
+                        name,
+                        "email",
+                        name + "@example.invalid",
+                        "fullName",
+                        "Batch employee",
+                        "departmentId",
+                        department,
+                        "role",
+                        "EMPLOYEE");
+        var preview =
+                call(
+                        "POST",
+                        "/workplace/staff/import",
+                        a,
+                        Map.of("rows", List.of(row), "preview", true));
+        status(preview, 200);
+        assertThat(data(preview).path("valid").asBoolean()).isTrue();
+        assertThat(
+                        db.queryForObject(
+                                "SELECT count(*) FROM users WHERE username=?", Integer.class, name))
+                .isZero();
+        var invalid =
+                call(
+                        "POST",
+                        "/workplace/staff/import",
+                        a,
+                        Map.of("rows", List.of(row, row), "preview", false));
+        status(invalid, 200);
+        assertThat(data(invalid).path("valid").asBoolean()).isFalse();
+        assertThat(
+                        db.queryForObject(
+                                "SELECT count(*) FROM users WHERE username=?", Integer.class, name))
+                .isZero();
+        status(
+                call(
+                        "POST",
+                        "/workplace/staff/import",
+                        a,
+                        Map.of("rows", List.of(row), "preview", false)),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT activation_required FROM users WHERE username=?",
+                                Boolean.class,
+                                name))
+                .isTrue();
+    }
+
+    @Test
+    void personnelRequiresHrAndIndependentExecutiveThenCutsOffAtEffectiveTime() throws Exception {
+        leadership();
+        UUID work = work();
+        command(work, e, "START", 0);
+        command(work, e, "PROGRESS", 1, "progress", 65);
+        var made =
+                call(
+                        "POST",
+                        "/workplace/personnel",
+                        e,
+                        Map.of(
+                                "userId",
+                                employee.getId(),
+                                "effectiveAt",
+                                Instant.now().plusSeconds(3600).toString(),
+                                "reason",
+                                "Voluntary practice departure"));
+        status(made, 200);
+        UUID id = UUID.fromString(data(made).asText());
+        status(
+                call(
+                        "POST",
+                        "/workplace/personnel/" + id + "/commands",
+                        m,
+                        Map.of("action", "SUBMIT", "reason", "Check", "version", 0)),
+                403);
+        status(
+                call(
+                        "POST",
+                        "/workplace/personnel/" + id + "/commands",
+                        h,
+                        Map.of("action", "SUBMIT", "reason", "Evidence checked", "version", 0)),
+                200);
+        status(
+                call(
+                        "POST",
+                        "/workplace/personnel/" + id + "/commands",
+                        a,
+                        Map.of("action", "APPROVE", "reason", "Decision", "version", 1)),
+                403);
+        status(
+                call(
+                        "POST",
+                        "/workplace/personnel/" + id + "/commands",
+                        o,
+                        Map.of(
+                                "action",
+                                "APPROVE",
+                                "reason",
+                                "Authorized decision fixture",
+                                "version",
+                                1)),
+                200);
+        status(call("GET", "/workplace/context", e, null), 200);
+        db.update(
+                "UPDATE users SET access_ends_at=now()-interval '1 second' WHERE id=?",
+                employee.getId());
+        db.update(
+                "UPDATE personnel_cases SET effective_at=now()-interval '1 second' WHERE id=?", id);
+        status(call("GET", "/workplace/context", e, null), 401);
+        peopleOperations.enforceDue();
+        var row =
+                db.queryForMap(
+                        "SELECT progress,status,assignee_id FROM department_work WHERE id=?", work);
+        assertThat(row.get("progress")).isEqualTo(65);
+        assertThat(row.get("status")).isEqualTo("HANDOVER");
+        assertThat(row.get("assignee_id")).isNull();
+        UUID request =
+                db.queryForObject(
+                        "SELECT id FROM access_requests WHERE personnel_case_id=?", UUID.class, id);
+        status(
+                call(
+                        "POST",
+                        "/workplace/access-requests/" + request + "/commands",
+                        a,
+                        Map.of("action", "EXECUTE", "reason", "Access reviewed", "version", 0)),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT access_done FROM personnel_cases WHERE id=?",
+                                Boolean.class,
+                                id))
+                .isTrue();
+        status(
+                call(
+                        "POST",
+                        "/workplace/personnel/" + id + "/commands",
+                        h,
+                        Map.of("action", "CLOSE", "reason", "Too early", "version", 3)),
+                422);
+    }
+
+    @Test
+    void privilegedAccountCannotGrantBusinessCapabilitiesToItself() throws Exception {
+        long v =
+                db.queryForObject(
+                        "SELECT version FROM users WHERE id=?", Long.class, admin.getId());
+        status(
+                call(
+                        "PUT",
+                        "/workplace/staff/" + admin.getId(),
+                        a,
+                        Map.of(
+                                "role",
+                                "ADMIN",
+                                "capabilities",
+                                List.of("PAYROLL_MANAGE"),
+                                "reason",
+                                "Not permitted",
+                                "version",
+                                v)),
+                422);
+    }
+
+    @Test
+    void incomeCannotPublishWithoutIndependentApprovalAndOwnDraftIsNotVisible() throws Exception {
+        timeSetup();
+        UUID id = income("2020-02-03");
+        assertThat(data(call("GET", "/workplace/time/incomes?period=2020-02", e, null))).isEmpty();
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/incomes/" + id + "/lock",
+                        h,
+                        Map.of("reason", "Bypass", "version", 0)),
+                422);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/incomes/" + id + "/commands",
+                        a,
+                        Map.of("action", "APPROVE", "reason", "Admin bypass", "version", 0)),
+                403);
+    }
+
+    @Test
+    void qrStationRequiresSpecialistAndRejectsExpiredReplayAndClosedStation() throws Exception {
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'TIME_REVIEW')",
+                hr.getId());
+        status(
+                call("POST", "/workplace/attendance/stations", e, Map.of("name", "Unauthorized")),
+                403);
+        var made =
+                call("POST", "/workplace/attendance/stations", h, Map.of("name", "Office fixture"));
+        status(made, 200);
+        UUID station = UUID.fromString(data(made).asText());
+        var qr = call("POST", "/workplace/attendance/stations/" + station + "/challenge", h, null);
+        status(qr, 200);
+        assertThat(data(qr).path("image").asText()).startsWith("data:image/svg+xml;base64,");
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        db.update(
+                "INSERT INTO"
+                    + " work_calendar(work_date,day_kind,normal_minutes,shift_start,shift_end,break_minutes,configured_by)"
+                    + " VALUES (?,'NORMAL',480,'08:00','17:00',60,?) ON CONFLICT(work_date) DO"
+                    + " NOTHING",
+                java.sql.Date.valueOf(today),
+                hr.getId());
+        UUID challenge = UUID.randomUUID();
+        String token = "fixture-token-" + UUID.randomUUID();
+        db.update(
+                "INSERT INTO"
+                        + " attendance_qr_challenges(id,station_id,token_hash,issued_by,expires_at)"
+                        + " VALUES (?,?,?,?,now()+interval '30 seconds')",
+                challenge,
+                station,
+                recoveryService.hash(token),
+                hr.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        e,
+                        Map.of("token", token, "type", "IN")),
+                200);
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        e,
+                        Map.of("token", token, "type", "IN")),
+                422);
+        db.update(
+                "UPDATE attendance_qr_challenges SET expires_at=now()-interval '1 second' WHERE"
+                        + " id=?",
+                challenge);
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        b,
+                        Map.of("token", token, "type", "IN")),
+                422);
+        db.update(
+                "UPDATE attendance_qr_challenges SET expires_at=now()+interval '30 seconds' WHERE"
+                        + " id=?",
+                challenge);
+        db.update("UPDATE attendance_stations SET is_active=false WHERE id=?", station);
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        b,
+                        Map.of("token", token, "type", "IN")),
+                422);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT count(*) FROM attendance_punches WHERE user_id=?",
+                                Integer.class,
+                                employee.getId()))
+                .isEqualTo(1);
+    }
+
+    @Test
+    void enabledMfaRejectsPasswordOnlyAndConsumesBackupCodeOnce() throws Exception {
+        String secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
+                backup = "fixture-recovery-" + UUID.randomUUID();
+        db.update(
+                "INSERT INTO identity_totp(user_id,secret_cipher,enabled,recovery_hashes) VALUES"
+                        + " (?,?,true,?)",
+                employee.getId(),
+                recoveryService.encrypt(secret),
+                recoveryService.hash(backup));
+        status(
+                call(
+                        "POST",
+                        "/auth/login",
+                        null,
+                        Map.of(
+                                "login",
+                                employee.getUsername(),
+                                "password",
+                                "Test-only-password-123")),
+                422);
+        status(
+                call(
+                        "POST",
+                        "/auth/login",
+                        null,
+                        Map.of(
+                                "login",
+                                employee.getUsername(),
+                                "password",
+                                "Test-only-password-123",
+                                "mfaCode",
+                                "wrong-code")),
+                422);
+        status(
+                call(
+                        "POST",
+                        "/auth/login",
+                        null,
+                        Map.of(
+                                "login",
+                                employee.getUsername(),
+                                "password",
+                                "Test-only-password-123",
+                                "mfaCode",
+                                backup)),
+                200);
+        status(
+                call(
+                        "POST",
+                        "/auth/login",
+                        null,
+                        Map.of(
+                                "login",
+                                employee.getUsername(),
+                                "password",
+                                "Test-only-password-123",
+                                "mfaCode",
+                                backup)),
+                422);
+    }
+
+    @Test
+    void activationExpiryCannotBeBypassedWithValidTokenHash() throws Exception {
+        String token = "expired-activation-" + UUID.randomUUID();
+        db.update(
+                "UPDATE users SET status='PENDING',activation_required=true WHERE id=?",
+                employee.getId());
+        db.update(
+                "INSERT INTO account_recovery_tokens(id,user_id,purpose,token_hash,expires_at)"
+                        + " VALUES (?,?,'ACTIVATE',?,now()-interval '1 second')",
+                UUID.randomUUID(),
+                employee.getId(),
+                recoveryService.hash(token));
+        status(
+                call(
+                        "POST",
+                        "/auth/activate",
+                        null,
+                        Map.of(
+                                "token",
+                                token,
+                                "fullName",
+                                "Expired",
+                                "password",
+                                "Personal-password-123",
+                                "confirmPassword",
+                                "Personal-password-123")),
+                422);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT status FROM users WHERE id=?",
+                                String.class,
+                                employee.getId()))
+                .isEqualTo("PENDING");
+    }
+
+    @Test
+    void blockedWorkRequiresReasonAndCancelIsTerminal() throws Exception {
+        UUID id = work();
+        command(id, e, "START", 0);
+        status(
+                call(
+                        "POST",
+                        "/workplace/work/" + id + "/commands",
+                        e,
+                        Map.of("action", "BLOCK", "version", 1)),
+                422);
+        var blocked = command(id, e, "BLOCK", 1, "content", "Awaiting approved access");
+        assertThat(blocked.path("status").asText()).isEqualTo("BLOCKED");
+        status(
+                call(
+                        "POST",
+                        "/workplace/work/" + id + "/commands",
+                        e,
+                        Map.of("action", "SUBMIT", "content", "Bypass", "version", 2)),
+                403);
+        command(id, e, "RESUME", 2, "content", "Access provided");
+        var cancelled = command(id, m, "CANCEL", 3, "content", "Requirement withdrawn");
+        assertThat(cancelled.path("status").asText()).isEqualTo("CANCELLED");
+        assertThat(cancelled.path("allowedActions")).isEmpty();
+        status(
+                call(
+                        "POST",
+                        "/workplace/work/" + id + "/commands",
+                        e,
+                        Map.of("action", "START", "version", 4)),
+                403);
+    }
+
+    @Test
+    void twoFactorEnrollmentVerifiesCodeAndCannotReplaceEnabledSecret() throws Exception {
+        var setup =
+                call(
+                        "POST",
+                        "/me/two-factor/setup",
+                        e,
+                        Map.of("password", "Test-only-password-123"));
+        status(setup, 200);
+        String secret = data(setup).path("secret").asText();
+        var method =
+                com.worksphere.identity.application.TwoFactorService.class.getDeclaredMethod(
+                        "totp", String.class, long.class);
+        method.setAccessible(true);
+        String code = (String) method.invoke(null, secret, Instant.now().getEpochSecond() / 30);
+        var enabled =
+                call(
+                        "POST",
+                        "/me/two-factor/enable",
+                        e,
+                        Map.of("password", "Test-only-password-123", "code", code));
+        status(enabled, 200);
+        assertThat(data(enabled).path("recoveryCodes").size()).isEqualTo(8);
+        status(
+                call(
+                        "POST",
+                        "/me/two-factor/setup",
+                        e,
+                        Map.of("password", "Test-only-password-123")),
+                422);
+        var backup = data(enabled).path("recoveryCodes").get(0).asText();
+        status(
+                call(
+                        "POST",
+                        "/me/two-factor/disable",
+                        e,
+                        Map.of("password", "Test-only-password-123", "code", backup)),
+                200);
+        status(call("GET", "/workplace/context", e, null), 401);
+    }
+
+    @Test
+    void approvedIncomeDetectsChangedSourceBeforePublication() throws Exception {
+        timeSetup();
+        var first =
+                timeRequest("TIME_CORRECTION", "2020-02-03T01:00:00Z", "2020-02-03T10:00:00Z", 480);
+        reviewTime(first, "APPROVE", 0, null);
+        UUID id = income("2020-02-03");
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'PAYROLL_APPROVE')",
+                otherManager.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/incomes/" + id + "/commands",
+                        h,
+                        Map.of("action", "SUBMIT", "reason", "Ready", "version", 0)),
+                200);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/incomes/" + id + "/commands",
+                        o,
+                        Map.of("action", "APPROVE", "reason", "Independent", "version", 1)),
+                200);
+        var correction =
+                timeRequest("TIME_CORRECTION", "2020-02-03T02:00:00Z", "2020-02-03T10:00:00Z", 420);
+        reviewTime(correction, "APPROVE", 0, null);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/incomes/" + id + "/lock",
+                        h,
+                        Map.of("reason", "Stale approval", "version", 2)),
+                422);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT status FROM income_periods WHERE id=?", String.class, id))
+                .isEqualTo("DRAFT");
+    }
+
+    @Test
+    void specialistsCanSubmitHistoricalCorrectionAfterOffboardingButCannotSelfReview()
+            throws Exception {
+        timeSetup();
+        db.update(
+                "UPDATE users SET status='DISABLED',access_ends_at='2020-02-05T00:00:00Z' WHERE"
+                        + " id=?",
+                employee.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/corrections",
+                        h,
+                        Map.of(
+                                "userId",
+                                employee.getId(),
+                                "workDate",
+                                "2020-02-03",
+                                "startsAt",
+                                "2020-02-03T01:00:00Z",
+                                "endsAt",
+                                "2020-02-03T10:00:00Z",
+                                "requestedMinutes",
+                                480,
+                                "reason",
+                                "Source verified after departure")),
+                200);
+        UUID id =
+                db.queryForObject(
+                        "SELECT id FROM staff_time_requests WHERE user_id=?",
+                        UUID.class,
+                        employee.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        h,
+                        Map.of("action", "APPROVE", "reason", "Cannot self-review", "version", 0)),
+                403);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "APPROVE",
+                                "reason",
+                                "Manager checked source",
+                                "version",
+                                0)),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT submitted_by FROM staff_time_requests WHERE id=?",
+                                UUID.class,
+                                id))
+                .isEqualTo(hr.getId());
+        status(call("GET", "/workplace/context", e, null), 401);
+    }
+
+    @Test
+    void personnelSelectorsRespectScopeAndDoNotIncludeTechnicalAdmins() throws Exception {
+        var own = data(call("GET", "/workplace/time/people", e, null));
+        assertThat(own.size()).isEqualTo(1);
+        assertThat(own.get(0).path("id").asText()).isEqualTo(employee.getId().toString());
+        var managed = data(call("GET", "/workplace/time/people", m, null));
+        assertThat(managed.toString())
+                .contains(employee.getId().toString())
+                .doesNotContain(outsider.getId().toString())
+                .doesNotContain(admin.getId().toString());
+        status(call("GET", "/workplace/time/people", a, null), 403);
+    }
+
+    @Test
+    void executiveReadScopeEndsWhenCapabilityIsRevoked() throws Exception {
+        User director = user("EMPLOYEE", null);
+        String directorToken = token(director);
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'EXECUTIVE')",
+                director.getId());
+        db.update(
+                "INSERT INTO department_authority(department_id,executive_id,reason,changed_by)"
+                        + " VALUES (?,?,'Assigned department',?)",
+                department,
+                director.getId(),
+                admin.getId());
+        var ownCase =
+                call(
+                        "POST",
+                        "/workplace/personnel",
+                        e,
+                        Map.of(
+                                "userId",
+                                employee.getId(),
+                                "effectiveAt",
+                                Instant.now().plusSeconds(7200).toString(),
+                                "reason",
+                                "Own department"));
+        status(ownCase, 200);
+        var otherCase =
+                call(
+                        "POST",
+                        "/workplace/personnel",
+                        x,
+                        Map.of(
+                                "userId",
+                                outsider.getId(),
+                                "effectiveAt",
+                                Instant.now().plusSeconds(7200).toString(),
+                                "reason",
+                                "Other department"));
+        status(otherCase, 200);
+        var visible = data(call("GET", "/workplace/personnel", directorToken, null));
+        assertThat(visible.toString())
+                .contains(data(ownCase).asText())
+                .doesNotContain(data(otherCase).asText());
+        var req1 =
+                call(
+                        "POST",
+                        "/workplace/access-requests",
+                        e,
+                        Map.of(
+                                "userId",
+                                employee.getId(),
+                                "type",
+                                "LOCK",
+                                "reason",
+                                "Own request"));
+        status(req1, 200);
+        var req2 =
+                call(
+                        "POST",
+                        "/workplace/access-requests",
+                        x,
+                        Map.of(
+                                "userId",
+                                outsider.getId(),
+                                "type",
+                                "LOCK",
+                                "reason",
+                                "Other request"));
+        status(req2, 200);
+        assertThat(data(call("GET", "/workplace/access-requests", directorToken, null)).toString())
+                .contains(data(req1).asText())
+                .doesNotContain(data(req2).asText());
+        db.update("DELETE FROM staff_capabilities WHERE user_id=?", director.getId());
+        assertThat(data(call("GET", "/workplace/personnel", directorToken, null))).isEmpty();
+        assertThat(data(call("GET", "/workplace/access-requests", directorToken, null))).isEmpty();
+    }
+
+    @Test
+    void personnelAndManagerTimeRequestsNotifyTheCorrectReviewers() throws Exception {
+        leadership();
+        timeSetup();
+        var made =
+                call(
+                        "POST",
+                        "/workplace/personnel",
+                        e,
+                        Map.of(
+                                "userId",
+                                employee.getId(),
+                                "effectiveAt",
+                                Instant.now().plusSeconds(7200).toString(),
+                                "reason",
+                                "Notification fixture"));
+        status(made, 200);
+        UUID id = UUID.fromString(data(made).asText());
+        assertThat(
+                        db.queryForObject(
+                                "SELECT count(*) FROM workplace_notices WHERE user_id=? AND"
+                                        + " reference_type='PERSONNEL' AND reference_id=?",
+                                Integer.class,
+                                hr.getId(),
+                                id))
+                .isEqualTo(1);
+        status(
+                call(
+                        "POST",
+                        "/workplace/personnel/" + id + "/commands",
+                        h,
+                        Map.of("action", "SUBMIT", "reason", "Checked", "version", 0)),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT count(*) FROM workplace_notices WHERE user_id=? AND"
+                                        + " reference_type='PERSONNEL' AND reference_id=?",
+                                Integer.class,
+                                otherManager.getId(),
+                                id))
+                .isEqualTo(1);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests",
+                        m,
+                        Map.of(
+                                "requestType",
+                                "LEAVE_UNPAID",
+                                "workDate",
+                                "2020-02-04",
+                                "startsAt",
+                                "2020-02-04T01:00:00Z",
+                                "endsAt",
+                                "2020-02-04T02:00:00Z",
+                                "requestedMinutes",
+                                60,
+                                "reason",
+                                "Manager self request")),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT count(*) FROM workplace_notices WHERE user_id=? AND"
+                                        + " reference_type='TIME'",
+                                Integer.class,
+                                otherManager.getId()))
+                .isEqualTo(1);
     }
 }

@@ -20,6 +20,10 @@ import java.util.*;
 public class TimeIncomeService {
     private static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     private final JdbcTemplate db;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.organization.application.ApprovalPolicy authority;
+
     private final WorkplaceService access;
     private final DepartmentRouting routing;
 
@@ -35,7 +39,8 @@ public class TimeIncomeService {
             String shiftStart,
             String shiftEnd,
             int breakMinutes,
-            List<LocalDate> holidays) {}
+            List<LocalDate> holidays) {
+}
 
     public record ImportRow(
             UUID userId,
@@ -43,7 +48,8 @@ public class TimeIncomeService {
             Instant clockIn,
             Instant clockOut,
             int regularMinutes,
-            String sourceReference) {}
+            String sourceReference) {
+}
 
     public record TimeInput(
             String requestType,
@@ -51,11 +57,14 @@ public class TimeIncomeService {
             Instant startsAt,
             Instant endsAt,
             int requestedMinutes,
-            String reason) {}
+            String reason) {
+}
 
-    public record Review(String action, String reason, Integer actualMinutes, Long version) {}
+    public record Review(String action, String reason, Integer actualMinutes, Long version) {
+}
 
-    public record BalanceInput(UUID userId, int year, int allowanceMinutes, String reason) {}
+    public record BalanceInput(UUID userId, int year, int allowanceMinutes, String reason) {
+}
 
     public record IncomeInput(
             UUID userId,
@@ -63,7 +72,8 @@ public class TimeIncomeService {
             BigDecimal monthlyWorkPay,
             LocalDate employmentFrom,
             LocalDate employmentTo,
-            Long version) {}
+            Long version) {
+}
 
     private BusinessRuleException bad(String message) {
         return new BusinessRuleException("VALIDATION_ERROR", message);
@@ -119,9 +129,29 @@ public class TimeIncomeService {
 
     @Transactional(readOnly = true)
     public List<Map<String, Object>> people(WorkSphereUserPrincipal p) {
-        access.requireCapability(access.actor(p), "PAYROLL_MANAGE");
+        UUID actor = access.actor(p);
+        if (access.admin(actor))
+            throw new AccessDeniedException(
+                    "Dùng không gian quản trị tài khoản; đây là nhân sự nghiệp vụ");
+        boolean specialist =
+                access.capability(actor, "PAYROLL_MANAGE")
+                        || access.capability(actor, "TIME_REVIEW")
+                        || access.capability(actor, "HR_MANAGE");
+        var depts = new java.util.HashSet<>(authority.managed(actor, "OPERATIONS", true));
+        depts.addAll(authority.managed(actor, "TIME", true));
+        String scope =
+                depts.stream()
+                        .map(UUID::toString)
+                        .collect(java.util.stream.Collectors.joining(","));
         return db.queryForList(
-                "SELECT id,full_name,status FROM users WHERE NOT is_deleted ORDER BY full_name");
+                "SELECT id,full_name,status,department_id FROM users u WHERE NOT is_deleted AND"
+                        + " (id=? OR ? OR department_id IN (SELECT"
+                        + " unnest(string_to_array(?,',')::uuid[]))) AND NOT EXISTS(SELECT 1 FROM"
+                        + " user_roles ur JOIN roles r ON r.id=ur.role_id WHERE ur.user_id=u.id AND"
+                        + " r.code='ADMIN') ORDER BY full_name LIMIT 1000",
+                actor,
+                specialist,
+                scope);
     }
 
     private void lockPeriod(UUID user, LocalDate day) {
@@ -154,6 +184,17 @@ public class TimeIncomeService {
                                 + " is_deleted)",
                         Boolean.class,
                         user))) throw bad("Nhân viên không hoạt động");
+    }
+
+    private void eligibleHistorical(UUID user, Instant end) {
+        var row =
+                one("SELECT status,access_ends_at FROM users WHERE id=? AND NOT is_deleted", user);
+        if (access.admin(user) || "PENDING".equals(row.get("status")) || end == null)
+            throw bad("Hồ sơ nhân viên chưa hợp lệ");
+        if (!"ACTIVE".equals(row.get("status")) && row.get("access_ends_at") == null)
+            throw bad("Cần mốc kết thúc đã xác nhận trước khi đối soát tài khoản không hoạt động");
+        if (row.get("access_ends_at") != null && end.isAfter(instant(row.get("access_ends_at"))))
+            throw bad("Khoảng công vượt mốc kết thúc đã xác nhận");
     }
 
     private long interval(LocalDate date, Instant start, Instant end) {
@@ -249,58 +290,74 @@ public class TimeIncomeService {
         var first = java.sql.Date.valueOf(month.atDay(1));
         var last = java.sql.Date.valueOf(month.atEndOfMonth());
         String scope =
-                "(r.user_id=? OR EXISTS(SELECT 1 FROM departments d WHERE d.id=u.department_id AND"
-                        + " d.manager_id=? AND d.is_active AND NOT d.is_deleted) OR ?)";
+                "(r.user_id=? OR u.department_id IN (SELECT unnest(string_to_array(?,',')::uuid[]))"
+                        + " OR ?)";
+        String reviewDepartments =
+                authority.managed(actor, "TIME", true).stream()
+                        .map(UUID::toString)
+                        .collect(java.util.stream.Collectors.joining(","));
         boolean specialist = access.capability(actor, "TIME_REVIEW");
-        return Map.of(
-                "calendar",
-                db.queryForList(
-                        "SELECT * FROM work_calendar WHERE work_date BETWEEN ? AND ? ORDER BY"
-                                + " work_date",
-                        first,
-                        last),
-                "attendance",
-                db.queryForList(
-                        "SELECT r.*,u.full_name,u.department_id FROM attendance_records r JOIN"
-                            + " users u ON u.id=r.user_id WHERE r.work_date BETWEEN ? AND ? AND "
-                                + scope
-                                + " ORDER BY r.work_date DESC,u.full_name",
-                        first,
-                        last,
-                        actor,
-                        actor,
-                        specialist),
-                "requests",
-                db.queryForList(
-                        "SELECT r.*,u.full_name FROM staff_time_requests r JOIN users u ON"
-                            + " u.id=r.user_id WHERE r.work_date BETWEEN ? AND ? AND (r.user_id=?"
-                            + " OR EXISTS(SELECT 1 FROM departments d WHERE d.id=r.department_id"
-                            + " AND d.manager_id=? AND d.is_active AND NOT d.is_deleted) OR ?)"
-                            + " ORDER BY r.created_at DESC",
-                        first,
-                        last,
-                        actor,
-                        actor,
-                        specialist),
-                "absences",
-                db.queryForList(
-                        "SELECT a.*,u.full_name FROM attendance_absences a JOIN users u ON"
-                            + " u.id=a.user_id WHERE a.work_date BETWEEN ? AND ? AND a.revoked_at"
-                            + " IS NULL AND (a.user_id=? OR ? OR EXISTS(SELECT 1 FROM departments d"
-                            + " WHERE d.id=u.department_id AND d.manager_id=? AND d.is_active AND"
-                            + " NOT d.is_deleted))",
-                        first,
-                        last,
-                        actor,
-                        specialist,
-                        actor),
-                "balances",
-                db.queryForList(
-                        "SELECT b.*,u.full_name FROM paid_leave_balances b JOIN users u ON"
-                                + " u.id=b.user_id WHERE b.leave_year=? AND (b.user_id=? OR ?)",
-                        month.getYear(),
-                        actor,
-                        access.capability(actor, "HR_MANAGE")));
+        Map<String, Object> result =
+                Map.of(
+                        "calendar",
+                        db.queryForList(
+                                "SELECT * FROM work_calendar WHERE work_date BETWEEN ? AND ? ORDER"
+                                        + " BY work_date",
+                                first,
+                                last),
+                        "attendance",
+                        db.queryForList(
+                                "SELECT r.*,u.full_name,u.department_id FROM attendance_records r"
+                                    + " JOIN users u ON u.id=r.user_id WHERE r.work_date BETWEEN ?"
+                                    + " AND ? AND "
+                                        + scope
+                                        + " ORDER BY r.work_date DESC,u.full_name",
+                                first,
+                                last,
+                                actor,
+                                reviewDepartments,
+                                specialist),
+                        "requests",
+                        db.queryForList(
+                                "SELECT r.*,u.full_name,u.department_id FROM staff_time_requests r"
+                                    + " JOIN users u ON u.id=r.user_id WHERE r.work_date BETWEEN ?"
+                                    + " AND ? AND (r.user_id=? OR r.department_id IN (SELECT"
+                                    + " unnest(string_to_array(?,',')::uuid[])) OR ?) ORDER BY"
+                                    + " r.created_at DESC",
+                                first,
+                                last,
+                                actor,
+                                reviewDepartments,
+                                specialist),
+                        "absences",
+                        db.queryForList(
+                                "SELECT a.*,u.full_name FROM attendance_absences a JOIN users u ON"
+                                        + " u.id=a.user_id WHERE a.work_date BETWEEN ? AND ? AND"
+                                        + " a.revoked_at IS NULL AND (a.user_id=? OR ? OR"
+                                        + " u.department_id IN (SELECT"
+                                        + " unnest(string_to_array(?,',')::uuid[])))",
+                                first,
+                                last,
+                                actor,
+                                specialist,
+                                reviewDepartments),
+                        "balances",
+                        db.queryForList(
+                                "SELECT b.*,u.full_name FROM paid_leave_balances b JOIN users u ON"
+                                    + " u.id=b.user_id WHERE b.leave_year=? AND (b.user_id=? OR ?)",
+                                month.getYear(),
+                                actor,
+                                access.capability(actor, "HR_MANAGE")));
+        for (String kind : List.of("attendance", "requests"))
+            for (var r : (List<Map<String, Object>>) result.get(kind))
+                r.put(
+                        "canReview",
+                        !actor.equals(r.get("submitted_by"))
+                                && authority.time(
+                                        (UUID) r.get("department_id"),
+                                        (UUID) r.get("user_id"),
+                                        actor));
+        return result;
     }
 
     public void importAttendance(List<ImportRow> rows, WorkSphereUserPrincipal p) {
@@ -317,7 +374,7 @@ public class TimeIncomeService {
                         .toList()) {
             if (row.clockOut() == null || row.clockOut().isAfter(Instant.now()))
                 throw bad("Không nhập công cho thời điểm chưa xảy ra");
-            active(row.userId());
+            eligibleHistorical(row.userId(), row.clockOut());
             long duration = interval(row.workDate(), row.clockIn(), row.clockOut());
             YearMonth month = YearMonth.from(row.workDate());
             calendarLock(month);
@@ -355,13 +412,44 @@ public class TimeIncomeService {
 
     public void request(TimeInput input, WorkSphereUserPrincipal p) {
         UUID actor = access.actor(p);
-        var user = one("SELECT department_id FROM users WHERE id=?", actor);
+        submitRequest(input, actor, actor);
+    }
+
+    public record CorrectionInput(
+            UUID userId,
+            LocalDate workDate,
+            Instant startsAt,
+            Instant endsAt,
+            int requestedMinutes,
+            String reason) {
+}
+
+    public void correctionFor(CorrectionInput r, WorkSphereUserPrincipal p) {
+        UUID actor = access.actor(p);
+        access.requireCapability(actor, "TIME_REVIEW");
+        if (actor.equals(r.userId()))
+            throw new AccessDeniedException("Đơn của bản thân dùng luồng cá nhân");
+        eligibleHistorical(r.userId(), r.endsAt());
+        submitRequest(
+                new TimeInput(
+                        "TIME_CORRECTION",
+                        r.workDate(),
+                        r.startsAt(),
+                        r.endsAt(),
+                        r.requestedMinutes(),
+                        r.reason()),
+                actor,
+                r.userId());
+    }
+
+    private void submitRequest(TimeInput input, UUID actor, UUID subject) {
+        var user = one("SELECT department_id FROM users WHERE id=?", subject);
         UUID department = (UUID) user.get("department_id");
         if (department == null) throw bad("Bạn chưa được gán phòng ban");
         routing.requireReceiving(department);
         long duration = interval(input.workDate(), input.startsAt(), input.endsAt());
         calendarLock(YearMonth.from(input.workDate()));
-        lockPeriod(actor, input.workDate());
+        lockPeriod(subject, input.workDate());
         var calendar = day(input.workDate());
         if (!Set.of("LEAVE_PAID", "LEAVE_UNPAID", "OVERTIME", "TIME_CORRECTION")
                 .contains(input.requestType() == null ? "" : input.requestType()))
@@ -386,27 +474,29 @@ public class TimeIncomeService {
         if (Boolean.TRUE.equals(
                 db.queryForObject(
                         "SELECT EXISTS(SELECT 1 FROM staff_time_requests WHERE user_id=? AND"
-                                + " work_date=? AND request_type=? AND status<>'REJECTED')",
+                                + " work_date=? AND request_type=? AND (status='PENDING' OR"
+                                + " (request_type<>'TIME_CORRECTION' AND status<>'REJECTED')))",
                         Boolean.class,
-                        actor,
+                        subject,
                         java.sql.Date.valueOf(input.workDate()),
                         input.requestType())))
             throw bad("Đã có đơn cùng loại trong ngày đang được xử lý");
         UUID id = UUID.randomUUID();
         db.update(
                 "INSERT INTO"
-                    + " staff_time_requests(id,user_id,department_id,request_type,work_date,starts_at,ends_at,requested_minutes,reason)"
-                    + " VALUES (?,?,?,?,?,?,?,?,?)",
+                    + " staff_time_requests(id,user_id,department_id,request_type,work_date,starts_at,ends_at,requested_minutes,reason,submitted_by)"
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?)",
                 id,
-                actor,
+                subject,
                 department,
                 input.requestType(),
                 java.sql.Date.valueOf(input.workDate()),
                 stamp(input.startsAt()),
                 stamp(input.endsAt()),
                 input.requestedMinutes(),
-                reason(input.reason()));
-        routing.notifyManager(department, "Có đơn công/nghỉ/tăng ca cần xem xét", null);
+                reason(input.reason()),
+                actor);
+        routing.notifyTimeApprovers(department, subject, id);
         audit(actor, id, "TIME_REQUEST_CREATED");
     }
 
@@ -418,7 +508,8 @@ public class TimeIncomeService {
                                 + " u.id=r.user_id WHERE r.id=?",
                         record);
         UUID user = (UUID) row.get("user_id");
-        if (actor.equals(user) || !reviewer(actor, (UUID) row.get("department_id")))
+        if (actor.equals(row.get("submitted_by"))
+                || !authority.time((UUID) row.get("department_id"), user, actor))
             throw new AccessDeniedException("Không tự duyệt công hoặc duyệt ngoài phạm vi");
         calendarLock(YearMonth.from(((java.sql.Date) row.get("work_date")).toLocalDate()));
         lockPeriod(user, ((java.sql.Date) row.get("work_date")).toLocalDate());
@@ -460,7 +551,8 @@ public class TimeIncomeService {
         var row = one("SELECT * FROM staff_time_requests WHERE id=?", request);
         UUID user = (UUID) row.get("user_id");
         LocalDate date = ((java.sql.Date) row.get("work_date")).toLocalDate();
-        if (actor.equals(user) || !reviewer(actor, (UUID) row.get("department_id")))
+        if (actor.equals(row.get("submitted_by"))
+                || !authority.time((UUID) row.get("department_id"), user, actor))
             throw new AccessDeniedException("Không tự duyệt đơn hoặc duyệt ngoài phạm vi");
         calendarLock(YearMonth.from(date));
         lockPeriod(user, date);
@@ -624,7 +716,8 @@ public class TimeIncomeService {
         audit(actor, request, "TIME_REQUEST_REVIEWED");
     }
 
-    public record AbsenceInput(UUID userId, LocalDate workDate, int absentMinutes, String reason) {}
+    public record AbsenceInput(UUID userId, LocalDate workDate, int absentMinutes, String reason) {
+}
 
     public void absence(AbsenceInput input, WorkSphereUserPrincipal p) {
         UUID actor = access.actor(p);
@@ -632,7 +725,7 @@ public class TimeIncomeService {
                 one(
                         "SELECT department_id FROM users WHERE id=? AND NOT is_deleted",
                         input.userId());
-        if (actor.equals(input.userId()) || !reviewer(actor, (UUID) user.get("department_id")))
+        if (!authority.time((UUID) user.get("department_id"), input.userId(), actor))
             throw new AccessDeniedException("Không tự xác nhận vắng hoặc xử lý ngoài phạm vi");
         if (input.workDate() == null || !input.workDate().isBefore(LocalDate.now(ZONE)))
             throw bad("Chỉ xác nhận vắng sau khi ngày công kết thúc");
@@ -725,6 +818,10 @@ public class TimeIncomeService {
                 || !YearMonth.from(input.employmentTo()).equals(month)
                 || input.employmentTo().isBefore(input.employmentFrom()))
             throw bad("Khoảng tính hưởng phải nằm trong tháng");
+        if (access.admin(input.userId()))
+            throw bad(
+                    "Tài khoản quản trị kỹ thuật không có bảng lương nghiệp vụ; dùng hồ sơ nhân"
+                            + " viên tương ứng");
         one("SELECT id FROM users WHERE id=? AND NOT is_deleted", input.userId());
         var old =
                 db.queryForList(
@@ -748,6 +845,8 @@ public class TimeIncomeService {
         } else {
             var row = old.getFirst();
             version(row, input.version());
+            if (!"DRAFT".equals(row.get("approval_state")))
+                throw bad("Bảng tính đã gửi kiểm tra; cần trả lại trước khi sửa");
             id = (UUID) row.get("id");
             db.update(
                     "UPDATE income_periods SET"
@@ -767,27 +866,39 @@ public class TimeIncomeService {
     public List<Map<String, Object>> incomes(String value, WorkSphereUserPrincipal p) {
         UUID actor = access.actor(p);
         String month = period(value).toString();
-        boolean payroll = access.capability(actor, "PAYROLL_MANAGE");
+        boolean payroll =
+                access.capability(actor, "PAYROLL_MANAGE")
+                        || access.capability(actor, "PAYROLL_APPROVE");
         var rows =
                 db.queryForList(
                         "SELECT i.*,u.full_name FROM income_periods i JOIN users u ON"
-                                + " u.id=i.user_id WHERE period=? AND (i.user_id=? OR ?) ORDER BY"
-                                + " u.full_name",
+                                + " u.id=i.user_id WHERE period=? AND ((i.user_id=? AND"
+                                + " i.approval_state='PUBLISHED') OR ?) ORDER BY u.full_name",
                         month,
                         actor,
                         payroll);
-        for (var row : rows) row.put("calculation", calculate(row));
+        for (var row : rows) {
+            row.put("calculation", calculate(row));
+            row.put(
+                    "adjustments",
+                    db.queryForList(
+                            "SELECT a.*,u.full_name created_name FROM income_adjustments a JOIN"
+                                    + " users u ON u.id=a.created_by WHERE income_id=? ORDER BY"
+                                    + " a.created_at",
+                            row.get("id")));
+        }
         return rows;
     }
 
-    private Map<String, Object> calculate(Map<String, Object> row) {
+    Map<String, Object> calculate(Map<String, Object> row) {
         if ("LOCKED".equals(row.get("status"))) {
             try {
                 return new ObjectMapper()
                         .readValue(
                                 (String) row.get("snapshot"),
                                 new com.fasterxml.jackson.core.type.TypeReference<
-                                        Map<String, Object>>() {});
+                                        Map<String, Object>>() {
+});
             } catch (Exception e) {
                 throw bad("Không đọc được phiếu chốt");
             }
@@ -937,6 +1048,10 @@ public class TimeIncomeService {
         version(row, input.version());
         if (actor.equals(row.get("user_id")))
             throw new AccessDeniedException("Không tự chốt phiếu thu nhập của mình");
+        if (!"APPROVED".equals(row.get("approval_state"))
+                || row.get("approved_by") == null
+                || actor.equals(row.get("approved_by")))
+            throw bad("Cần người phê duyệt độc lập trước khi phát hành phiếu");
         reason(input.reason());
         if (!LocalDate.now(ZONE).isAfter(month.atEndOfMonth()))
             throw bad("Chỉ chốt khi tháng đã kết thúc");
@@ -945,9 +1060,15 @@ public class TimeIncomeService {
                 || ((Number) result.get("pendingItems")).intValue() != 0)
             throw bad("Còn thiếu lịch công hoặc hồ sơ chờ xác nhận");
         try {
+            if (!new ObjectMapper()
+                    .readTree((String) row.get("snapshot"))
+                    .equals(
+                            new ObjectMapper()
+                                    .readTree(new ObjectMapper().writeValueAsString(result))))
+                throw bad("Nguồn công thay đổi sau khi duyệt; cần trả lại và duyệt lại");
             db.update(
                     "UPDATE income_periods SET"
-                        + " status='LOCKED',snapshot=?,locked_by=?,locked_at=now(),version=version+1"
+                        + " status='LOCKED',approval_state='PUBLISHED',snapshot=?,locked_by=?,locked_at=now(),version=version+1"
                         + " WHERE id=?",
                     new ObjectMapper().writeValueAsString(result),
                     actor,
