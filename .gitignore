@@ -74,6 +74,7 @@ Thumbs.db
 work/
 .external/
 .env.local
+.local/
 *.dump
 *.backup
 *.apk

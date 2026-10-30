@@ -131,6 +131,32 @@ export interface Ticket {
   }[];
   attachments: Attachment[];
 }
+export type PunchAction = 'IN' | 'OUT' | 'OT_IN' | 'OT_OUT';
+export interface PunchRow {
+  id: string;
+  user_id: string;
+  full_name?: string;
+  punch_type: PunchAction;
+  recorded_at: string;
+  network_status: string;
+  station_name?: string;
+}
+export interface AttendanceToday {
+  lateMinutes?: number;
+  earlyMinutes?: number;
+  status: string;
+  serverTime: string;
+  workDate: string;
+  message: string;
+  actions: PunchAction[];
+  punches: PunchRow[];
+  calendar: {
+    shift_start: string;
+    shift_end: string;
+    break_start?: string;
+    break_end?: string;
+  } | null;
+}
 export interface TimeRow {
   id: string;
   user_id: string;
@@ -146,8 +172,15 @@ export interface TimeRow {
   canReview?: boolean;
   clock_in?: string;
   clock_out?: string;
+  late_minutes?: number;
+  early_minutes?: number;
+  network_review_required?: boolean;
+  exception_reason?: string;
+  approval_mode?: string;
 }
 export interface TimeOverview {
+  today?: AttendanceToday;
+  punches?: PunchRow[];
   attendance: TimeRow[];
   requests: TimeRow[];
   balances: { user_id: string; allowance_minutes: number }[];
@@ -285,6 +318,7 @@ export const workspaceApi = {
     reason: string,
     startsAt?: string,
     endsAt?: string,
+    exceptionReason?: string,
   ) =>
     http.post('/workplace/time/requests', {
       requestType,
@@ -293,6 +327,7 @@ export const workspaceApi = {
       reason,
       startsAt,
       endsAt,
+      exceptionReason: exceptionReason || null,
     }),
   reviewTime: (
     row: TimeRow,
@@ -300,12 +335,21 @@ export const workspaceApi = {
     action: string,
     reason: string,
     actualMinutes?: number,
+    acknowledgeNetwork = false,
+    exceptionReason?: string,
   ) =>
     http.post(
       `/workplace/time/${record ? 'records' : 'requests'}/${row.id}/review`,
-      { version: row.version, action, reason, actualMinutes },
+      {
+        version: row.version,
+        action,
+        reason,
+        actualMinutes,
+        acknowledgeNetwork,
+        exceptionReason: exceptionReason || null,
+      },
     ),
-  punch: (token: string, type: 'IN' | 'OUT', generation?: number) =>
+  punch: (token: string, type: PunchAction, generation?: number) =>
     required(
       http.post<object, { message: string; recordedAt: string; type: string }>(
         '/workplace/attendance/punches',

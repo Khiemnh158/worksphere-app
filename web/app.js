@@ -1978,7 +1978,55 @@ async function timeView() {
         (r) => r.request_type === "OVERTIME" && r.status === "APPROVED"
       ).length,
       "clock"
-    )}</div>${
+    )}</div><section class="panel"><h2>Chấm công hôm nay</h2><p>${esc(
+      data.today?.message || ""
+    )}</p><p>${
+      {
+        NOT_STARTED: "Chưa vào ca",
+        WORKING: "Đã vào — chưa ra ca",
+        COMPLETED: "Đã kết thúc ca",
+      }[data.today?.status] || ""
+    } · quét bằng ứng dụng tại văn phòng.</p><p class="muted">Muộn ${
+      data.today?.lateMinutes || 0
+    } phút · Về sớm ${
+      data.today?.earlyMinutes || 0
+    } phút. Không tự sinh khoản phạt.</p>${
+      data.today?.calendar
+        ? `<p class="muted">Ca ${esc(data.today.calendar.shift_start)}–${esc(
+            data.today.calendar.shift_end
+          )} · Nghỉ ${esc(
+            data.today.calendar.break_start || "chưa cấu hình"
+          )}–${esc(data.today.calendar.break_end || "")}</p>`
+        : ""
+    }</section>
+    <div class="section-head"><h2>Lượt quét đã lưu</h2><span class="muted">Giờ máy chủ · Vào ca vẫn hiện khi chưa có lượt Ra</span></div>
+    ${
+      (data.punches || []).length
+        ? `<div class="table-wrap"><table><thead><tr><th>Nhân viên</th><th>Thao tác / thời gian</th><th>Điểm / mạng</th></tr></thead><tbody>${data.punches
+            .map(
+              (p) =>
+                `<tr><td>${esc(p.full_name)}</td><td>${esc(
+                  {
+                    IN: "Vào ca",
+                    OUT: "Ra ca",
+                    OT_IN: "Bắt đầu OT",
+                    OT_OUT: "Kết thúc OT",
+                  }[p.punch_type]
+                )}<br>${fmt(p.recorded_at, true)}</td><td>${esc(
+                  p.station_name
+                )}<br>${esc(
+                  {
+                    MATCH: "Khớp mạng cấu hình",
+                    MISMATCH: "Khác mạng — cần xác minh",
+                    UNCONFIGURED: "Chưa cấu hình mạng",
+                    UNVERIFIED: "Lượt cũ chưa kiểm tra mạng",
+                  }[p.network_status]
+                )}</td></tr>`
+            )
+            .join("")}</tbody></table></div>`
+        : empty("Chưa có lượt quét trong kỳ.")
+    }
+    ${
       !data.calendar.length
         ? '<div class="error-box" style="margin-bottom:20px">Kỳ này chưa có lịch công. Người phụ trách đối soát công cần cấu hình trước khi ghi nhận và tính thu nhập.</div>'
         : ""
@@ -1992,9 +2040,15 @@ async function timeView() {
                 )}</small></td><td>${fmt(r.clock_in, true)}<br>${fmt(
                   r.clock_out,
                   true
-                )}</td><td>${hours(r.regular_minutes)}</td><td><small>${esc(
-                  r.source_reference
-                )}</small><br>${pill(r.status)}</td><td>${
+                )}</td><td>${hours(r.regular_minutes)}<br><small>Muộn: ${
+                  r.late_minutes || 0
+                } phút · Về sớm: ${r.early_minutes || 0} phút</small>${
+                  r.network_review_required
+                    ? '<br><span class="pill red">Cần xác minh mạng</span>'
+                    : ""
+                }</td><td><small>${esc(r.source_reference)}</small><br>${pill(
+                  r.status
+                )}</td><td>${
                   r.status === "PENDING" && r.canReview
                     ? btn("review-attendance", "Kiểm tra", "small", r.id)
                     : `<small class="muted">${esc(
@@ -2013,12 +2067,20 @@ async function timeView() {
                   r.work_date
                 )}</small></td><td>${esc(
                   labels[r.request_type]
-                )}<br><small>${esc(r.reason)}</small></td><td>${hours(
-                  r.requested_minutes
-                )}<br><small>${fmt(r.starts_at, true)} → ${fmt(
-                  r.ends_at,
+                )}<br><small>${esc(r.reason)}</small>${
+                  r.exception_reason
+                    ? `<p class="muted">Ngoại lệ OT: ${esc(
+                        r.exception_reason
+                      )}</p>`
+                    : ""
+                }${
+                  r.approval_mode === "EXCEPTION"
+                    ? '<span class="pill purple">OT ngoại lệ</span>'
+                    : ""
+                }</td><td>${hours(r.requested_minutes)}<br><small>${fmt(
+                  r.starts_at,
                   true
-                )}</small></td><td>${pill(r.status)}${
+                )} → ${fmt(r.ends_at, true)}</small></td><td>${pill(r.status)}${
                   r.actual_minutes != null
                     ? `<br><small>Thực tế: ${hours(r.actual_minutes)}</small>`
                     : ""
@@ -2234,7 +2296,13 @@ function timeRequest() {
       }) +
       field("reason", "Lý do và nội dung cần xem xét", "textarea", {
         max: 2000,
-      }),
+      }) +
+      field(
+        "exceptionReason",
+        "Giải trình OT phát sinh sau giờ bắt đầu (nếu có)",
+        "textarea",
+        { required: false, max: 2000 }
+      ),
     (v) =>
       api("/workplace/time/requests", {
         method: "POST",
@@ -2243,6 +2311,7 @@ function timeRequest() {
           requestType: v.requestType,
           requestedMinutes: Number(v.requestedMinutes),
           reason: v.reason,
+          exceptionReason: v.exceptionReason || null,
         },
       }),
     {
@@ -2261,9 +2330,29 @@ function calendarConfig() {
           { value: "1,2,3,4,5,6", label: "Thứ Hai đến thứ Bảy" },
         ],
       }) +
-      field("shiftStart", "Giờ bắt đầu ca", "time") +
-      field("shiftEnd", "Giờ kết thúc ca", "time") +
+      field("shiftStart", "Giờ bắt đầu ca", "time", {
+        value: current?.data?.calendar?.[0]?.shift_start?.slice(0, 5),
+      }) +
+      field("shiftEnd", "Giờ kết thúc ca", "time", {
+        value: current?.data?.calendar?.[0]?.shift_end?.slice(0, 5),
+      }) +
+      field("breakStart", "Bắt đầu nghỉ giữa ca", "time", {
+        value:
+          current?.data?.calendar?.[0]?.break_start?.slice(0, 5) || "11:30",
+        required: false,
+      }) +
+      field("breakEnd", "Kết thúc nghỉ giữa ca", "time", {
+        value: current?.data?.calendar?.[0]?.break_end?.slice(0, 5) || "12:30",
+        required: false,
+      }) +
+      field(
+        "lateGraceMinutes",
+        "Dung sai báo đi muộn (phút, không cộng thêm công)",
+        "number",
+        { value: 0, min: 0, max: 120 }
+      ) +
       field("breakMinutes", "Nghỉ giữa ca không tính công (phút)", "number", {
+        value: current?.data?.calendar?.[0]?.break_minutes ?? 60,
         min: 0,
         max: 480,
       }) +
@@ -2280,6 +2369,9 @@ function calendarConfig() {
           ...v,
           weekdays: v.weekdays.split(",").map(Number),
           breakMinutes: Number(v.breakMinutes),
+          lateGraceMinutes: Number(v.lateGraceMinutes),
+          breakStart: v.breakStart || null,
+          breakEnd: v.breakEnd || null,
           holidays: v.holidays.trim()
             ? v.holidays.split(",").map((s) => s.trim())
             : [],
@@ -2383,7 +2475,31 @@ function reviewTime(action, id) {
               { value: "REJECT", label: "Từ chối, cần giải trình" },
             ],
           })) +
-      field("reason", "Nhận xét / căn cứ xác nhận", "textarea", { max: 2000 }),
+      field("reason", "Nhận xét / căn cứ xác nhận", "textarea", { max: 2000 }) +
+      ((record && r.network_review_required) || confirm
+        ? field(
+            "acknowledgeNetwork",
+            "Đã xác minh cảnh báo mạng của lượt chấm?",
+            "select",
+            {
+              choices: [
+                { value: "false", label: "Chưa xác minh" },
+                {
+                  value: "true",
+                  label: "Đã kiểm tra thực tế, ghi căn cứ ở trên",
+                },
+              ],
+            }
+          )
+        : "") +
+      (!record && r.request_type === "OVERTIME" && !confirm
+        ? field(
+            "exceptionReason",
+            "Căn cứ duyệt OT ngoại lệ sau giờ bắt đầu (nếu có)",
+            "textarea",
+            { required: false, max: 2000 }
+          )
+        : ""),
     (v) =>
       api(`/workplace/time/${record ? "records" : "requests"}/${id}/review`, {
         method: "POST",
@@ -2392,6 +2508,8 @@ function reviewTime(action, id) {
           actualMinutes: confirm ? Number(v.actualMinutes) : null,
           reason: v.reason,
           version: r.version,
+          acknowledgeNetwork: v.acknowledgeNetwork === "true",
+          exceptionReason: v.exceptionReason || null,
         },
       }),
     {
@@ -2771,7 +2889,8 @@ document.addEventListener("click", async (e) => {
       n.read_at = new Date().toISOString();
       if (n.reference_id && n.reference_type === "WORK")
         location.hash = "work/" + n.reference_id;
-      else if (n.reference_type === "TIME") location.hash = "time";
+      else if (["TIME", "ATTENDANCE"].includes(n.reference_type))
+        location.hash = "time";
       else if (n.reference_type === "INCOME")
         location.hash =
           C.capabilities.includes("PAYROLL_MANAGE") ||

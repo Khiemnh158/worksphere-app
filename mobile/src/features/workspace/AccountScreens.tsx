@@ -45,10 +45,15 @@ export function AccountScreen() {
       <Card>
         <Copy title>Bảo mật tài khoản</Copy>
         <Copy muted>
-          Mã hai bước và mã dự phòng được nhập ngay lúc đăng nhập. Thiết lập/đổi
-          mật khẩu và quản lý phiên tại Bảo mật trên web. Tài khoản bị khóa hoặc
-          đến hạn ngừng truy cập sẽ bị từ chối trên cả web và mobile.
+          Thiết lập mã hai bước, đổi mật khẩu và đăng xuất mọi thiết bị ngay
+          trên ứng dụng. Tài khoản bị khóa hoặc đến hạn ngừng truy cập sẽ bị từ
+          chối trên cả web và mobile.
         </Copy>
+        <Button
+          title="Mở bảo mật tài khoản"
+          secondary
+          onPress={() => navigation.navigate('Security')}
+        />
       </Card>
       <Button
         title="Đăng xuất"
@@ -256,6 +261,10 @@ export function NoticesScreen() {
                   await state.refresh();
                   if (n.reference_type === 'WORK' && n.reference_id)
                     navigation.navigate('WorkDetail', { id: n.reference_id });
+                  else if (
+                    ['TIME', 'ATTENDANCE'].includes(n.reference_type ?? '')
+                  )
+                    navigation.navigate('WorkspaceTabs', { screen: 'Time' });
                   else if (
                     ['SERVICE_REQUEST', 'REQUEST'].includes(
                       n.reference_type ?? '',

@@ -5,17 +5,17 @@
     "exitCode": 0
   },
   "jest": {
-    "suitesPassed": 91,
-    "suitesTotal": 91,
-    "testsPassed": 810,
-    "testsTotal": 810,
+    "suitesPassed": 92,
+    "suitesTotal": 92,
+    "testsPassed": 822,
+    "testsTotal": 822,
     "skipped": 0,
-    "seconds": 33.832,
-    "notes": "Legacy act warnings remain; no forceExit"
+    "seconds": 57.541,
+    "notes": "Inherited act warnings remain"
   },
   "lintChangedSource": {
     "errors": 0,
-    "warnings": 34
+    "warnings": 31
   },
   "android": {
     "target": "debug x86_64",
@@ -62,5 +62,17 @@
       "out": "NOT_VERIFIED",
       "details": "Identifying activity details retained locally, not published"
     }
+  },
+  "bundledLocal": {
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "build": "SUCCESS",
+    "metroRequired": false,
+    "backendRequired": true,
+    "environment": "loopback local, debug signed",
+    "emulatorLoginAndAttendance": "PASS",
+    "physicalNewBuildOut": "NOT_VERIFIED"
   }
 }

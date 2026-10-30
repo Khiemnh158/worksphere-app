@@ -1,3 +1,7 @@
+server:
+  # Presence checks use the actual peer. Proxy forwarding requires a separately trusted setup.
+  forward-headers-strategy: none
+
 spring:
   profiles:
     active: dev

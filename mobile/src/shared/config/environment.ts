@@ -94,6 +94,24 @@ export function getEnvironmentConfig(): EnvironmentConfig {
   const nativeConstants = getNativeEnvironmentConstants();
   const nativeUrl = nativeConstants.API_BASE_URL?.trim();
 
+  if (nativeConstants.BUNDLED_LOCAL === true) {
+    if (
+      !nativeUrl ||
+      !/^http:\/\/(?:127\.0\.0\.1|localhost|10\.0\.2\.2)(?::\d+)?(?:\/|$)/i.test(
+        nativeUrl,
+      )
+    ) {
+      throw new Error(
+        'Bản thử local chỉ kết nối máy chủ loopback; bản phát hành cần HTTPS.',
+      );
+    }
+    return {
+      apiBaseUrl: normalizeApiBaseUrl(nativeUrl, false),
+      isProduction: false,
+      requestTimeoutMs: DEFAULT_REQUEST_TIMEOUT_MS,
+    };
+  }
+
   if (isDev) {
     const devUrl =
       nativeUrl && nativeUrl.length > 0

@@ -53,7 +53,7 @@ class WorkplacePostgresTest {
                 .isEmpty();
         db.update(
                 "INSERT INTO income_adjustments(id,income_id,created_by,reason,amount) VALUES"
-                    + " (?,?,?,?,?)",
+                        + " (?,?,?,?,?)",
                 UUID.randomUUID(),
                 id,
                 hr.getId(),
@@ -82,6 +82,23 @@ class WorkplacePostgresTest {
         p.add("worksphere.people.scheduling.enabled", () -> "false");
         p.add("worksphere.notification.scheduling.enabled", () -> "false");
         p.add("worksphere.storage.path", () -> "target/authz-test-uploads");
+    }
+
+    @Autowired com.worksphere.workplace.AttendanceStationService stationService;
+    @Autowired com.worksphere.workplace.TimeIncomeService timeService;
+
+    void attendanceClock(String instant) {
+        Clock fixed = Clock.fixed(Instant.parse(instant), ZoneOffset.UTC);
+        org.springframework.test.util.ReflectionTestUtils.setField(stationService, "clock", fixed);
+        org.springframework.test.util.ReflectionTestUtils.setField(timeService, "clock", fixed);
+    }
+
+    @AfterEach
+    void restoreAttendanceClock() {
+        org.springframework.test.util.ReflectionTestUtils.setField(
+                stationService, "clock", Clock.systemUTC());
+        org.springframework.test.util.ReflectionTestUtils.setField(
+                timeService, "clock", Clock.systemUTC());
     }
 
     @Autowired WebApplicationContext context;
@@ -1031,6 +1048,10 @@ class WorkplacePostgresTest {
                                     "17:00",
                                     "breakMinutes",
                                     60,
+                                    "breakStart",
+                                    "11:30",
+                                    "breakEnd",
+                                    "12:30",
                                     "holidays",
                                     List.of("2020-02-06"))),
                     200);
@@ -1054,7 +1075,9 @@ class WorkplacePostgresTest {
                                 "requestedMinutes",
                                 minutes,
                                 "reason",
-                                "Practice request with evidence")),
+                                "Practice request with evidence",
+                                "exceptionReason",
+                                "Historical fixture reviewed as an explicit exception")),
                 200);
         return db.queryForObject(
                 "SELECT id FROM staff_time_requests WHERE user_id=? AND request_type=? ORDER BY"
@@ -1068,6 +1091,7 @@ class WorkplacePostgresTest {
         Map<String, Object> body = new HashMap<>();
         body.put("action", action);
         body.put("reason", "Reviewed evidence");
+        body.put("exceptionReason", "Historical exception supported by reviewed evidence");
         body.put("version", version);
         if (actual != null) body.put("actualMinutes", actual);
         status(call("POST", "/workplace/time/requests/" + id + "/review", m, body), 200);
@@ -1764,6 +1788,12 @@ class WorkplacePostgresTest {
 
     @Test
     void qrStationRequiresSpecialistAndRejectsExpiredReplayAndClosedStation() throws Exception {
+        attendanceClock(
+                LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"))
+                        .atTime(10, 0)
+                        .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
+                        .toInstant()
+                        .toString());
         db.update(
                 "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'TIME_REVIEW')",
                 hr.getId());
@@ -1810,7 +1840,7 @@ class WorkplacePostgresTest {
                         Map.of("token", token, "type", "IN")),
                 422);
         db.update(
-                "UPDATE attendance_qr_challenges SET expires_at=now()-interval '1 second' WHERE"
+                "UPDATE attendance_qr_challenges SET expires_at='2000-01-01T00:00:00Z' WHERE"
                         + " id=?",
                 challenge);
         status(
@@ -2291,5 +2321,318 @@ class WorkplacePostgresTest {
                     .isEqualTo("Thông tin đăng nhập không chính xác");
             assertThat(error.path("data").isNull() || error.path("data").isMissingNode()).isTrue();
         }
+    }
+
+    String attendanceFixture(String networks) throws Exception {
+        attendanceClock("2030-05-06T01:00:00Z");
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'TIME_REVIEW')",
+                hr.getId());
+        db.update(
+                "INSERT INTO"
+                    + " work_calendar(work_date,day_kind,normal_minutes,shift_start,shift_end,break_minutes,break_start,break_end,configured_by)"
+                    + " VALUES ('2030-05-06','NORMAL',480,'08:00','17:00',60,'11:30','12:30',?) ON"
+                    + " CONFLICT(work_date) DO NOTHING",
+                hr.getId());
+        var made =
+                call(
+                        "POST",
+                        "/workplace/attendance/stations",
+                        h,
+                        Map.of("name", "Office fixture", "allowedCidrs", networks));
+        status(made, 200);
+        UUID station = UUID.fromString(data(made).asText());
+        String token = "attendance-fixture-" + UUID.randomUUID();
+        db.update(
+                "INSERT INTO"
+                    + " attendance_qr_challenges(id,station_id,token_hash,issued_by,expires_at)"
+                    + " VALUES (?,?,?,?,?)",
+                UUID.randomUUID(),
+                station,
+                recoveryService.hash(token),
+                hr.getId(),
+                java.sql.Timestamp.from(Instant.parse("2030-05-06T14:59:59Z")));
+        return token;
+    }
+
+    @Test
+    void qrOpenPunchScopeAndNetworkAcknowledgementAreEnforced() throws Exception {
+        String token = attendanceFixture("192.0.2.0/24");
+        var punch =
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        e,
+                        Map.of("token", token, "type", "IN"));
+        status(punch, 200);
+        assertThat(data(punch).path("networkStatus").asText()).isEqualTo("MISMATCH");
+        var today = data(call("GET", "/workplace/attendance/today", e, null));
+        assertThat(today.path("actions").toString()).contains("OUT").doesNotContain("\"IN\"");
+        assertThat(today.path("punches")).hasSize(1);
+        assertThat(data(call("GET", "/workplace/time?period=2030-05", x, null)).path("punches"))
+                .isEmpty();
+        assertThat(data(call("GET", "/workplace/time?period=2030-05", m, null)).path("punches"))
+                .hasSize(1);
+        attendanceClock("2030-05-06T10:00:00Z");
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        e,
+                        Map.of("token", token, "type", "OUT")),
+                200);
+        UUID record =
+                db.queryForObject(
+                        "SELECT id FROM attendance_records WHERE user_id=? AND"
+                            + " work_date='2030-05-06'",
+                        UUID.class,
+                        employee.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/records/" + record + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "APPROVE",
+                                "version",
+                                0,
+                                "reason",
+                                "Interviewed employee and verified presence")),
+                422);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/records/" + record + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "APPROVE",
+                                "version",
+                                0,
+                                "reason",
+                                "Interviewed employee and verified presence",
+                                "acknowledgeNetwork",
+                                true)),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT regular_minutes FROM attendance_records WHERE id=?",
+                                Integer.class,
+                                record))
+                .isEqualTo(480);
+        assertThat(data(call("GET", "/workplace/attendance/today", e, null)).path("actions"))
+                .isEmpty();
+    }
+
+    @Test
+    void qrDoesNotTrustForwardedHeaderAndStationHoursAreEnforced() throws Exception {
+        String token = attendanceFixture("192.0.2.0/24");
+        var response =
+                mvc.perform(
+                                request(HttpMethod.POST, "/api/v1/workplace/attendance/punches")
+                                        .header("Authorization", "Bearer " + e)
+                                        .header("X-Forwarded-For", "192.0.2.5")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(
+                                                json.writeValueAsBytes(
+                                                        Map.of("token", token, "type", "IN"))))
+                        .andReturn();
+        status(response, 200);
+        assertThat(data(response).path("networkStatus").asText()).isEqualTo("MISMATCH");
+        attendanceClock("2030-05-06T15:00:00Z");
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        b,
+                        Map.of("token", token, "type", "IN")),
+                422);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT count(*) FROM attendance_punches WHERE user_id=?",
+                                Integer.class,
+                                replacement.getId()))
+                .isZero();
+    }
+
+    @Test
+    void overtimeScansCannotPayBeyondMeasuredTimeOrBypassNetworkReview() throws Exception {
+        String token = attendanceFixture("");
+        var input =
+                Map.of(
+                        "requestType",
+                        "OVERTIME",
+                        "workDate",
+                        "2030-05-06",
+                        "startsAt",
+                        "2030-05-06T11:00:00Z",
+                        "endsAt",
+                        "2030-05-06T12:00:00Z",
+                        "requestedMinutes",
+                        60,
+                        "reason",
+                        "Approved maintenance work");
+        status(call("POST", "/workplace/time/requests", e, input), 200);
+        UUID id =
+                db.queryForObject(
+                        "SELECT id FROM staff_time_requests WHERE user_id=?",
+                        UUID.class,
+                        employee.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "APPROVE",
+                                "version",
+                                0,
+                                "reason",
+                                "Reviewed maintenance plan")),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT approval_mode FROM staff_time_requests WHERE id=?",
+                                String.class,
+                                id))
+                .isEqualTo("PRIOR");
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        e,
+                        Map.of("token", token, "type", "OT_IN")),
+                422);
+        attendanceClock("2030-05-06T11:00:00Z");
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        e,
+                        Map.of("token", token, "type", "OT_IN")),
+                200);
+        attendanceClock("2030-05-06T11:45:00Z");
+        status(
+                call(
+                        "POST",
+                        "/workplace/attendance/punches",
+                        e,
+                        Map.of("token", token, "type", "OT_OUT")),
+                200);
+        attendanceClock("2030-05-06T13:00:00Z");
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "CONFIRM",
+                                "version",
+                                1,
+                                "reason",
+                                "Checked actual work",
+                                "actualMinutes",
+                                60,
+                                "acknowledgeNetwork",
+                                true)),
+                422);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "CONFIRM",
+                                "version",
+                                1,
+                                "reason",
+                                "Checked actual work",
+                                "actualMinutes",
+                                45)),
+                422);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "CONFIRM",
+                                "version",
+                                1,
+                                "reason",
+                                "Checked actual work and network",
+                                "actualMinutes",
+                                45,
+                                "acknowledgeNetwork",
+                                true)),
+                200);
+    }
+
+    @Test
+    void retrospectiveOvertimeRequiresExplicitExceptionAtSubmissionAndApproval() throws Exception {
+        attendanceFixture("127.0.0.1/32");
+        attendanceClock("2030-05-06T13:00:00Z");
+        Map<String, Object> input =
+                new HashMap<>(
+                        Map.of(
+                                "requestType",
+                                "OVERTIME",
+                                "workDate",
+                                "2030-05-06",
+                                "startsAt",
+                                "2030-05-06T11:00:00Z",
+                                "endsAt",
+                                "2030-05-06T12:00:00Z",
+                                "requestedMinutes",
+                                60,
+                                "reason",
+                                "Incident recovery"));
+        status(call("POST", "/workplace/time/requests", e, input), 422);
+        input.put("exceptionReason", "Emergency incident documented after restoration");
+        status(call("POST", "/workplace/time/requests", e, input), 200);
+        UUID id =
+                db.queryForObject(
+                        "SELECT id FROM staff_time_requests WHERE user_id=?",
+                        UUID.class,
+                        employee.getId());
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "APPROVE",
+                                "version",
+                                0,
+                                "reason",
+                                "Reviewed incident evidence")),
+                422);
+        status(
+                call(
+                        "POST",
+                        "/workplace/time/requests/" + id + "/review",
+                        m,
+                        Map.of(
+                                "action",
+                                "APPROVE",
+                                "version",
+                                0,
+                                "reason",
+                                "Reviewed incident evidence",
+                                "exceptionReason",
+                                "Approved emergency exception with incident log")),
+                200);
+        assertThat(
+                        db.queryForObject(
+                                "SELECT approval_mode FROM staff_time_requests WHERE id=?",
+                                String.class,
+                                id))
+                .isEqualTo("EXCEPTION");
     }
 }

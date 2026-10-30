@@ -107,6 +107,7 @@ android {
 
     namespace "com.workspheremobile"
     defaultConfig {
+        buildConfigField "boolean", "BUNDLED_LOCAL", "false"
         applicationId "com.workspheremobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -128,6 +129,21 @@ android {
             def debugUrl = debugProp ? normalizeAndValidateApiUrl(debugProp, false) : "http://10.0.2.2:18120/api/v1"
             buildConfigField "String", "API_BASE_URL", "\"${debugUrl}\""
         }
+        localDemo {
+            initWith debug
+            matchingFallbacks = ['debug']
+            // A bundled, debug-signed local test client. Production release keeps HTTPS requirements.
+            buildConfigField "boolean", "BUNDLED_LOCAL", "true"
+            def localUrl = normalizeAndValidateApiUrl(project.findProperty("WORKSPHERE_API_BASE_URL")?.toString() ?: "http://127.0.0.1:18120/api/v1", false)
+            if (gradle.startParameter.taskNames.any { it.toLowerCase().contains("localdemo") }) {
+                def parsed = new URI(localUrl)
+                if (parsed.scheme != 'http' || !(parsed.host in ['127.0.0.1', 'localhost', '10.0.2.2'])) {
+                    throw new GradleException("Local demo accepts only loopback/emulator HTTP. Use HTTPS production release for a hosted backend.")
+                }
+            }
+            buildConfigField "String", "API_BASE_URL", "\"${localUrl}\""
+            manifestPlaceholders = [usesCleartextTraffic: "false"]
+        }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
@@ -148,6 +164,12 @@ android {
             } else {
                 buildConfigField "String", "API_BASE_URL", "\"\""
             }
+        }
+    }
+    sourceSets {
+        localDemo {
+            manifest.srcFile 'src/debug/AndroidManifest.xml'
+            res.srcDirs = ['src/debug/res']
         }
     }
 }

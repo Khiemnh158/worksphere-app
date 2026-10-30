@@ -60,14 +60,17 @@ export function Copy({
   children,
   muted = false,
   title = false,
+  selectable = false,
 }: {
   children: ReactNode;
   muted?: boolean;
   title?: boolean;
+  selectable?: boolean;
 }) {
   const { colors } = useAppTheme();
   return (
     <Text
+      selectable={selectable}
       style={{
         color: muted ? colors.textSecondary : colors.textPrimary,
         fontSize: title ? 22 : 14,

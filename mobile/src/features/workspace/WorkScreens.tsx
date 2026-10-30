@@ -88,6 +88,13 @@ export function HomeScreen() {
               onPress={() => navigation.navigate('CreateTicket')}
             />
           </Card>
+          <Button
+            title="Chấm công hôm nay →"
+            secondary
+            onPress={() =>
+              navigation.navigate('WorkspaceTabs', { screen: 'Time' })
+            }
+          />
           <Copy title>Lịch cần làm</Copy>
           <Copy muted>
             Sắp xếp theo hạn công việc thật. Hôm nay và các ngày tới.

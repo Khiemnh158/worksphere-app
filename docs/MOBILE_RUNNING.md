@@ -1,3 +1,15 @@
+# Bản Android localDemo hiện hành
+
+Đã có APK chứa giao diện, không cần Metro, cho arm64-v8a và x86_64. Backend local/USB vẫn cần; chưa phải production/iOS. Đọc [cách chạy từ clone](FRESH_CLONE_RUNNING.md), dùng scripts/run-android-local.ps1. Bản thử chỉ loopback; release vẫn yêu cầu HTTPS.
+
+Trên máy tác giả: outputs/WorkSphere-Android-local-demo.apk. Native build qua ổ subst: đặt WORKSPHERE_JS_ROOT trỏ đường dẫn mobile gốc cho Metro; Gradle vẫn chạy trên ổ ngắn.
+
+Có trạng thái công/OT, cảnh báo mạng, khoảng nghỉ cụ thể và màn bảo mật TOTP/đổi mật khẩu/logout mọi thiết bị. Hồ sơ vẫn đọc; tệp/deep link/push còn TODO. Xem reports/ATTENDANCE_INCREMENT_2026-10-30.md.
+
+## Hướng dẫn debug dùng Metro trước đây
+
+Phần dưới giữ cho phát triển/debug, không phải yêu cầu chạy localDemo.
+
 # Chạy Android cùng cổng web hiện hành
 
 ## Trên máy làm đồ án hiện tại

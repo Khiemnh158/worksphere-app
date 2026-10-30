@@ -32,6 +32,79 @@ const request = {
   request_type: 'OVERTIME',
   canReview: true,
 };
+beforeEach(() => jest.clearAllMocks());
+
+test('an open IN only exposes the server-provided OUT action and preserves the saved punch', async () => {
+  (workspaceApi.time as jest.Mock).mockResolvedValue({
+    attendance: [],
+    balances: [],
+    requests: [],
+    today: {
+      status: 'WORKING',
+      actions: ['OUT'],
+      message: 'Giờ máy chủ',
+      calendar: null,
+      punches: [
+        {
+          id: 'p',
+          punch_type: 'IN',
+          recorded_at: '2030-05-06T01:00:00Z',
+          network_status: 'UNCONFIGURED',
+        },
+      ],
+    },
+  });
+  const ui = await render(
+    <ThemeProvider theme={theme}>
+      <TimeScreen />
+    </ThemeProvider>,
+  );
+  await waitFor(() => expect(ui.getByText('Đã vào — chưa ra ca')).toBeTruthy());
+  expect(ui.getByText('Quét QR · Ra ca')).toBeTruthy();
+  expect(ui.queryByText('Quét QR · Vào ca')).toBeNull();
+  expect(ui.queryByText('Quét QR · Bắt đầu OT')).toBeNull();
+  expect(ui.getByText(/Có cảnh báo mạng, chờ xác minh/)).toBeTruthy();
+});
+
+test('network acknowledgement starts false and is transmitted only after an explicit review choice', async () => {
+  const record = {
+    ...request,
+    id: 'record',
+    network_review_required: true,
+    regular_minutes: 180,
+  };
+  (workspaceApi.time as jest.Mock).mockResolvedValue({
+    attendance: [record],
+    balances: [],
+    requests: [],
+  });
+  (workspaceApi.reviewTime as jest.Mock).mockResolvedValue(null);
+  const ui = await render(
+    <ThemeProvider theme={theme}>
+      <TimeScreen />
+    </ThemeProvider>,
+  );
+  await waitFor(() => expect(ui.getByText('Tôi được duyệt')).toBeTruthy());
+  await fireEvent.press(ui.getByText('Tôi được duyệt'));
+  await fireEvent.press(ui.getByText('Đồng ý'));
+  expect(ui.getByText('Chưa xác minh mạng')).toBeTruthy();
+  await fireEvent.changeText(
+    ui.getByLabelText('Lý do / kết quả kiểm tra'),
+    'Đã hỏi nhân viên và xác minh tại văn phòng',
+  );
+  await fireEvent.press(ui.getByText('Đã xác minh mạng, ghi căn cứ'));
+  await fireEvent.press(ui.getByText('Xác nhận'));
+  expect(workspaceApi.reviewTime).toHaveBeenCalledWith(
+    record,
+    true,
+    'APPROVE',
+    expect.stringContaining('Đã hỏi'),
+    undefined,
+    true,
+    undefined,
+  );
+});
+
 test('review identifies the employee and sends only that record/version after an explicit reason', async () => {
   (workspaceApi.time as jest.Mock).mockResolvedValue({
     attendance: [],
@@ -72,6 +145,8 @@ test('review identifies the employee and sends only that record/version after an
     false,
     'APPROVE',
     expect.stringContaining('Đã kiểm tra'),
+    undefined,
+    false,
     undefined,
   );
 });

@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Alert, NativeModules, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { normalizeError } from '../../shared/api/apiError';
-import { TimeRow, workspaceApi } from './api';
+import { PunchAction, TimeRow, workspaceApi } from './api';
 import { useWorkplace, WorkspaceNavigation } from './WorkspaceNavigator';
 import { Button, Card, Choices, Copy, Field, Page, useLoad } from './ui';
 import {
@@ -31,7 +31,15 @@ export function TimeScreen() {
   } | null>(null);
   const [reason, setReason] = useState('');
   const [actual, setActual] = useState('');
-  async function scan(type: 'IN' | 'OUT') {
+  const [acknowledgeNetwork, setAcknowledgeNetwork] = useState(false);
+  const [exceptionReason, setExceptionReason] = useState('');
+  const punchLabels: Record<PunchAction, string> = {
+    IN: 'Vào ca',
+    OUT: 'Ra ca',
+    OT_IN: 'Bắt đầu OT',
+    OT_OUT: 'Kết thúc OT',
+  };
+  async function scan(type: PunchAction) {
     if (busy) return;
     if (Platform.OS !== 'android' || !NativeModules.WorkplaceDevice?.scanQr) {
       setError('Camera QR hiện có trong bản Android.');
@@ -47,9 +55,9 @@ export function TimeScreen() {
       );
       if (!saved) return;
       setMessage(
-        `${type === 'IN' ? 'Vào ca' : 'Ra ca'} · ${dateTime(
-          saved.recordedAt,
-        )}. ${saved.message}`,
+        `${punchLabels[type]} · ${dateTime(saved.recordedAt)}. ${
+          saved.message
+        }`,
       );
       await state.refresh();
     } catch (e) {
@@ -58,9 +66,9 @@ export function TimeScreen() {
       setBusy(false);
     }
   }
-  function beginScan(type: 'IN' | 'OUT') {
+  function beginScan(type: PunchAction) {
     Alert.alert(
-      type === 'IN' ? 'Chấm vào ca' : 'Chấm ra ca',
+      punchLabels[type],
       'Quét QR đang hiển thị tại điểm chấm công. Lượt chấm được gửi ngay theo thời gian máy chủ.',
       [
         { text: 'Hủy', style: 'cancel' },
@@ -87,6 +95,8 @@ export function TimeScreen() {
         review.action,
         reason.trim(),
         review.action === 'CONFIRM' ? Number(actual) : undefined,
+        acknowledgeNetwork,
+        exceptionReason || undefined,
       );
       setReview(null);
       setReason('');
@@ -114,6 +124,23 @@ export function TimeScreen() {
             {label(row.status)} ·{' '}
             {record ? row.regular_minutes : row.requested_minutes} phút
           </Copy>
+          {!!row.clock_in && (
+            <Copy muted>
+              Vào {dateTime(row.clock_in)} · Ra {dateTime(row.clock_out)}
+            </Copy>
+          )}
+          {record && (
+            <Copy muted>
+              Muộn {row.late_minutes ?? 0} phút · Về sớm{' '}
+              {row.early_minutes ?? 0} phút
+            </Copy>
+          )}
+          {row.network_review_required && (
+            <Copy>Cần xác minh mạng trước khi duyệt.</Copy>
+          )}
+          {!!row.exception_reason && (
+            <Copy>Ngoại lệ OT: {row.exception_reason}</Copy>
+          )}
           {!!row.reason && <Copy>{row.reason}</Copy>}
           {row.canReview && row.status === 'PENDING' && (
             <>
@@ -122,6 +149,8 @@ export function TimeScreen() {
                 title="Đồng ý"
                 onPress={() => {
                   setReview({ row, record, action: 'APPROVE' });
+                  setAcknowledgeNetwork(false);
+                  setExceptionReason('');
                   setError('');
                 }}
               />
@@ -130,6 +159,8 @@ export function TimeScreen() {
                 title="Từ chối"
                 onPress={() => {
                   setReview({ row, record, action: 'REJECT' });
+                  setAcknowledgeNetwork(false);
+                  setExceptionReason('');
                   setError('');
                 }}
               />
@@ -143,6 +174,8 @@ export function TimeScreen() {
                 secondary
                 onPress={() => {
                   setReview({ row, record, action: 'CONFIRM' });
+                  setAcknowledgeNetwork(false);
+                  setExceptionReason('');
                   setActual(String(row.requested_minutes));
                   setError('');
                 }}
@@ -164,17 +197,52 @@ export function TimeScreen() {
           Mã đổi liên tục. Chỉ chấm cho chính bạn; không chọn thời gian hay
           người khác.
         </Copy>
-        <Button
-          title="Quét QR · Vào ca"
-          busy={busy}
-          onPress={() => beginScan('IN')}
-        />
-        <Button
-          title="Quét QR · Ra ca"
-          secondary
-          busy={busy}
-          onPress={() => beginScan('OUT')}
-        />
+        <Copy>
+          {(
+            {
+              NOT_STARTED: 'Chưa vào ca',
+              WORKING: 'Đã vào — chưa ra ca',
+              COMPLETED: 'Đã kết thúc ca',
+            } as Record<string, string>
+          )[state.data?.today?.status ?? ''] ??
+            'Đang kiểm tra trạng thái máy chủ'}
+        </Copy>
+        {state.data?.today?.calendar && (
+          <Copy muted>
+            Ca {state.data.today.calendar.shift_start}–
+            {state.data.today.calendar.shift_end} · Nghỉ{' '}
+            {state.data.today.calendar.break_start ?? 'chưa cấu hình'}–
+            {state.data.today.calendar.break_end ?? ''}
+          </Copy>
+        )}
+        <Copy muted>{state.data?.today?.message}</Copy>
+        {!!state.data?.today && (
+          <Copy muted>
+            Muộn {state.data.today.lateMinutes ?? 0} phút · Về sớm{' '}
+            {state.data.today.earlyMinutes ?? 0} phút. Đây là số phút theo lịch,
+            không tự sinh khoản phạt.
+          </Copy>
+        )}
+        {(state.data?.today?.actions ?? []).map(action => (
+          <Button
+            key={action}
+            title={'Quét QR · ' + punchLabels[action]}
+            busy={busy}
+            onPress={() => beginScan(action)}
+          />
+        ))}
+        {(state.data?.today?.punches ?? []).map(p => (
+          <Copy key={p.id}>
+            {punchLabels[p.punch_type]} · {dateTime(p.recorded_at)} ·{' '}
+            {p.network_status === 'MATCH'
+              ? 'Khớp mạng cấu hình'
+              : 'Có cảnh báo mạng, chờ xác minh'}
+          </Copy>
+        ))}
+        <Copy muted>
+          OT chỉ hiện trong khoảng được duyệt; quét muộn không tự cộng tiền.
+          Không tự sửa giờ hoặc chấm offline.
+        </Copy>
         <Copy muted>
           Mất mạng hoặc mã hết hạn: quét lại khi kết nối được; không lưu lượt
           chấm giả trên máy.
@@ -232,6 +300,27 @@ export function TimeScreen() {
             onChange={setReason}
             multiline
           />
+          {(review.row.network_review_required ||
+            review.action === 'CONFIRM') && (
+            <Choices
+              value={String(acknowledgeNetwork)}
+              onChange={value => setAcknowledgeNetwork(value === 'true')}
+              values={[
+                { id: 'false', name: 'Chưa xác minh mạng' },
+                { id: 'true', name: 'Đã xác minh mạng, ghi căn cứ' },
+              ]}
+            />
+          )}
+          {!review.record &&
+            review.row.request_type === 'OVERTIME' &&
+            review.action === 'APPROVE' && (
+              <Field
+                label="Căn cứ duyệt OT ngoại lệ sau giờ bắt đầu (nếu có)"
+                value={exceptionReason}
+                onChange={setExceptionReason}
+                multiline
+              />
+            )}
           {review.action === 'CONFIRM' && (
             <Field
               label="Số phút thực tế"
@@ -276,6 +365,7 @@ export function TimeRequestScreen() {
   const [end, setEnd] = useState('17:00');
   const [minutes, setMinutes] = useState('480');
   const [reason, setReason] = useState('');
+  const [exceptionReason, setExceptionReason] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   async function submit() {
@@ -311,6 +401,7 @@ export function TimeRequestScreen() {
         reason.trim(),
         startsAt.toISOString(),
         endsAt.toISOString(),
+        exceptionReason.trim() || undefined,
       );
       navigation.goBack();
     } catch (e) {
@@ -353,6 +444,14 @@ export function TimeRequestScreen() {
         onChange={setReason}
         multiline
       />
+      {type === 'OVERTIME' && (
+        <Field
+          label="Giải trình OT phát sinh sau giờ bắt đầu (nếu có)"
+          value={exceptionReason}
+          onChange={setExceptionReason}
+          multiline
+        />
+      )}
       <Button title="Gửi đơn" busy={busy} onPress={() => void submit()} />
     </Page>
   );

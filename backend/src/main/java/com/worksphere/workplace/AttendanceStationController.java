@@ -3,6 +3,8 @@ package com.worksphere.workplace;
 import com.worksphere.shared.response.ApiResponse;
 import com.worksphere.shared.security.WorkSphereUserPrincipal;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,10 +46,17 @@ public class AttendanceStationController {
         return ApiResponse.success(service.challenge(id, p));
     }
 
+    @GetMapping("/today")
+    public ApiResponse<?> today(@AuthenticationPrincipal WorkSphereUserPrincipal p) {
+        return ApiResponse.success(service.today(p));
+    }
+
     @PostMapping("/punches")
     public ApiResponse<?> punch(
             @RequestBody AttendanceStationService.Punch r,
-            @AuthenticationPrincipal WorkSphereUserPrincipal p) {
-        return ApiResponse.success(service.punch(r, p));
+            @AuthenticationPrincipal WorkSphereUserPrincipal p,
+            HttpServletRequest request) {
+        // Do not trust a client-supplied X-Forwarded-For header as presence evidence.
+        return ApiResponse.success(service.punch(r, p, request.getRemoteAddr()));
     }
 }

@@ -1,3 +1,14 @@
+# Cập nhật tiếp tục — 30/10/2026
+
+Đã bổ sung chấm công/QR/mạng văn phòng, khoảng nghỉ cụ thể, trạng thái IN mở và OT riêng có duyệt trước/ngoại lệ. Mobile có màn bảo mật và bản localDemo chứa bundle, không cần Metro; vẫn cần backend local/USB. Lịch hiện là lịch chung doanh nghiệp, chưa có ca riêng từng người.
+
+- 150 backend tests chọn lọc đạt, gồm 56 PostgreSQL; Maven package thành công.
+- Toàn bộ mobile 92 suites/822 tests đạt; TypeScript đạt, lint nguồn thay đổi 0 lỗi/31 cảnh báo.
+- Web đã kiểm tra lượt quét đang mở và bổ sung khoảng nghỉ 11:30–12:30 do người dùng chọn; không tự cấu hình mạng/IP văn phòng.
+- Script chạy cho máy khác nằm trong repo; đã thử database/cổng riêng và lifecycle. Xem docs/FRESH_CLONE_RUNNING.md, docs/ATTENDANCE_POLICY.md và TODO.md cho giới hạn.
+
+## Trạng thái trước đợt này
+
 # Hiện hành 30/10/2026 — web qua cổng kiểm tra, Android đã bắt đầu
 
 Web giai đoạn 2 đủ điều kiện nối mobile trong phạm vi đồ án, chưa phải production hoặc nghiệm thu toàn bộ mã kế thừa. Đã sửa kiểm tra mật khẩu trước trạng thái tài khoản, nhãn thao tác công việc và enum ưu tiên hỗ trợ; thêm API thu nhập chỉ của chính mình đã phát hành.

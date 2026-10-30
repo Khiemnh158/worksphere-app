@@ -14,7 +14,7 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [x] Công/nghỉ/OT/đối soát thay; bảng lương lập/duyệt độc lập, phát hành khóa nguồn, điều chỉnh bổ sung; không tự phạt/chuyển tiền.
 - [x] Điểm QR xoay vòng, hạn mã/thời gian máy chủ, chặn OUT thiếu IN/trùng/điểm đóng/kỳ khóa.
 - [x] Sáng/tối, logo mở điều hướng, cuộn menu độc lập, reduced-motion, biểu mẫu mở lại sau hủy.
-- [x] Rà soát mới: 142 backend tests chọn lọc (52 PostgreSQL), 5 tests phiên web, package thành công; sửa lộ trạng thái login khi sai mật khẩu và nhãn hủy công việc.
+- [x] Rà soát mới: 150 backend tests chọn lọc (56 PostgreSQL), 5 tests phiên web, package thành công; sửa lộ trạng thái login khi sai mật khẩu và nhãn hủy công việc.
 - [x] Khởi động bản mới; kiểm tra UI Admin, tài khoản/chức vụ, nhân viên, bàn giao giữ 65%, mở → hủy → mở biểu mẫu.
 
 Đủ điều kiện bắt đầu mobile trong phạm vi đồ án. Xem [báo cáo cổng web](reports/WEB_READINESS_2026-10-30.md).
@@ -28,20 +28,22 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [x] Công/nghỉ/OT/sửa công; xem và duyệt theo canReview, phiên bản; OT phải xác nhận thực tế.
 - [x] Bridge camera QR Android; chặn mã sai, hủy camera không chấm, kết quả camera sau đổi phiên bị bỏ. Đã mở camera trên giả lập.
 - [x] Thông báo trong app, danh bạ phòng 20/trang, hồ sơ đọc, phiếu thu nhập của chính mình đã phát hành; che số tiền mặc định.
-- [x] TypeScript; toàn bộ 91 suites/810 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
+- [x] TypeScript; toàn bộ 92 suites/822 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
 - [x] Ghi chú Android → web đồng bộ; công việc bàn giao giữ 65%. Khôi phục Wrapper chính thức, ghim checksum.
 - [ ] Nghiệm thu camera quét QR đang xoay và lượt IN/OUT trên điện thoại thật; thử mất mạng, hết hạn, trùng lượt bằng thiết bị. Test backend cho các điều kiện này đã có, không thay thế thử thiết bị.
 - [ ] Tải lên/xem/tải tệp đính kèm mobile; hiện chỉ có metadata tệp công việc, thao tác tệp trên web.
-- [ ] Đổi thông tin hồ sơ/MFA/quản lý phiên trực tiếp trên mobile, deep link OS; hiện cấu hình bảo mật qua web, kích hoạt/reset dán liên kết.
+- [x] Mobile: đổi mật khẩu, thiết lập/bật/tắt TOTP, mã dự phòng một lần và đăng xuất mọi thiết bị; che secrets khi background/blur, không giả báo remote logout thành công khi mất mạng.
+- [ ] Sửa hồ sơ trực tiếp và deep link OS; hiện hồ sơ đọc, kích hoạt/reset bằng dán liên kết.
 - [ ] Push khi ứng dụng đóng/realtime; hiện làm mới khi focus/foreground hoặc bấm cập nhật.
 - [ ] Điều phối hỗ trợ mở rộng (chuyển phòng/đề nghị hủy/đổi người kèm rà soát), tạo/sửa việc từ mobile nếu chốt cần mang khỏi web. Hiện thực hiện đầy đủ trên web, không hiện nút giả.
 - [x] Build/cài Android debug arm64-v8a trên OPPO thật qua USB; vẫn phụ thuộc Metro/backend local. Đã xác nhận lượt IN bằng camera điện thoại thật trong môi trường thử local; OUT còn chờ.
-- [ ] Release signing/APK chạy độc lập Metro và iOS trên macOS; chưa nghiệm thu.
+- [x] APK localDemo arm64-v8a + x86_64 chứa bundle, tắt dev support, chỉ loopback; đăng nhập và xem công trên giả lập khi Metro tắt. Backend local/USB vẫn cần.
+- [ ] Production release signing/HTTPS hosted API và iOS trên macOS; chưa nghiệm thu.
 
 ## Còn nghiệm thu / chưa kiểm chứng
 
 - [ ] Người dùng nghiệm thu UI/quy trình; rubric chính thức môn Lập trình nâng cao chưa được cung cấp.
-- [ ] Toàn bộ legacy Testcontainers trên Docker; audit hết project/task/assets kế thừa. 142 tests không đại diện toàn bộ suite.
+- [ ] Toàn bộ legacy Testcontainers trên Docker; audit hết project/task/assets kế thừa. 150 tests không đại diện toàn bộ suite.
 - [ ] Thử tải/phân trang hồ sơ/nhật ký còn giới hạn 200 và bộ chọn 1000 nếu mở rộng quy mô.
 - [ ] Release signing, HTTPS/SMTP thật, backup/restore, CI triển khai hai repo chuyên đề.
 - [ ] Thuế/BHXH/thực lĩnh/ca đêm/vân tay/SSO chỉ mở khi có yêu cầu/chính sách cụ thể; hiện chưa làm.
@@ -50,13 +52,17 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 
 Kiểm tra hạn mức thực sau mỗi chặng. Khi một cửa sổ còn ≤5%, dừng, lưu trạng thái/việc tiếp theo và báo người dùng. Chờ người dùng yêu cầu mới tiếp tục.
 
-## Rà soát sau khi người dùng thử QR thật
+## Chấm công sau rà soát — đã triển khai, còn nghiệm thu thiết bị
 
-- [x] Camera điện thoại thật → API → PostgreSQL: IN đã lưu trong môi trường thử local. Chi tiết nhận dạng/giờ hoạt động giữ trên máy. Không nhận là đã nghiệm thu OUT hoặc chống gian lận đầy đủ.
-- [ ] Hiển thị lượt IN đang mở trên web/mobile; hiện bảng công chỉ tạo sau OUT, nên chỉ IN sẽ chưa xuất hiện trong attendance_records.
-- [ ] Chốt chính sách cửa sổ/ca/điểm QR và ghi nhật ký quản lý điểm; hiện người có TIME_REVIEW mở điểm hoạt động là sinh mã, chưa có giới hạn giờ mở tự động.
-- [ ] Hiển thị đi muộn/về sớm theo giờ máy chủ, chính sách dung sai; không tự phạt. Hiện có timestamp/cắt công trong ca nhưng chưa báo cáo late/early riêng.
-- [ ] Chốt chính sách OT phải duyệt trước hoặc xử lý ngoại lệ có căn cứ; hiện duyệt + xác nhận thực tế + công đã duyệt, nhưng chưa buộc đơn tạo trước giờ OT.
-- [ ] Rà soát khoảng nghỉ thực tế: QR hiện trừ toàn bộ break_minutes từ giao khoảng IN/OUT với ca; cần lịch khoảng nghỉ để xử lý đúng ca ngắn.
+- [x] Hiển thị IN đang mở, trạng thái/actions theo máy chủ, late/early và khoảng nghỉ cụ thể trên web/mobile.
+- [x] Giờ mở điểm, IP/CIDR dạng số; bỏ qua header IP tự khai, cảnh báo chưa cấu hình/khác mạng, thông báo trưởng phòng; người duyệt phải xác minh rõ.
+- [x] Lưu timestamp/IP/cảnh báo của lượt; thay cấu hình đóng điểm làm hết hạn QR, không ghi đè nguồn công đã có.
+- [x] OT duyệt trước/ngoại lệ có căn cứ, cặp quét OT riêng, không vượt phút thực tế trong khoảng duyệt, không tự cộng tiền do ra muộn.
+- [x] Công thường chỉ trừ phần nghỉ giao với thời gian làm; lịch cũ phải bổ sung giờ nghỉ, không tự đoán hoặc sửa nguồn đã duyệt.
+- [x] Script khởi động web và Android nằm trong repo; thử trên database/cổng riêng, nhận lại tiến trình và Stop riêng; Maven Wrapper đã xác minh.
+- [ ] Nghiệm thu OUT/cảnh báo mạng/OT bằng điện thoại thật trên bản mới; hiện đã kiểm IN thật và các nhánh nghiệp vụ bằng PostgreSQL tests.
+- [ ] Lịch riêng/ca khác nhau theo từng nhân viên; hiện lịch công chung doanh nghiệp. Ca đêm vẫn ngoài phạm vi hiện tại.
+- [ ] Biểu mẫu giải trình riêng gắn từng punch; hiện căn cứ ở quyết định đối soát/đơn bổ sung, kèm thông báo người phụ trách.
+- [ ] Phân trang punches (đang giới hạn 1000/kỳ) và giám sát tải khi mở rộng.
 
-QR đổi 30 giây, token hạn 40 giây; không chứng minh người quét thật sự ở văn phòng hoặc đang làm việc. Chia sẻ mã tức thời/đưa tài khoản cho người khác vẫn là giới hạn. Các mục chính sách phía trên chưa được triển khai/chốt thông số.
+Đọc docs/ATTENDANCE_POLICY.md và docs/FRESH_CLONE_RUNNING.md. Không khẳng định QR/IP chứng minh hiện diện tuyệt đối; không tự phạt tiền. Các chính sách/mạng thật chưa cung cấp không được tự giả định.

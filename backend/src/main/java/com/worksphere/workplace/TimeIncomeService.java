@@ -19,10 +19,14 @@ import java.util.*;
 @Transactional
 public class TimeIncomeService {
     private static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+    @org.springframework.beans.factory.annotation.Autowired private Clock clock;
     private final JdbcTemplate db;
 
     @org.springframework.beans.factory.annotation.Autowired
     private com.worksphere.organization.application.ApprovalPolicy authority;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private AttendanceStationService attendanceStation;
 
     private final WorkplaceService access;
     private final DepartmentRouting routing;
@@ -39,7 +43,10 @@ public class TimeIncomeService {
             String shiftStart,
             String shiftEnd,
             int breakMinutes,
-            List<LocalDate> holidays) {}
+            List<LocalDate> holidays,
+            String breakStart,
+            String breakEnd,
+            Integer lateGraceMinutes) {}
 
     public record ImportRow(
             UUID userId,
@@ -55,9 +62,26 @@ public class TimeIncomeService {
             Instant startsAt,
             Instant endsAt,
             int requestedMinutes,
-            String reason) {}
+            String reason,
+            String exceptionReason) {
+        public TimeInput(
+                String type,
+                LocalDate day,
+                Instant start,
+                Instant end,
+                int minutes,
+                String reason) {
+            this(type, day, start, end, minutes, reason, null);
+        }
+    }
 
-    public record Review(String action, String reason, Integer actualMinutes, Long version) {}
+    public record Review(
+            String action,
+            String reason,
+            Integer actualMinutes,
+            Long version,
+            Boolean acknowledgeNetwork,
+            String exceptionReason) {}
 
     public record BalanceInput(UUID userId, int year, int allowanceMinutes, String reason) {}
 
@@ -239,6 +263,23 @@ public class TimeIncomeService {
                 || minutes > 480
                 || input.breakMinutes() < 0)
             throw bad("Ca ban ngày có thời gian làm việc từ 1 đến 480 phút");
+        LocalTime breakStart = null, breakEnd = null;
+        try {
+            if (input.breakMinutes() > 0) {
+                breakStart = LocalTime.parse(input.breakStart());
+                breakEnd = LocalTime.parse(input.breakEnd());
+                if (breakStart.isBefore(start)
+                        || breakEnd.isAfter(end)
+                        || !breakEnd.isAfter(breakStart)
+                        || Duration.between(breakStart, breakEnd).toMinutes()
+                                != input.breakMinutes()) throw new IllegalArgumentException();
+            }
+        } catch (Exception ex) {
+            throw bad("Khoảng nghỉ cụ thể phải nằm trong ca và bằng số phút nghỉ đã chọn");
+        }
+        int grace = input.lateGraceMinutes() == null ? 0 : input.lateGraceMinutes();
+        if (grace < 0 || grace > 120)
+            throw bad("Dung sai đi muộn từ 0 đến 120 phút, không thay đổi phút công thực tế");
         Set<LocalDate> holidays =
                 new HashSet<>(input.holidays() == null ? List.of() : input.holidays());
         if (holidays.stream().anyMatch(d -> !YearMonth.from(d).equals(month)))
@@ -261,18 +302,47 @@ public class TimeIncomeService {
             LocalDate date = month.atDay(n);
             boolean scheduled = input.weekdays().contains(date.getDayOfWeek().getValue());
             String kind = holidays.contains(date) ? "HOLIDAY" : scheduled ? "NORMAL" : "WEEKLY_OFF";
+            boolean hasPunch =
+                    db.queryForObject(
+                            "SELECT EXISTS(SELECT 1 FROM attendance_punches WHERE work_date=?)",
+                            Boolean.class,
+                            java.sql.Date.valueOf(date));
+            if (hasPunch) {
+                var old =
+                        one(
+                                "SELECT * FROM work_calendar WHERE work_date=?",
+                                java.sql.Date.valueOf(date));
+                if (!kind.equals(old.get("day_kind"))
+                        || ((Number) old.get("normal_minutes")).intValue()
+                                != (scheduled ? minutes : 0)
+                        || !java.sql.Time.valueOf(start).equals(old.get("shift_start"))
+                        || !java.sql.Time.valueOf(end).equals(old.get("shift_end"))
+                        || ((Number) old.get("break_minutes")).intValue() != input.breakMinutes()
+                        || old.get("break_start") != null
+                                && (!java.sql.Time.valueOf(breakStart)
+                                                .equals(old.get("break_start"))
+                                        || !java.sql.Time.valueOf(breakEnd)
+                                                .equals(old.get("break_end")))
+                        || ((Number) old.get("late_grace_minutes")).intValue() != grace)
+                    throw bad(
+                            "Ngày đã có lượt quét; chỉ bổ sung khoảng nghỉ còn thiếu, không đổi"
+                                    + " lịch nguồn");
+            }
             db.update(
                     "INSERT INTO"
-                        + " work_calendar(work_date,day_kind,normal_minutes,shift_start,shift_end,break_minutes,configured_by)"
-                        + " VALUES (?,?,?,?,?,?,?) ON CONFLICT(work_date) DO UPDATE SET"
-                        + " day_kind=excluded.day_kind,normal_minutes=excluded.normal_minutes,shift_start=excluded.shift_start,shift_end=excluded.shift_end,break_minutes=excluded.break_minutes,configured_by=excluded.configured_by,configured_at=now()",
+                        + " work_calendar(work_date,day_kind,normal_minutes,shift_start,shift_end,break_minutes,configured_by,break_start,break_end,late_grace_minutes)"
+                        + " VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(work_date) DO UPDATE SET"
+                        + " day_kind=excluded.day_kind,normal_minutes=excluded.normal_minutes,shift_start=excluded.shift_start,shift_end=excluded.shift_end,break_minutes=excluded.break_minutes,configured_by=excluded.configured_by,configured_at=now(),break_start=excluded.break_start,break_end=excluded.break_end,late_grace_minutes=excluded.late_grace_minutes",
                     java.sql.Date.valueOf(date),
                     kind,
                     scheduled ? minutes : 0,
                     java.sql.Time.valueOf(start),
                     java.sql.Time.valueOf(end),
                     input.breakMinutes(),
-                    actor);
+                    actor,
+                    breakStart == null ? null : java.sql.Time.valueOf(breakStart),
+                    breakEnd == null ? null : java.sql.Time.valueOf(breakEnd),
+                    grace);
         }
         audit(actor, null, "TIME_CALENDAR_CONFIGURED");
     }
@@ -351,7 +421,10 @@ public class TimeIncomeService {
                                         (UUID) r.get("department_id"),
                                         (UUID) r.get("user_id"),
                                         actor));
-        return result;
+        var extended = new LinkedHashMap<>(result);
+        extended.put("punches", attendanceStation.punches(monthText, p));
+        extended.put("today", attendanceStation.today(p));
+        return extended;
     }
 
     public void importAttendance(List<ImportRow> rows, WorkSphereUserPrincipal p) {
@@ -366,7 +439,7 @@ public class TimeIncomeService {
                 rows.stream()
                         .sorted(Comparator.comparing(r -> r.userId() + ":" + r.workDate()))
                         .toList()) {
-            if (row.clockOut() == null || row.clockOut().isAfter(Instant.now()))
+            if (row.clockOut() == null || row.clockOut().isAfter(Instant.now(clock)))
                 throw bad("Không nhập công cho thời điểm chưa xảy ra");
             eligibleHistorical(row.userId(), row.clockOut());
             long duration = interval(row.workDate(), row.clockIn(), row.clockOut());
@@ -447,7 +520,8 @@ public class TimeIncomeService {
         if (!Set.of("LEAVE_PAID", "LEAVE_UNPAID", "OVERTIME", "TIME_CORRECTION")
                 .contains(input.requestType() == null ? "" : input.requestType()))
             throw bad("Loại đơn không hợp lệ");
-        if ("TIME_CORRECTION".equals(input.requestType()) && input.endsAt().isAfter(Instant.now()))
+        if ("TIME_CORRECTION".equals(input.requestType())
+                && input.endsAt().isAfter(Instant.now(clock)))
             throw bad("Chỉ bổ sung công cho thời gian đã xảy ra");
         if (input.requestedMinutes() <= 0
                 || input.requestedMinutes() > duration
@@ -474,6 +548,15 @@ public class TimeIncomeService {
                         java.sql.Date.valueOf(input.workDate()),
                         input.requestType())))
             throw bad("Đã có đơn cùng loại trong ngày đang được xử lý");
+        if ("OVERTIME".equals(input.requestType())
+                && !input.startsAt().isAfter(Instant.now(clock))
+                && (input.exceptionReason() == null
+                        || input.exceptionReason().trim().length() < 10))
+            throw bad(
+                    "OT phát sinh sau giờ bắt đầu cần giải trình ngoại lệ ít nhất 10 ký tự và người"
+                            + " khác phê duyệt");
+        if (input.exceptionReason() != null && input.exceptionReason().length() > 2000)
+            throw bad("Giải trình tối đa 2000 ký tự");
         UUID id = UUID.randomUUID();
         db.update(
                 "INSERT INTO"
@@ -490,6 +573,11 @@ public class TimeIncomeService {
                 reason(input.reason()),
                 actor);
         routing.notifyTimeApprovers(department, subject, id);
+        if (input.exceptionReason() != null)
+            db.update(
+                    "UPDATE staff_time_requests SET exception_reason=? WHERE id=?",
+                    input.exceptionReason().trim(),
+                    id);
         audit(actor, id, "TIME_REQUEST_CREATED");
     }
 
@@ -515,6 +603,10 @@ public class TimeIncomeService {
         if (!"PENDING".equals(row.get("status"))) throw bad("Bản ghi đã được đối soát");
         if (!Set.of("APPROVE", "REJECT").contains(input.action() == null ? "" : input.action()))
             throw bad("Thao tác không hợp lệ");
+        if ("APPROVE".equals(input.action())
+                && Boolean.TRUE.equals(row.get("network_review_required"))
+                && !Boolean.TRUE.equals(input.acknowledgeNetwork()))
+            throw bad("Cần xác nhận đã kiểm tra cảnh báo mạng trước khi duyệt công");
         if ("APPROVE".equals(input.action())
                 && Boolean.TRUE.equals(
                         db.queryForObject(
@@ -554,7 +646,7 @@ public class TimeIncomeService {
         String note = reason(input.reason()), type = (String) row.get("request_type");
         int minutes = ((Number) row.get("requested_minutes")).intValue();
         if ("CONFIRM".equals(input.action())) {
-            if (instant(row.get("ends_at")).isAfter(Instant.now()))
+            if (instant(row.get("ends_at")).isAfter(Instant.now(clock)))
                 throw bad("Chưa đến thời điểm xác nhận thực tế tăng ca");
             if (!"OVERTIME".equals(type)
                     || !"APPROVED".equals(row.get("status"))
@@ -563,18 +655,47 @@ public class TimeIncomeService {
                     || input.actualMinutes() > minutes)
                 throw bad("Chỉ xác nhận thời gian thực tế của đơn tăng ca đã duyệt");
             if (input.actualMinutes() > 0) {
-                var attendance =
-                        one(
-                                "SELECT * FROM attendance_records WHERE user_id=? AND work_date=?"
-                                        + " AND status='APPROVED'",
-                                user,
-                                java.sql.Date.valueOf(date));
-                if (instant(attendance.get("clock_in")).isAfter(instant(row.get("starts_at")))
-                        || instant(attendance.get("clock_out"))
-                                .isBefore(instant(row.get("ends_at"))))
-                    throw bad(
-                            "Khoảng tăng ca chưa được bản ghi công xác nhận đầy đủ; cần bổ sung"
-                                    + " công trước");
+                var scans =
+                        db.queryForList(
+                                "SELECT * FROM attendance_punches WHERE overtime_request_id=? ORDER"
+                                        + " BY recorded_at",
+                                request);
+                if (!scans.isEmpty()) {
+                    var otIn =
+                            scans.stream()
+                                    .filter(r -> "OT_IN".equals(r.get("punch_type")))
+                                    .findFirst()
+                                    .orElseThrow(() -> bad("Thiếu lượt bắt đầu OT"));
+                    var otOut =
+                            scans.stream()
+                                    .filter(r -> "OT_OUT".equals(r.get("punch_type")))
+                                    .findFirst()
+                                    .orElseThrow(() -> bad("Thiếu lượt kết thúc OT"));
+                    long measured =
+                            AttendanceRules.overlap(
+                                    instant(otIn.get("recorded_at")),
+                                    instant(otOut.get("recorded_at")),
+                                    instant(row.get("starts_at")),
+                                    instant(row.get("ends_at")));
+                    if (input.actualMinutes() > measured)
+                        throw bad("Số phút OT vượt thời gian thực tế trong khoảng đã duyệt");
+                    if (scans.stream().anyMatch(r -> !"MATCH".equals(r.get("network_status")))
+                            && !Boolean.TRUE.equals(input.acknowledgeNetwork()))
+                        throw bad("Cần xác minh cảnh báo mạng của các lượt OT");
+                } else {
+                    var attendance =
+                            one(
+                                    "SELECT * FROM attendance_records WHERE user_id=? AND"
+                                            + " work_date=? AND status='APPROVED'",
+                                    user,
+                                    java.sql.Date.valueOf(date));
+                    if (instant(attendance.get("clock_in")).isAfter(instant(row.get("starts_at")))
+                            || instant(attendance.get("clock_out"))
+                                    .isBefore(instant(row.get("ends_at"))))
+                        throw bad(
+                                "Khoảng tăng ca chưa được bản ghi công xác nhận đầy đủ; cần bổ sung"
+                                        + " công trước");
+                }
             }
             db.update(
                     "UPDATE staff_time_requests SET"
@@ -590,6 +711,24 @@ public class TimeIncomeService {
                             .contains(input.action() == null ? "" : input.action()))
                 throw bad("Đơn đã được xử lý hoặc thao tác không hợp lệ");
             boolean approve = "APPROVE".equals(input.action());
+            if (approve && "OVERTIME".equals(type)) {
+                boolean prior =
+                        instant(row.get("starts_at")).isAfter(Instant.now(clock))
+                                && row.get("exception_reason") == null;
+                if (!prior
+                        && (input.exceptionReason() == null
+                                || input.exceptionReason().trim().length() < 10))
+                    throw bad("Duyệt OT sau giờ bắt đầu cần ghi căn cứ ngoại lệ ít nhất 10 ký tự");
+                if (input.exceptionReason() != null && input.exceptionReason().length() > 2000)
+                    throw bad("Căn cứ ngoại lệ quá dài");
+                db.update(
+                        "UPDATE staff_time_requests SET"
+                            + " approval_mode=?,exception_reason=COALESCE(?,exception_reason) WHERE"
+                            + " id=?",
+                        prior ? "PRIOR" : "EXCEPTION",
+                        prior ? null : input.exceptionReason().trim(),
+                        request);
+            }
             if (approve && "LEAVE_PAID".equals(type)) {
                 db.queryForList(
                         "SELECT pg_advisory_xact_lock(hashtextextended(?,0))",
@@ -885,8 +1024,8 @@ public class TimeIncomeService {
                     "adjustments",
                     db.queryForList(
                             "SELECT a.*,u.full_name created_name FROM income_adjustments a JOIN"
-                                + " users u ON u.id=a.created_by WHERE income_id=? AND (? OR"
-                                + " a.status='APPROVED') ORDER BY a.created_at",
+                                    + " users u ON u.id=a.created_by WHERE income_id=? AND (? OR"
+                                    + " a.status='APPROVED') ORDER BY a.created_at",
                             row.get("id"),
                             !personal));
         }

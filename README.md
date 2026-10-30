@@ -2,7 +2,7 @@
 
 Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh nghiệp. Đây là **nguồn ứng dụng chuẩn** của ba học phần.
 
-**Trạng thái: web đã nối API và PostgreSQL, có đăng nhập thật, quyền theo phòng, hỗ trợ, công việc/bàn giao, quản trị và đối soát công/thu nhập. 142 backend tests chọn lọc (52 PostgreSQL), 5 tests phiên web và 810 tests mobile/91 suites đạt; chưa phải bản production; chưa chạy toàn bộ backend kế thừa.**
+**Trạng thái: web đã nối API và PostgreSQL, có đăng nhập thật, quyền theo phòng, hỗ trợ, công việc/bàn giao, quản trị và đối soát công/thu nhập. 150 backend tests chọn lọc (56 PostgreSQL), 5 tests phiên web và 822 tests mobile/92 suites đạt; chưa phải bản production; chưa chạy toàn bộ backend kế thừa.**
 
 | Học phần | Repository | Phạm vi |
 | --- | --- | --- |
@@ -11,6 +11,8 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 | Triển khai phần mềm | [worksphere-deployment](https://github.com/Khiemnh158/worksphere-deployment) | Jenkins, Docker Compose, Sonar, Prom/Graf, vận hành và minh chứng |
 
 Giai đoạn 2: [Hợp đồng hiện hành](docs/WEB_PHASE2_CONTRACT.md), [kết quả nghiệm thu](reports/WEB_PHASE2_IMPLEMENTATION.md). Thư thử local, QR web và TOTP đã có. Cổng web được kiểm tra lại trước khi bắt đầu Android; xem [web readiness](reports/WEB_READINESS_2026-10-30.md), [mobile đợt đầu](reports/MOBILE_FIRST_CLIENT_2026-10-30.md) và [cách chạy](docs/MOBILE_RUNNING.md).
+
+Chạy trên máy khác: [hướng dẫn clone](docs/FRESH_CLONE_RUNNING.md). Hợp đồng mới: [chấm công/QR/OT](docs/ATTENDANCE_POLICY.md).
 
 ## Đọc trước khi bắt đầu
 
@@ -36,7 +38,7 @@ Giai đoạn 2: [Hợp đồng hiện hành](docs/WEB_PHASE2_CONTRACT.md), [kế
 
 ## Chưa có, không coi là đã làm
 
-- Kiểm chứng QR trọn vòng bằng điện thoại thật, APK ARM/release/iOS, tệp mobile đầy đủ và push notification. Camera Android đã mở được trên giả lập; chưa nhận là chống chấm hộ tuyệt đối.
+- Kiểm chứng QR trọn vòng bằng điện thoại thật, production release/iOS, tệp mobile đầy đủ và push notification. Camera Android đã mở được trên giả lập; chưa nhận là chống chấm hộ tuyệt đối.
 - GPS/vân tay thật, ca đêm/qua ngày, thuế/BHXH/thực lĩnh, xử lý pháp lý bồi thường và hardening production.
 - Các phát hiện còn lại ngoài phạm vi đợt 1; xem STATUS và kết quả kiểm thử mới.
 - Pipeline CI/CD hoàn chỉnh, Dockerfile/Compose, Sonar, Prometheus/Grafana và bản release mobile.

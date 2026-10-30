@@ -2,6 +2,7 @@
 export function createPeopleUI(env) {
   const { api, esc, field, form, btn, heading, fmt, parseCsv } = env;
   let qrTimer, stationId;
+  let stationRows = [];
   let rows = [],
     directoryPage = 0,
     directoryQuery = "",
@@ -352,12 +353,19 @@ export function createPeopleUI(env) {
   async function stations() {
     const list = await api("/workplace/attendance/stations");
     let active = list.find((x) => x.id === stationId && x.is_active);
-    const qr = active
-      ? await api(
+    stationRows = list;
+    let qr = null,
+      qrError = "";
+    if (active) {
+      try {
+        qr = await api(
           "/workplace/attendance/stations/" + active.id + "/challenge",
           { method: "POST" }
-        )
-      : null;
+        );
+      } catch (e) {
+        qrError = e.message || "Điểm chưa mở QR; kiểm tra giờ hoạt động.";
+      }
+    }
     if (qr) qrTimer = setTimeout(renewQr, 30000);
     return (
       heading(
@@ -371,7 +379,15 @@ export function createPeopleUI(env) {
             (x) =>
               `<section class="panel"><h3>${esc(x.name)}</h3><p class="muted">${
                 x.is_active ? "Đang hoạt động" : "Đã đóng"
-              }</p><div class="row wrap">${
+              }</p><p class="muted">${esc(x.opens_at)}–${esc(x.closes_at)} · ${
+                x.allowed_cidrs
+                  ? "Đã cấu hình mạng văn phòng"
+                  : "Chưa cấu hình mạng — lượt chấm cần xác minh"
+              }</p><div class="row wrap">${button(
+                "station-config",
+                "Giờ mở & mạng",
+                x.id
+              )}${
                 x.is_active
                   ? button("station-show", "Mở màn hình QR", x.id)
                   : ""
@@ -383,7 +399,7 @@ export function createPeopleUI(env) {
           )
           .join("") ||
         '<section class="panel">Chưa cấu hình điểm chấm công.</section>'
-      }</div>${
+      }</div>${qrError ? `<div class="error-box">${esc(qrError)}</div>` : ""}${
         qr
           ? `<section class="panel station-display"><span class="eyebrow">ĐIỂM CHẤM CÔNG · ${esc(
               qr.stationName
@@ -436,10 +452,48 @@ export function createPeopleUI(env) {
         break;
       }
 
+      case "station-config": {
+        const row = stationRows.find((x) => x.id === id);
+        form(
+          "Giờ mở & mạng văn phòng",
+          field("opensAt", "Mở điểm từ", "time", {
+            value: row.opens_at.slice(0, 5),
+          }) +
+            field("closesAt", "Đóng điểm lúc", "time", {
+              value: row.closes_at.slice(0, 5),
+            }) +
+            field(
+              "allowedCidrs",
+              "IP/CIDR văn phòng (cách nhau bằng dấu phẩy)",
+              "textarea",
+              { value: row.allowed_cidrs, required: false, max: 2048 }
+            ),
+          (v) =>
+            api("/workplace/attendance/stations/" + id, {
+              method: "PUT",
+              body: v,
+            }),
+          {
+            intro:
+              "Máy chủ đối chiếu địa chỉ kết nối thực, không tin IP do điện thoại tự khai. Để trống sẽ cảnh báo chưa cấu hình; USB/VPN không chứng minh hiện diện. Đổi cấu hình làm hết hạn mã đang hiển thị; mở lại QR sau khi lưu. Ca ban ngày 06:00–22:00.",
+          }
+        );
+        break;
+      }
       case "station-new":
         form(
           "Thêm điểm chấm công",
-          field("name", "Tên điểm (ví dụ: Quầy lễ tân)", "text", { max: 100 }),
+          field("name", "Tên điểm (ví dụ: Văn phòng tầng 2)", "text", {
+            max: 100,
+          }) +
+            field("opensAt", "Mở điểm từ", "time", { value: "06:00" }) +
+            field("closesAt", "Đóng điểm lúc", "time", { value: "22:00" }) +
+            field(
+              "allowedCidrs",
+              "IP/CIDR văn phòng (để trống nếu chưa có)",
+              "textarea",
+              { required: false, max: 2048 }
+            ),
           (v) =>
             api("/workplace/attendance/stations", { method: "POST", body: v })
         );

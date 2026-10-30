@@ -9,6 +9,8 @@ import { useAuth } from '../../app/auth';
 import { useAppTheme } from '../../app/providers/ThemeProvider';
 import { workspaceApi, WorkplaceContext } from './api';
 import { Button, Copy, Page, useLoad } from './ui';
+import { SecurityScreen } from './SecurityScreen';
+import { ChangePasswordScreen } from '../profile/screens/ChangePasswordScreen';
 import { HomeScreen, WorkScreen, WorkDetailScreen } from './WorkScreens';
 import {
   TicketListScreen,
@@ -24,7 +26,9 @@ import {
 } from './AccountScreens';
 
 export type WorkspaceRoutes = {
-  WorkspaceTabs: undefined;
+  WorkspaceTabs:
+    | { screen?: 'Today' | 'Work' | 'Support' | 'Time' | 'Account' }
+    | undefined;
   WorkDetail: { id: string };
   TicketDetail: { id: string };
   CreateTicket: undefined;
@@ -32,6 +36,8 @@ export type WorkspaceRoutes = {
   Directory: undefined;
   Income: undefined;
   Notices: undefined;
+  Security: undefined;
+  ChangePassword: undefined;
 };
 export type WorkspaceNavigation = NativeStackNavigationProp<WorkspaceRoutes>;
 const Stack = createNativeStackNavigator<WorkspaceRoutes>();
@@ -192,6 +198,16 @@ export function WorkspaceNavigator() {
           name="Notices"
           component={NoticesScreen}
           options={{ title: 'Thông báo' }}
+        />
+        <Stack.Screen
+          name="Security"
+          component={SecurityScreen}
+          options={{ title: 'Bảo mật tài khoản' }}
+        />
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePasswordScreen}
+          options={{ title: 'Đổi mật khẩu' }}
         />
       </Stack.Navigator>
     </Context.Provider>
