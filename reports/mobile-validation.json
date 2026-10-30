@@ -55,7 +55,12 @@
     "launchCommand": "SUCCESS",
     "requiresMetro": true,
     "connection": "USB adb reverse 18120/8081",
-    "physicalQrInOut": "WAITING_FOR_USER",
-    "apkSha256": "22df4ec3cb77afd874836dbcff6de54d3ea7299c708bc33a02d1fa5e62c80d40"
+    "physicalQrInOut": "IN_VERIFIED_OUT_PENDING",
+    "apkSha256": "22df4ec3cb77afd874836dbcff6de54d3ea7299c708bc33a02d1fa5e62c80d40",
+    "inEvidence": {
+      "result": "IN persisted after a physical camera scan in local test environment",
+      "out": "NOT_VERIFIED",
+      "details": "Identifying activity details retained locally, not published"
+    }
   }
 }

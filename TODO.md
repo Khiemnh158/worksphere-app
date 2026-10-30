@@ -35,7 +35,7 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [ ] Đổi thông tin hồ sơ/MFA/quản lý phiên trực tiếp trên mobile, deep link OS; hiện cấu hình bảo mật qua web, kích hoạt/reset dán liên kết.
 - [ ] Push khi ứng dụng đóng/realtime; hiện làm mới khi focus/foreground hoặc bấm cập nhật.
 - [ ] Điều phối hỗ trợ mở rộng (chuyển phòng/đề nghị hủy/đổi người kèm rà soát), tạo/sửa việc từ mobile nếu chốt cần mang khỏi web. Hiện thực hiện đầy đủ trên web, không hiện nút giả.
-- [x] Build/cài Android debug arm64-v8a trên OPPO thật qua USB; vẫn phụ thuộc Metro/backend local. Chưa xác nhận quét QR thành công.
+- [x] Build/cài Android debug arm64-v8a trên OPPO thật qua USB; vẫn phụ thuộc Metro/backend local. Đã xác nhận lượt IN bằng camera điện thoại thật trong môi trường thử local; OUT còn chờ.
 - [ ] Release signing/APK chạy độc lập Metro và iOS trên macOS; chưa nghiệm thu.
 
 ## Còn nghiệm thu / chưa kiểm chứng
@@ -49,3 +49,14 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 ## Hạn mức
 
 Kiểm tra hạn mức thực sau mỗi chặng. Khi một cửa sổ còn ≤5%, dừng, lưu trạng thái/việc tiếp theo và báo người dùng. Chờ người dùng yêu cầu mới tiếp tục.
+
+## Rà soát sau khi người dùng thử QR thật
+
+- [x] Camera điện thoại thật → API → PostgreSQL: IN đã lưu trong môi trường thử local. Chi tiết nhận dạng/giờ hoạt động giữ trên máy. Không nhận là đã nghiệm thu OUT hoặc chống gian lận đầy đủ.
+- [ ] Hiển thị lượt IN đang mở trên web/mobile; hiện bảng công chỉ tạo sau OUT, nên chỉ IN sẽ chưa xuất hiện trong attendance_records.
+- [ ] Chốt chính sách cửa sổ/ca/điểm QR và ghi nhật ký quản lý điểm; hiện người có TIME_REVIEW mở điểm hoạt động là sinh mã, chưa có giới hạn giờ mở tự động.
+- [ ] Hiển thị đi muộn/về sớm theo giờ máy chủ, chính sách dung sai; không tự phạt. Hiện có timestamp/cắt công trong ca nhưng chưa báo cáo late/early riêng.
+- [ ] Chốt chính sách OT phải duyệt trước hoặc xử lý ngoại lệ có căn cứ; hiện duyệt + xác nhận thực tế + công đã duyệt, nhưng chưa buộc đơn tạo trước giờ OT.
+- [ ] Rà soát khoảng nghỉ thực tế: QR hiện trừ toàn bộ break_minutes từ giao khoảng IN/OUT với ca; cần lịch khoảng nghỉ để xử lý đúng ca ngắn.
+
+QR đổi 30 giây, token hạn 40 giây; không chứng minh người quét thật sự ở văn phòng hoặc đang làm việc. Chia sẻ mã tức thời/đưa tài khoản cho người khác vẫn là giới hạn. Các mục chính sách phía trên chưa được triển khai/chốt thông số.

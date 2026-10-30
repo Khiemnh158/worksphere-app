@@ -41,3 +41,7 @@ Tệp đính kèm mobile đầy đủ; cấu hình MFA/đổi mật khẩu/quả
 ## Cài trên OPPO thật
 
 Android debug arm64-v8a đã build/cài và gửi lệnh mở trên OPPO CPH2603 (Android 16), nối backend/Metro qua USB. Người dùng đang đăng nhập để kiểm tra QR; chưa đánh dấu nghiệm thu camera/IN/OUT. Hướng dẫn: docs/MOBILE_RUNNING.md. Bản release/iOS vẫn chưa làm.
+
+## QR trên thiết bị thật — IN đã xác minh
+
+Người dùng quét bằng điện thoại thật; đã kiểm chứng PostgreSQL lưu lượt IN trong môi trường thử local. Chi tiết tài khoản và giờ hoạt động giữ trên máy, không xuất bản. OUT chưa xác minh. Bảng công hiện chỉ sinh khi OUT; việc chưa thấy dòng bảng công sau IN không có nghĩa chưa lưu punch. Các khoảng trống lịch mở điểm, late/early, phê duyệt OT trước giờ và tính khoảng nghỉ được ghi tại TODO.md, chưa nhận là hoàn thiện.
