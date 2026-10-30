@@ -35,7 +35,8 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [ ] Đổi thông tin hồ sơ/MFA/quản lý phiên trực tiếp trên mobile, deep link OS; hiện cấu hình bảo mật qua web, kích hoạt/reset dán liên kết.
 - [ ] Push khi ứng dụng đóng/realtime; hiện làm mới khi focus/foreground hoặc bấm cập nhật.
 - [ ] Điều phối hỗ trợ mở rộng (chuyển phòng/đề nghị hủy/đổi người kèm rà soát), tạo/sửa việc từ mobile nếu chốt cần mang khỏi web. Hiện thực hiện đầy đủ trên web, không hiện nút giả.
-- [ ] APK ARM/release signing và iOS trên macOS; build đang kiểm chứng là debug x86_64 phụ thuộc Metro.
+- [x] Build/cài Android debug arm64-v8a trên OPPO thật qua USB; vẫn phụ thuộc Metro/backend local. Chưa xác nhận quét QR thành công.
+- [ ] Release signing/APK chạy độc lập Metro và iOS trên macOS; chưa nghiệm thu.
 
 ## Còn nghiệm thu / chưa kiểm chứng
 

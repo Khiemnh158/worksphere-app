@@ -8,6 +8,8 @@ Web giai đoạn 2 đủ điều kiện nối mobile trong phạm vi đồ án, 
 - Admin kỹ thuật không có tab công việc/chấm công/thu nhập. Quản trị, hồ sơ nhân sự, dữ liệu lương và điều phối mở rộng tiếp tục trên web. Mobile có các thao tác thường dùng đúng allowedActions/canReview và version từ máy chủ.
 - Còn tệp mobile, cấu hình MFA/quản lý phiên trên mobile, deep link hệ điều hành, push, kiểm thử camera/QR thiết bị thật và nghiệm thu UI. Xem TODO.md và reports/MOBILE_FIRST_CLIENT_2026-10-30.md.
 
+- Cập nhật thiết bị: Android ARM64 debug đã build/cài và gửi lệnh mở trên OPPO CPH2603, Android 16 qua USB; đang chờ xác nhận quét QR thật. Đã cấu hình lịch thử local theo giờ người dùng chọn, chưa thiết lập lương.
+
 ## Lịch sử trước cập nhật này
 
 # Web đang chạy — 29/10/2026

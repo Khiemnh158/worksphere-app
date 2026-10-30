@@ -43,5 +43,19 @@
     "Push/realtime/offline",
     "ARM release signing and iOS",
     "User acceptance"
-  ]
+  ],
+  "androidPhysical": {
+    "target": "debug arm64-v8a",
+    "model": "OPPO CPH2603",
+    "android": "16",
+    "build": "SUCCESS",
+    "buildSeconds": 225,
+    "tasks": 191,
+    "install": "PASS",
+    "launchCommand": "SUCCESS",
+    "requiresMetro": true,
+    "connection": "USB adb reverse 18120/8081",
+    "physicalQrInOut": "WAITING_FOR_USER",
+    "apkSha256": "22df4ec3cb77afd874836dbcff6de54d3ea7299c708bc33a02d1fa5e62c80d40"
+  }
 }

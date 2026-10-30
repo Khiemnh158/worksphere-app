@@ -37,3 +37,7 @@ Lỗi cập nhật nóng sau khi định dạng ThemeProvider đã xuất hiện
 ## Chưa làm / chưa nghiệm thu
 
 Tệp đính kèm mobile đầy đủ; cấu hình MFA/đổi mật khẩu/quản lý phiên và sửa hồ sơ trực tiếp mobile; deep link OS; điều phối hỗ trợ nâng cao ngoài web; push/realtime/offline; iOS, ARM/release signing; QR bằng điện thoại thật; kiểm tra tải và nghiệm thu của người dùng. Lint trên nguồn thay đổi: 0 lỗi, 34 cảnh báo về style/render callback theo cấu hình hiện hành. TODO.md là nguồn theo dõi, không nhận mọi checkbox code là E2E thiết bị đã đạt.
+
+## Cài trên OPPO thật
+
+Android debug arm64-v8a đã build/cài và gửi lệnh mở trên OPPO CPH2603 (Android 16), nối backend/Metro qua USB. Người dùng đang đăng nhập để kiểm tra QR; chưa đánh dấu nghiệm thu camera/IN/OUT. Hướng dẫn: docs/MOBILE_RUNNING.md. Bản release/iOS vẫn chưa làm.

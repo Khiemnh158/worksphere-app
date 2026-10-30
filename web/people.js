@@ -362,7 +362,7 @@ export function createPeopleUI(env) {
     return (
       heading(
         "Điểm chấm công QR",
-        "QR có hạn ngắn; thời gian ghi nhận do máy chủ quyết định. Mobile sẽ tích hợp sau khi nghiệm thu web.",
+        "Mở ứng dụng WorkSphere trên điện thoại, vào Chấm công và quét mã tại đây. Thời gian ghi nhận do máy chủ quyết định.",
         button("station-new", "Thêm điểm chấm công", "", "primary")
       ) +
       `<div class="cards">${
@@ -392,7 +392,7 @@ export function createPeopleUI(env) {
             )}" width="288" height="288" alt="QR chấm công xoay vòng"><p id="station-expires" class="muted">Mã hiện tại hết hạn ${fmt(
               qr.expiresAt,
               true
-            )} · tự đổi sau 30 giây</p><p>Chưa tích hợp mobile trong lượt này. QR không thay thế xác minh danh tính và không bảo đảm chống gian lận tuyệt đối.</p></section>`
+            )} · tự đổi sau 30 giây</p><p>Mỗi người đăng nhập tài khoản của mình để quét vào hoặc ra ca. Không chia sẻ mã chấm công.</p></section>`
           : ""
       }`
     );

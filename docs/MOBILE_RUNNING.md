@@ -4,7 +4,7 @@
 
 Mở outputs/Mo-WorkSphere-Mobile.cmd ở thư mục workspace (ngoài Git). Launcher gọi Run-WorkSphere-Web.ps1 trước, dùng backend 18120 và cùng database worksphere_web; Metro 8081, giả lập Small_Phone, adb reverse hai cổng. Tài khoản/mật khẩu thử nằm trong outputs/Tai-khoan-Web-local.txt riêng trên máy, không upload. Cổng web: http://127.0.0.1:18110/.
 
-APK hiện tại là debug x86_64, cần Metro và máy chủ local; không phải APK phát hành cho điện thoại ARM. Hai launcher cũ Run-WorkSphere.ps1/checkout outputs/WorkSphere trỏ baseline 18080, không dùng cho nghiệp vụ mới.
+Đã có hai bản debug: x86_64 cho giả lập và arm64-v8a cho điện thoại Android. Cả hai cần Metro và máy chủ local, chưa phải bản phát hành độc lập. Hai launcher cũ Run-WorkSphere.ps1/checkout outputs/WorkSphere trỏ baseline 18080, không dùng cho nghiệp vụ mới.
 
 Nếu cổng 8081 thuộc một dự án khác, dừng đúng Metro của dự án đó hoặc đổi cổng đồng bộ; launcher không tự giết tiến trình không rõ nguồn. Không tạo tài khoản/mật khẩu dễ đoán hoặc copy token web vào mobile.
 
@@ -45,3 +45,13 @@ Windows: nếu CMake/prefab báo đường dẫn >260 ký tự, dùng thư mục
 Email kích hoạt/reset dùng hộp thư thử local; dán liên kết vào màn mobile. Mã một lần và hạn dùng do máy chủ kiểm tra; app không tự cấp token/mật khẩu tạm. TOTP/mã dự phòng nhập lúc đăng nhập, thiết lập và quản lý phiên qua web.
 
 Camera Android dùng JourneyApps ZXing embedded 4.3.0: https://github.com/journeyapps/zxing-android-embedded. iOS cần triển khai scanner native tương ứng và kiểm tra trên macOS, không nhận là đã hỗ trợ quét iOS.
+
+## Điện thoại Android ARM64 qua USB — 30/10/2026
+
+Đã build arm64-v8a thành công (3 phút 45 giây, 191 tasks), cài bằng adb và gửi lệnh mở trên OPPO CPH2603 chạy Android 16. Xác nhận camera/QR trọn vòng trên điện thoại thật còn chờ người dùng, không lấy việc cài thành công làm bằng chứng đã quét thành công.
+
+Trên máy hiện tại: outputs/Mo-WorkSphere-OPPO.cmd; APK local outputs/WorkSphere-Android-arm64-debug.apk; hướng dẫn outputs/Thu-QR-tren-OPPO.md. Launcher nhận DeviceId/ApkPath, adb reverse 18120 và 8081; giữ USB trong lúc thử. Không đưa số thiết bị, tài khoản, APK hoặc cấu hình riêng lên Git.
+
+Build như lệnh trên nhưng thay -PreactNativeArchitectures=x86_64 bằng -PreactNativeArchitectures=arm64-v8a. Luôn kiểm tra ABI trong APK trước khi cài. Mỗi bản build ghi đè app-debug.apk, nên giữ các bản cục bộ dưới tên riêng.
+
+Người dùng chọn lịch công thử local tháng 10/2026: thứ Hai–thứ Sáu, 08:00–17:00, nghỉ 60 phút. Đã lưu qua web bằng HR thử; không thiết lập lương. Thử ngoài ca có thể ghi 0 phút công thường; công vẫn cần đối soát và không tự xác nhận OT.
