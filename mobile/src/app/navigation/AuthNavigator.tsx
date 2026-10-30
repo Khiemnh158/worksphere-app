@@ -1,8 +1,13 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { LoginScreen, ForgotPasswordScreen, ResetPasswordScreen } from '../../features/auth/screens';
+import {
+  LoginScreen,
+  ForgotPasswordScreen,
+  ResetPasswordScreen,
+} from '../../features/auth/screens';
 import { useAppTheme } from '../providers/ThemeProvider';
 import type { AuthStackParamList } from './types';
+import { ActivateAccountScreen } from '../../features/auth/screens/ActivateAccountScreen';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -40,6 +45,11 @@ export function AuthNavigator() {
         name="ResetPassword"
         component={ResetPasswordScreen}
         options={{ title: 'Đặt lại mật khẩu' }}
+      />
+      <Stack.Screen
+        name="ActivateAccount"
+        component={ActivateAccountScreen}
+        options={{ title: 'Kích hoạt tài khoản' }}
       />
     </Stack.Navigator>
   );

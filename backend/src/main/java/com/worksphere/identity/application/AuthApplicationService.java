@@ -93,16 +93,15 @@ public class AuthApplicationService {
                                                 "INVALID_CREDENTIALS",
                                                 "Thông tin đăng nhập không chính xác"));
 
-        guardCurrentAccount(user.getId());
-        // Domain validates status - throws if not ACTIVE
-        user.validateCanLogin();
-
+        // Verify credentials before revealing account state to the caller.
         // Verify password without logging it
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new BusinessRuleException(
                     "INVALID_CREDENTIALS", "Thông tin đăng nhập không chính xác");
         }
 
+        guardCurrentAccount(user.getId());
+        user.validateCanLogin();
         twoFactor.verify(user.getId(), request.mfaCode());
         // Create login session first
         UUID sessionId = UUID.randomUUID();

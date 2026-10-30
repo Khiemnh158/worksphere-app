@@ -30,5 +30,5 @@ export const colors = {
   disabledContainer: '#E2E8F0',
 } as const;
 
-export type ColorTokens = typeof colors;
+export type ColorTokens = { [K in keyof typeof colors]: string };
 export type ColorKey = keyof typeof colors;

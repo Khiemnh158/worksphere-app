@@ -10,5 +10,6 @@ declare module 'axios' {
   interface AxiosRequestConfig {
     skipAuthRefresh?: boolean;
     _retry?: boolean;
+    _sessionGeneration?: number;
   }
 }

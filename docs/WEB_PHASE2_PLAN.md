@@ -1,12 +1,12 @@
 # Phạm vi được người dùng yêu cầu triển khai
 
-Cập nhật 30/10/2026: người dùng chọn QR xoay vòng, hộp thư thử local và yêu cầu chỉ làm mobile sau khi họ kiểm tra web. Nội dung nghiên cứu dưới đây là căn cứ kế hoạch; kết quả triển khai phải đọc WEB_PHASE2_CONTRACT.md và reports/WEB_PHASE2_IMPLEMENTATION.md.
+Cập nhật 30/10/2026: người dùng chọn QR xoay vòng và hộp thư thử local; sau yêu cầu kiểm tra kỹ web rồi tiếp tục mobile, cổng kiểm tra web đã đạt và Android đợt đầu đã triển khai (reports/WEB_READINESS_2026-10-30.md, reports/MOBILE_FIRST_CLIENT_2026-10-30.md). Nội dung nghiên cứu dưới đây là căn cứ kế hoạch; kết quả triển khai phải đọc WEB_PHASE2_CONTRACT.md và reports/WEB_PHASE2_IMPLEMENTATION.md.
 
 # Kế hoạch hoàn thiện WorkSphere: web trước, mobile sau
 
 Ngày tổng hợp: 30/10/2026, Asia/Saigon.
 
-Trạng thái: tài liệu phân tích và đề xuất triển khai cho đợt tiếp theo; chưa sửa ứng dụng theo tài liệu này. Chỉ bắt đầu triển khai khi người dùng yêu cầu tiếp tục. Hạn mức phục hồi không tự khởi động công việc.
+Trạng thái: đây là căn cứ kế hoạch lịch sử. Web đã triển khai và mobile đang phát triển theo phạm vi trong TODO.md; không dùng danh sách đề xuất ở dưới để suy ra mọi chức năng đều đã hoàn tất. Hạn mức phục hồi không tự khởi động công việc.
 
 ## 1. Cơ sở và cách sử dụng
 

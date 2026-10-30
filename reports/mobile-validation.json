@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-30",
+  "scope": "Android first client on shared web backend; not complete mobile release",
+  "typecheck": {
+    "exitCode": 0
+  },
+  "jest": {
+    "suitesPassed": 91,
+    "suitesTotal": 91,
+    "testsPassed": 810,
+    "testsTotal": 810,
+    "skipped": 0,
+    "seconds": 33.832,
+    "notes": "Legacy act warnings remain; no forceExit"
+  },
+  "lintChangedSource": {
+    "errors": 0,
+    "warnings": 34
+  },
+  "android": {
+    "target": "debug x86_64",
+    "build": "SUCCESS",
+    "seconds": 18,
+    "tasks": 191,
+    "requiresMetro": true,
+    "emulator": "Small_Phone",
+    "install": "PASS",
+    "coldStartSessionRestored": true,
+    "cameraOpened": true,
+    "physicalQrInOut": "NOT_VERIFIED"
+  },
+  "manualScenarios": [
+    "Employee session, own department directory and assigned work",
+    "Lan to Hai handover retains progress 65%",
+    "Android work comment visible on web after reload",
+    "Native Android QR camera opens; full real-camera rotating QR IN/OUT not verified"
+  ],
+  "backendEvidence": "web-validation.json",
+  "remaining": [
+    "Physical QR IN/OUT and camera/network edge cases",
+    "Mobile attachment workflows",
+    "Mobile security settings and OS deep links",
+    "Push/realtime/offline",
+    "ARM release signing and iOS",
+    "User acceptance"
+  ]
+}

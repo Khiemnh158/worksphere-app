@@ -102,6 +102,12 @@ public class TimeIncomeController {
         return ApiResponse.success(service.incomes(period, p));
     }
 
+    @GetMapping("/incomes/mine")
+    public ApiResponse<?> personalIncomes(
+            @RequestParam String period, @AuthenticationPrincipal WorkSphereUserPrincipal p) {
+        return ApiResponse.success(service.personalIncomes(period, p));
+    }
+
     @PutMapping("/incomes")
     public ApiResponse<?> configureIncome(
             @RequestBody TimeIncomeService.IncomeInput r,

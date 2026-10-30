@@ -39,8 +39,7 @@ public class TimeIncomeService {
             String shiftStart,
             String shiftEnd,
             int breakMinutes,
-            List<LocalDate> holidays) {
-}
+            List<LocalDate> holidays) {}
 
     public record ImportRow(
             UUID userId,
@@ -48,8 +47,7 @@ public class TimeIncomeService {
             Instant clockIn,
             Instant clockOut,
             int regularMinutes,
-            String sourceReference) {
-}
+            String sourceReference) {}
 
     public record TimeInput(
             String requestType,
@@ -57,14 +55,11 @@ public class TimeIncomeService {
             Instant startsAt,
             Instant endsAt,
             int requestedMinutes,
-            String reason) {
-}
+            String reason) {}
 
-    public record Review(String action, String reason, Integer actualMinutes, Long version) {
-}
+    public record Review(String action, String reason, Integer actualMinutes, Long version) {}
 
-    public record BalanceInput(UUID userId, int year, int allowanceMinutes, String reason) {
-}
+    public record BalanceInput(UUID userId, int year, int allowanceMinutes, String reason) {}
 
     public record IncomeInput(
             UUID userId,
@@ -72,8 +67,7 @@ public class TimeIncomeService {
             BigDecimal monthlyWorkPay,
             LocalDate employmentFrom,
             LocalDate employmentTo,
-            Long version) {
-}
+            Long version) {}
 
     private BusinessRuleException bad(String message) {
         return new BusinessRuleException("VALIDATION_ERROR", message);
@@ -421,8 +415,7 @@ public class TimeIncomeService {
             Instant startsAt,
             Instant endsAt,
             int requestedMinutes,
-            String reason) {
-}
+            String reason) {}
 
     public void correctionFor(CorrectionInput r, WorkSphereUserPrincipal p) {
         UUID actor = access.actor(p);
@@ -716,8 +709,7 @@ public class TimeIncomeService {
         audit(actor, request, "TIME_REQUEST_REVIEWED");
     }
 
-    public record AbsenceInput(UUID userId, LocalDate workDate, int absentMinutes, String reason) {
-}
+    public record AbsenceInput(UUID userId, LocalDate workDate, int absentMinutes, String reason) {}
 
     public void absence(AbsenceInput input, WorkSphereUserPrincipal p) {
         UUID actor = access.actor(p);
@@ -864,11 +856,21 @@ public class TimeIncomeService {
 
     @Transactional(readOnly = true)
     public List<Map<String, Object>> incomes(String value, WorkSphereUserPrincipal p) {
+        return incomeRows(value, p, false);
+    }
+
+    public List<Map<String, Object>> personalIncomes(String value, WorkSphereUserPrincipal p) {
+        return incomeRows(value, p, true);
+    }
+
+    private List<Map<String, Object>> incomeRows(
+            String value, WorkSphereUserPrincipal p, boolean personal) {
         UUID actor = access.actor(p);
         String month = period(value).toString();
         boolean payroll =
-                access.capability(actor, "PAYROLL_MANAGE")
-                        || access.capability(actor, "PAYROLL_APPROVE");
+                !personal
+                        && (access.capability(actor, "PAYROLL_MANAGE")
+                                || access.capability(actor, "PAYROLL_APPROVE"));
         var rows =
                 db.queryForList(
                         "SELECT i.*,u.full_name FROM income_periods i JOIN users u ON"
@@ -883,9 +885,10 @@ public class TimeIncomeService {
                     "adjustments",
                     db.queryForList(
                             "SELECT a.*,u.full_name created_name FROM income_adjustments a JOIN"
-                                    + " users u ON u.id=a.created_by WHERE income_id=? ORDER BY"
-                                    + " a.created_at",
-                            row.get("id")));
+                                + " users u ON u.id=a.created_by WHERE income_id=? AND (? OR"
+                                + " a.status='APPROVED') ORDER BY a.created_at",
+                            row.get("id"),
+                            !personal));
         }
         return rows;
     }
@@ -897,8 +900,7 @@ public class TimeIncomeService {
                         .readValue(
                                 (String) row.get("snapshot"),
                                 new com.fasterxml.jackson.core.type.TypeReference<
-                                        Map<String, Object>>() {
-});
+                                        Map<String, Object>>() {});
             } catch (Exception e) {
                 throw bad("Không đọc được phiếu chốt");
             }

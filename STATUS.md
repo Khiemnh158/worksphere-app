@@ -1,8 +1,12 @@
-# Cập nhật 30/10/2026 — chờ nghiệm thu web trước mobile
+# Hiện hành 30/10/2026 — web qua cổng kiểm tra, Android đã bắt đầu
 
-Web giai đoạn 2 đã triển khai: Admin tách riêng, danh bạ phòng, kích hoạt/reset qua hộp thư thử, TOTP opt-in, lãnh đạo/phụ trách thay, hồ sơ nhân sự/cutoff, bảng tính duyệt độc lập và điểm QR. Hợp đồng hiện hành: docs/WEB_PHASE2_CONTRACT.md. Kết quả: reports/WEB_PHASE2_IMPLEMENTATION.md.
+Web giai đoạn 2 đủ điều kiện nối mobile trong phạm vi đồ án, chưa phải production hoặc nghiệm thu toàn bộ mã kế thừa. Đã sửa kiểm tra mật khẩu trước trạng thái tài khoản, nhãn thao tác công việc và enum ưu tiên hỗ trợ; thêm API thu nhập chỉ của chính mình đã phát hành.
 
-140 backend tests chọn lọc đạt (gồm 50 PostgreSQL integration), 5 tests phiên web đạt. Chưa xác nhận toàn bộ legacy suite hoặc production. Mobile chưa thay đổi, theo yêu cầu đợi người dùng kiểm tra web. Thư chỉ local, lương/lịch cần dữ liệu có thẩm quyền; không có chuyển tiền.
+- 142 backend tests chọn lọc đạt, gồm 52 PostgreSQL thật; 5 tests phiên web đạt; Maven package thành công.
+- Mobile: TypeScript đạt; toàn bộ Jest 91 suites/810 tests đạt, còn cảnh báo act trong một số tests kế thừa. Android debug x86_64 đã build/cài/đăng nhập, khởi động nguội giữ phiên; camera QR mở được. Không nhận kết quả này là iOS/ARM/release hoặc QR trọn vòng trên điện thoại thật.
+- Đã xác minh ghi chú từ Android xuất hiện trên web, giữ tiến độ bàn giao 65%; danh bạ cùng phòng và công việc đúng tài khoản. Web và mobile dùng cùng backend/PostgreSQL, tải lại khi vào màn hoặc quay lại ứng dụng; chưa realtime/push khi đóng app.
+- Admin kỹ thuật không có tab công việc/chấm công/thu nhập. Quản trị, hồ sơ nhân sự, dữ liệu lương và điều phối mở rộng tiếp tục trên web. Mobile có các thao tác thường dùng đúng allowedActions/canReview và version từ máy chủ.
+- Còn tệp mobile, cấu hình MFA/quản lý phiên trên mobile, deep link hệ điều hành, push, kiểm thử camera/QR thiết bị thật và nghiệm thu UI. Xem TODO.md và reports/MOBILE_FIRST_CLIENT_2026-10-30.md.
 
 ## Lịch sử trước cập nhật này
 

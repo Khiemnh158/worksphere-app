@@ -3,6 +3,7 @@ import { getEnvironmentConfig } from '../config/environment';
 import { accessTokenStore } from '../storage/accessTokenStore';
 import { normalizeError } from './apiError';
 import { isApiResponse, unwrapApiResponse } from './apiEnvelope';
+import { getSessionCredentialGeneration } from '../../app/auth/sessionCredentialCoordinator';
 
 export type UnauthorizedHandler = () => void | Promise<void>;
 export type TokenRefreshHandler = () => Promise<string>;
@@ -14,7 +15,9 @@ let tokenRefreshHandler: TokenRefreshHandler | null = null;
  * Registers the global 401 Unauthorized callback with ownership protection.
  * Returns an unregister function that only clears the handler if it is still the active one.
  */
-export function registerUnauthorizedHandler(handler: UnauthorizedHandler): () => void {
+export function registerUnauthorizedHandler(
+  handler: UnauthorizedHandler,
+): () => void {
   unauthorizedHandler = handler;
   return () => {
     if (unauthorizedHandler === handler) {
@@ -27,7 +30,9 @@ export function registerUnauthorizedHandler(handler: UnauthorizedHandler): () =>
  * Registers the token refresh coordinator handler with ownership protection.
  * Returns an unregister function that only clears the handler if it is still the active one.
  */
-export function registerTokenRefreshHandler(handler: TokenRefreshHandler): () => void {
+export function registerTokenRefreshHandler(
+  handler: TokenRefreshHandler,
+): () => void {
   tokenRefreshHandler = handler;
   return () => {
     if (tokenRefreshHandler === handler) {
@@ -40,7 +45,9 @@ export function registerTokenRefreshHandler(handler: TokenRefreshHandler): () =>
  * Injects or clears the global 401 Unauthorized callback.
  * Kept for backward compatibility.
  */
-export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+export function setUnauthorizedHandler(
+  handler: UnauthorizedHandler | null,
+): void {
   unauthorizedHandler = handler;
 }
 
@@ -48,7 +55,9 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
  * Injects or clears the token refresh coordinator handler.
  * Kept for backward compatibility.
  */
-export function setTokenRefreshHandler(handler: TokenRefreshHandler | null): void {
+export function setTokenRefreshHandler(
+  handler: TokenRefreshHandler | null,
+): void {
   tokenRefreshHandler = handler;
 }
 
@@ -73,8 +82,21 @@ const NON_REFRESHABLE_ENDPOINTS = [
   '/auth/reset-password',
   '/auth/logout',
   '/auth/logout-all',
+  '/auth/activate',
 ];
 
+function assertCurrentSession(config?: AxiosRequestConfig): void {
+  if (
+    config?._sessionGeneration !== undefined &&
+    config._sessionGeneration !== getSessionCredentialGeneration()
+  ) {
+    throw {
+      kind: 'UNKNOWN_ERROR',
+      backendCode: 'STALE_SESSION',
+      message: 'Phiên đã thay đổi. Vui lòng tải lại dữ liệu.',
+    };
+  }
+}
 
 /**
  * Checks if a failed 401 response is eligible for automatic token refresh and retry.
@@ -95,8 +117,13 @@ function isEligibleForRefresh(error: any): boolean {
   }
 
   // Must have carried an Authorization Bearer header
-  const authHeader = config.headers?.Authorization || config.headers?.get?.('Authorization');
-  if (!authHeader || typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
+  const authHeader =
+    config.headers?.Authorization || config.headers?.get?.('Authorization');
+  if (
+    !authHeader ||
+    typeof authHeader !== 'string' ||
+    !authHeader.startsWith('Bearer ')
+  ) {
     return false;
   }
 
@@ -143,28 +170,43 @@ function createApiClient(): AxiosInstance {
       }
 
       const token = accessTokenStore.getAccessToken();
-      if (token) {
+      assertCurrentSession(config);
+      if (
+        token &&
+        !NON_REFRESHABLE_ENDPOINTS.some(ep => config.url?.includes(ep))
+      ) {
+        config._sessionGeneration ??= getSessionCredentialGeneration();
+        config.headers.set('Authorization', `Bearer ${token}`);
+      } else if (token && config.url?.includes('/auth/logout')) {
         config.headers.set('Authorization', `Bearer ${token}`);
       }
 
       return config;
     },
-    error => Promise.reject(normalizeError(error))
+    error => Promise.reject(normalizeError(error)),
   );
 
   // Response Interceptor: Intercepts 401, attempts single-flight refresh and retries once
   instance.interceptors.response.use(
-    response => response,
+    response => {
+      assertCurrentSession(response.config);
+      return response;
+    },
     async error => {
+      assertCurrentSession(error.config);
       if (isEligibleForRefresh(error) && tokenRefreshHandler) {
         const originalConfig = error.config;
         originalConfig._retry = true;
 
         try {
           const newAccessToken = await tokenRefreshHandler();
+          assertCurrentSession(originalConfig);
           if (originalConfig.headers) {
             if (typeof originalConfig.headers.set === 'function') {
-              originalConfig.headers.set('Authorization', `Bearer ${newAccessToken}`);
+              originalConfig.headers.set(
+                'Authorization',
+                `Bearer ${newAccessToken}`,
+              );
             } else {
               originalConfig.headers.Authorization = `Bearer ${newAccessToken}`;
             }
@@ -172,7 +214,10 @@ function createApiClient(): AxiosInstance {
           return await instance.request(originalConfig);
         } catch (refreshOrRetryError) {
           // Refresh failed or retry failed with 401: trigger session invalidation once
-          await notifyUnauthorized();
+          assertCurrentSession(originalConfig);
+          if (normalizeError(refreshOrRetryError).kind === 'UNAUTHORIZED') {
+            await notifyUnauthorized();
+          }
           return Promise.reject(normalizeError(refreshOrRetryError));
         }
       }
@@ -182,14 +227,16 @@ function createApiClient(): AxiosInstance {
         // If it was already a retried request or a protected request with no refresh handler
         const config = error.config;
         const url = config?.url;
-        const isAuthEndpoint = url ? NON_REFRESHABLE_ENDPOINTS.some(ep => url.includes(ep)) : false;
+        const isAuthEndpoint = url
+          ? NON_REFRESHABLE_ENDPOINTS.some(ep => url.includes(ep))
+          : false;
         if (!isAuthEndpoint && (config?._retry || !tokenRefreshHandler)) {
           await notifyUnauthorized();
         }
       }
 
       return Promise.reject(normalizeError(error));
-    }
+    },
   );
 
   return instance;
@@ -212,9 +259,13 @@ export const http = {
   async post<TRequest, TResponse>(
     url: string,
     data?: TRequest,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<TResponse | null> {
-    const response: AxiosResponse<unknown> = await apiClient.post(url, data, config);
+    const response: AxiosResponse<unknown> = await apiClient.post(
+      url,
+      data,
+      config,
+    );
     if (isApiResponse(response.data)) {
       return unwrapApiResponse<TResponse>(response.data as any);
     }
@@ -224,17 +275,27 @@ export const http = {
   async put<TRequest, TResponse>(
     url: string,
     data?: TRequest,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<TResponse | null> {
-    const response: AxiosResponse<unknown> = await apiClient.put(url, data, config);
+    const response: AxiosResponse<unknown> = await apiClient.put(
+      url,
+      data,
+      config,
+    );
     if (isApiResponse(response.data)) {
       return unwrapApiResponse<TResponse>(response.data as any);
     }
     return response.data as TResponse;
   },
 
-  async delete<TResponse>(url: string, config?: AxiosRequestConfig): Promise<TResponse | null> {
-    const response: AxiosResponse<unknown> = await apiClient.delete(url, config);
+  async delete<TResponse>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<TResponse | null> {
+    const response: AxiosResponse<unknown> = await apiClient.delete(
+      url,
+      config,
+    );
     if (isApiResponse(response.data)) {
       return unwrapApiResponse<TResponse>(response.data as any);
     }

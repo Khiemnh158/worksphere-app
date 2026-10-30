@@ -8,7 +8,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.154"
+      "time": "0.165"
     },
     {
       "name": "com.worksphere.file.application.FileValidationServiceTest",
@@ -24,7 +24,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.072"
+      "time": "0.069"
     },
     {
       "name": "com.worksphere.identity.AuthorizationPostgresTest",
@@ -32,7 +32,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "15.5"
+      "time": "15.975"
     },
     {
       "name": "com.worksphere.identity.dev.E2eUserProvisionerTest",
@@ -40,7 +40,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.758"
+      "time": "0.717"
     },
     {
       "name": "com.worksphere.identity.SessionAuthorizationTest",
@@ -48,15 +48,15 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.382"
+      "time": "0.372"
     },
     {
       "name": "com.worksphere.identity.WorkplacePostgresTest",
-      "tests": "42",
+      "tests": "44",
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "82.356"
+      "time": "96.11"
     },
     {
       "name": "com.worksphere.project.ProjectAccessPolicyTest",
@@ -64,7 +64,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.123"
+      "time": "0.257"
     },
     {
       "name": "com.worksphere.service_request.ServiceRequestAccessPolicyTest",
@@ -72,7 +72,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.006"
+      "time": "0.012"
     },
     {
       "name": "com.worksphere.task.TaskTest",
@@ -80,7 +80,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.014"
+      "time": "0.023"
     },
     {
       "name": "com.worksphere.task.TaskWorkflowTest",
@@ -88,7 +88,7 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.013"
+      "time": "0.036"
     },
     {
       "name": "com.worksphere.identity.application.TwoFactorServiceTest",
@@ -96,16 +96,16 @@
       "failures": "0",
       "errors": "0",
       "skipped": "0",
-      "time": "0.025"
+      "time": "0.024"
     }
   ],
   "total": {
-    "tests": 140,
+    "tests": 142,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
-  "postgresIntegrationTests": 50,
+  "postgresIntegrationTests": 52,
   "clientSessionTests": {
     "tests": 5,
     "pass": 5,
@@ -118,7 +118,9 @@
     "logo/menu, retained navigation position, responsive and light/dark",
     "forgot-password writes a private local test email",
     "HR attendance station produces rotating QR",
-    "executive approval workspace and personnel/delegation forms"
+    "executive approval workspace and personnel/delegation forms",
+    "Admin and employee work/handover reviewed again; cancel/reopen forms",
+    "Android work comment appears in web with progress still 65%"
   ],
-  "mobile": "Deferred explicitly until user reviews web; no native client changes"
+  "mobile": "Android first client implemented; see reports/mobile-validation.json and MOBILE_FIRST_CLIENT_2026-10-30.md. Device QR end-to-end, ARM/iOS/release and attachment workflows remain pending."
 }

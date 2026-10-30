@@ -47,8 +47,6 @@ const icon = (n) =>
 const labels = {
   BLOCKED: "Đang vướng",
   BLOCK: "Báo vướng mắc",
-  RESUME: "Tiếp tục thực hiện",
-  CANCEL: "Hủy công việc",
   REQUEST_CANCEL: "Đề nghị hủy",
   APPROVE_CANCEL: "Đồng ý hủy",
   DENY_CANCEL: "Không chấp nhận hủy",
@@ -76,6 +74,7 @@ const labels = {
   MEDIUM: "Bình thường",
   HIGH: "Cao",
   URGENT: "Khẩn cấp",
+  CRITICAL: "Khẩn cấp",
   ACTIVE: "Hoạt động",
   LOCKED: "Đang khóa",
   DISABLED: "Ngừng truy cập",
@@ -102,11 +101,23 @@ const labels = {
   CREATED: "Tạo công việc",
   OFFBOARDING: "Chuyển vào danh sách bàn giao",
 };
+const workLabels = {
+  ...labels,
+  RESUME: "Tiếp tục thực hiện",
+  CANCEL: "Hủy công việc",
+};
 const pill = (code, custom) =>
   `<span class="pill ${
     ["COMPLETED", "CLOSED", "ACTIVE"].includes(code)
       ? "lime"
-      : ["HIGH", "URGENT", "LOCKED", "DISABLED", "REJECTED"].includes(code)
+      : [
+          "HIGH",
+          "URGENT",
+          "CRITICAL",
+          "LOCKED",
+          "DISABLED",
+          "REJECTED",
+        ].includes(code)
       ? "red"
       : ["HANDOVER", "REVIEW", "RESOLVED"].includes(code)
       ? "purple"
@@ -679,7 +690,7 @@ function workDetail(w) {
               : a === "APPROVE"
               ? "check"
               : "arrow"
-          )} ${labels[a === "HANDOVER" ? "HANDOVER_ACTION" : a]}`,
+          )} ${workLabels[a === "HANDOVER" ? "HANDOVER_ACTION" : a]}`,
           ["START", "SUBMIT", "APPROVE", "ACCEPT_HANDOVER"].includes(a)
             ? "primary small"
             : "small",
@@ -1362,7 +1373,7 @@ function workCommand(action) {
   }
   let fields = "",
     intro = "",
-    submit = labels[action === "HANDOVER" ? "HANDOVER_ACTION" : action];
+    submit = workLabels[action === "HANDOVER" ? "HANDOVER_ACTION" : action];
   if (action === "PROGRESS")
     fields += field("progress", "Tiến độ (%)", "number", {
       value: w.progress,
@@ -1460,7 +1471,7 @@ function requestForm(edit = false) {
       }) +
       field("priority", "Mức ưu tiên đề nghị", "select", {
         value: r?.priority || "MEDIUM",
-        choices: ["LOW", "MEDIUM", "HIGH", "URGENT"].map((v) => ({
+        choices: ["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((v) => ({
           value: v,
           label: labels[v],
         })),

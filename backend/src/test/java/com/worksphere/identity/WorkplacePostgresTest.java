@@ -34,6 +34,38 @@ import java.util.concurrent.*;
 @SpringBootTest
 @EnabledIfEnvironmentVariable(named = "WORKSPHERE_AUTHZ_TEST_JDBC_URL", matches = ".+")
 class WorkplacePostgresTest {
+    @Test
+    void personalIncomeEndpointNeverReturnsOtherPeopleEvenForPayrollSpecialist() throws Exception {
+        timeSetup();
+        UUID id = income("2020-02-03");
+        assertThat(data(call("GET", "/workplace/time/incomes/mine?period=2020-02", e, null)))
+                .isEmpty();
+        db.update("UPDATE income_periods SET approval_state='PUBLISHED' WHERE id=?", id);
+        db.update(
+                "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'PAYROLL_MANAGE')",
+                employee.getId());
+        var own = data(call("GET", "/workplace/time/incomes/mine?period=2020-02", e, null));
+        assertThat(own).hasSize(1);
+        assertThat(own.get(0).path("user_id").asText()).isEqualTo(employee.getId().toString());
+        assertThat(data(call("GET", "/workplace/time/incomes/mine?period=2020-02", h, null)))
+                .isEmpty();
+        assertThat(data(call("GET", "/workplace/time/incomes/mine?period=2020-02", a, null)))
+                .isEmpty();
+        db.update(
+                "INSERT INTO income_adjustments(id,income_id,created_by,reason,amount) VALUES"
+                    + " (?,?,?,?,?)",
+                UUID.randomUUID(),
+                id,
+                hr.getId(),
+                "Pending review",
+                1000);
+        assertThat(
+                        data(call("GET", "/workplace/time/incomes/mine?period=2020-02", e, null))
+                                .get(0)
+                                .path("adjustments"))
+                .isEmpty();
+    }
+
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry p) {
         p.add("spring.datasource.url", () -> System.getenv("WORKSPHERE_AUTHZ_TEST_JDBC_URL"));
@@ -46,6 +78,7 @@ class WorkplacePostgresTest {
                 () -> "authorization-integration-test-signing-key-not-for-production");
         p.add("worksphere.dev.e2e-user.enabled", () -> "false");
         p.add("worksphere.web-demo.enabled", () -> "false");
+        p.add("worksphere.mail.local-enabled", () -> "false");
         p.add("worksphere.people.scheduling.enabled", () -> "false");
         p.add("worksphere.notification.scheduling.enabled", () -> "false");
         p.add("worksphere.storage.path", () -> "target/authz-test-uploads");
@@ -2236,5 +2269,27 @@ class WorkplacePostgresTest {
                                 Integer.class,
                                 otherManager.getId()))
                 .isEqualTo(1);
+    }
+
+    @Test
+    void wrongPasswordDoesNotDiscloseWhetherAccountIsLockedPendingOrDisabled() throws Exception {
+        for (String accountState : List.of("ACTIVE", "LOCKED", "PENDING", "DISABLED")) {
+            db.update("UPDATE users SET status=? WHERE id=?", accountState, employee.getId());
+            var response =
+                    call(
+                            "POST",
+                            "/auth/login",
+                            null,
+                            Map.of(
+                                    "login",
+                                    employee.getUsername(),
+                                    "password",
+                                    "Incorrect-test-password-123"));
+            var error = json.readTree(response.getResponse().getContentAsString());
+            assertThat(error.path("code").asText()).isEqualTo("INVALID_CREDENTIALS");
+            assertThat(error.path("message").asText())
+                    .isEqualTo("Thông tin đăng nhập không chính xác");
+            assertThat(error.path("data").isNull() || error.path("data").isMissingNode()).isTrue();
+        }
     }
 }

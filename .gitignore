@@ -13,6 +13,8 @@
 backend/target/
 *.class
 *.jar
+# Official Gradle bootstrap is required to build a fresh clone.
+!mobile/android/gradle/wrapper/gradle-wrapper.jar
 *.war
 
 # Node and React Native
