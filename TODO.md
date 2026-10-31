@@ -78,3 +78,4 @@ Ngày31/10 người dùng cho phép tiếp tục dù hạn mức tuần còn5%, 
 - [x] Ngày31/10: toàn bộ mobile95 suites/832 tests và TypeScript đạt; lint5 file thay đổi0errors/2warnings. Backend150 là kết quả30/10, không chạy lại hôm nay.
 
 - [x] Nhãn ngày nghỉ/ngày lễ và khung ca thường web/mobile đúng day_kind; OT tiếp tục theo actions máy chủ, thêm2 tests, không đổi lịch.
+- [x] Biểu mẫu kích hoạt Android có lối quay về Login trước khi kích hoạt; mở rộng test không POST và biểu mẫu/token rời màn hình. Kiểm tra trên OPPO vẫn cần nghiệm thu.

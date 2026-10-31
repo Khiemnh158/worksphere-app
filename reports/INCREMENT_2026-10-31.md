@@ -28,3 +28,7 @@ Android localDemo: BUILD SUCCESSFUL4m37s,151tasks; cài cập nhật lên OPPO k
 Web/mobile phân biệt WEEKLY_OFF/HOLIDAY khi chưa vào ca: ghi Ngày nghỉ theo lịch, ẩn khung ca thường; giữ nút OT chỉ theo actions máy chủ. Hai ca regression kiểm tra ngày nghỉ/ngày lễ không mở IN nhưng giữ OT được phép. Backend/lịch/tiền không đổi. Web đã xác minh trực tiếp sau reload.
 
 Bộ cuối95 suites/832 tests đạt32.174s; TypeScript đạt. Lint tăng thêm2file0errors/3warnings (cộng lần7files0errors/5warnings). APK cuối build47s/151tasks, tiếp tục có bundle ARM64+x86_64. Không dùng kết quả fixture thay nghiệm thu QR/OT thật.
+
+## Bổ sung sau khi tiếp tục dưới1%
+
+Biểu mẫu kích hoạt Android có nút Về đăng nhập cả trước khi kích hoạt. Khi bấm, xóa giá trị token/mật khẩu trong state của biểu mẫu và reset stack về Login; không tự gửi API. Kiểm thử navigator mở link → về Login → biểu mẫu/token không còn hiện và không POST đạt (1 test mở rộng,4.352s); TypeScript đạt. Bộ832 tests đầy đủ là kết quả trước thay đổi nhỏ này, không ghi là đã chạy lại toàn bộ sau bổ sung. Nghiệm thu UI thực trên thiết bị vẫn ghi riêng.

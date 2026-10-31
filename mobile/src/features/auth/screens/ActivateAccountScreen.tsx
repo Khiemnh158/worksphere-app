@@ -111,6 +111,17 @@ export function ActivateAccountScreen() {
         onChange={setConfirmPassword}
       />
       <Button title="Kích hoạt" busy={busy} onPress={() => void submit()} />
+      <Button
+        title="Về đăng nhập"
+        secondary
+        busy={busy}
+        onPress={() => {
+          setToken('');
+          setPassword('');
+          setConfirmPassword('');
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        }}
+      />
     </Page>
   );
 }
