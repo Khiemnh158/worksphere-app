@@ -6,6 +6,7 @@ import { WorkspaceNavigator } from '../../features/workspace/WorkspaceNavigator'
 import { useAppTheme } from '../providers/ThemeProvider';
 import { useAuth } from '../auth';
 import type { RootStackParamList, SessionState } from './types';
+import { useRecoveryLink } from './recoveryLinks';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -19,6 +20,7 @@ export function RootNavigator({
   const theme = useAppTheme();
   const auth = useAuth();
   const sessionState = explicitSessionState ?? auth.sessionState;
+  const recovery = useRecoveryLink(sessionState);
 
   if (sessionState === 'INITIALIZING') {
     if (auth.canRetryBootstrap) {
@@ -120,7 +122,12 @@ export function RootNavigator({
           navigationKey={auth.currentUser?.id ?? 'session'}
         />
       ) : (
-        <Stack.Screen name="Auth" component={AuthNavigator} />
+        <Stack.Screen
+          name="Auth"
+          navigationKey={`auth-${recovery?.sequence ?? 0}`}
+        >
+          {() => <AuthNavigator recovery={recovery ?? undefined} />}
+        </Stack.Screen>
       )}
     </Stack.Navigator>
   );

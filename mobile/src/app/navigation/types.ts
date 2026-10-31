@@ -13,7 +13,7 @@ export type AuthStackParamList = {
   Login: undefined;
   ForgotPassword: { email?: string } | undefined;
   ResetPassword: { token?: string } | undefined;
-  ActivateAccount: undefined;
+  ActivateAccount: { token?: string } | undefined;
 };
 
 export type MainTabParamList = {

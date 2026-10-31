@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { http } from '../../../shared/api/apiClient';
 import { normalizeError } from '../../../shared/api/apiError';
-import type { AuthNavigationProp } from '../../../app/navigation/types';
+import type {
+  AuthNavigationProp,
+  AuthRouteProp,
+} from '../../../app/navigation/types';
 import { Button, Copy, Field, Page } from '../../workspace/ui';
 import { validateResetPassword } from '../validation/authValidation';
 
@@ -10,7 +13,8 @@ import { recoveryToken } from '../validation/recoveryToken';
 
 export function ActivateAccountScreen() {
   const navigation = useNavigation<AuthNavigationProp<'ActivateAccount'>>();
-  const [token, setToken] = useState('');
+  const route = useRoute<AuthRouteProp<'ActivateAccount'>>();
+  const [token, setToken] = useState(route.params?.token ?? '');
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -63,7 +67,12 @@ export function ActivateAccountScreen() {
       <Page>
         <Copy title>Kích hoạt thành công</Copy>
         <Copy>Đăng nhập bằng tên và mật khẩu bạn vừa đặt.</Copy>
-        <Button title="Về đăng nhập" onPress={() => navigation.popToTop()} />
+        <Button
+          title="Về đăng nhập"
+          onPress={() =>
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] })
+          }
+        />
       </Page>
     );
   return (

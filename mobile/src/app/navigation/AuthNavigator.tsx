@@ -8,15 +8,16 @@ import {
 import { useAppTheme } from '../providers/ThemeProvider';
 import type { AuthStackParamList } from './types';
 import { ActivateAccountScreen } from '../../features/auth/screens/ActivateAccountScreen';
+import type { RecoveryLink } from './recoveryLinks';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
-export function AuthNavigator() {
+export function AuthNavigator({ recovery }: { recovery?: RecoveryLink }) {
   const theme = useAppTheme();
 
   return (
     <Stack.Navigator
-      initialRouteName="Login"
+      initialRouteName={recovery?.screen ?? 'Login'}
       screenOptions={{
         headerStyle: {
           backgroundColor: theme.colors.surface,
@@ -44,11 +45,21 @@ export function AuthNavigator() {
       <Stack.Screen
         name="ResetPassword"
         component={ResetPasswordScreen}
+        initialParams={
+          recovery?.screen === 'ResetPassword'
+            ? { token: recovery.token }
+            : undefined
+        }
         options={{ title: 'Đặt lại mật khẩu' }}
       />
       <Stack.Screen
         name="ActivateAccount"
         component={ActivateAccountScreen}
+        initialParams={
+          recovery?.screen === 'ActivateAccount'
+            ? { token: recovery.token }
+            : undefined
+        }
         options={{ title: 'Kích hoạt tài khoản' }}
       />
     </Stack.Navigator>

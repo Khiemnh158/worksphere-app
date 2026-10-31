@@ -1,21 +1,22 @@
 {
-  "date": "2026-10-30",
+  "date": "2026-10-31",
   "scope": "Android first client on shared web backend; not complete mobile release",
   "typecheck": {
     "exitCode": 0
   },
   "jest": {
-    "suitesPassed": 93,
-    "suitesTotal": 93,
-    "testsPassed": 824,
-    "testsTotal": 824,
+    "suitesPassed": 95,
+    "suitesTotal": 95,
+    "testsPassed": 830,
+    "testsTotal": 830,
     "skipped": 0,
-    "seconds": 67.013,
+    "seconds": 72.331,
     "notes": "Inherited act warnings remain"
   },
   "lintChangedSource": {
     "errors": 0,
-    "warnings": 32
+    "warnings": 32,
+    "date": "2026-10-30"
   },
   "android": {
     "target": "debug x86_64",
@@ -39,7 +40,7 @@
   "remaining": [
     "Physical QR IN/OUT and camera/network edge cases",
     "Mobile attachment workflows",
-    "OS deep links",
+    "Physical OS-link acceptance; verified HTTPS App Links and iOS",
     "Push/realtime/offline",
     "ARM release signing and iOS",
     "User acceptance"
@@ -74,9 +75,22 @@
     "environment": "loopback local, debug signed",
     "emulatorLoginAndAttendance": "PASS",
     "physicalNewBuildOut": "NOT_VERIFIED",
-    "buildSeconds": 48,
+    "buildSeconds": 277,
     "tasks": 151,
     "profileBasics": "IMPLEMENTED; two regression tests pass; physical UI not verified",
-    "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made"
+    "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made",
+    "physicalInstallAndUserLaunch": "PASS; Android localDemo on existing USB device",
+    "physicalRecoveryLink": "PENDING"
+  },
+  "lintLatestIncrement": {
+    "files": 5,
+    "errors": 0,
+    "warnings": 2
+  },
+  "recoveryLinks": {
+    "implementation": "Android custom scheme with strict parser and session guard",
+    "webFixtureButton": "VERIFIED",
+    "automaticCredentialSubmission": false,
+    "physicalFormAcceptance": "PENDING"
   }
 }

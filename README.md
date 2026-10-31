@@ -14,7 +14,7 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ cho do
 
 ## Trạng thái
 
-Đã có web nghiệp vụ và client Android; chưa nghiệm thu toàn bộ sản phẩm hoặc production. Lần chạy code gần nhất 30/10: 150 backend tests chọn lọc (56 PostgreSQL thật), 5 tests phiên web và 824 mobile tests/93 suites đạt. Không nhận đây là kết quả chạy lại ngày 31/10 hoặc toàn bộ backend kế thừa.
+Đã có web nghiệp vụ và client Android; chưa nghiệm thu toàn bộ sản phẩm hoặc production. Lần chạy code gần nhất 30/10: 150 backend tests chọn lọc (56 PostgreSQL thật), 5 tests phiên web và 824 mobile tests/93 suites đạt. Backend chưa chạy lại31/10 và không phải toàn bộ mã kế thừa. Mobile đã chạy lại31/10:830 tests/95 suites và TypeScript đạt; có Android recovery links. Xem [báo cáo31/10](reports/INCREMENT_2026-10-31.md).
 
 ## Ba repository
 

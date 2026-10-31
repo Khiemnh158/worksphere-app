@@ -34,7 +34,8 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [ ] Tải lên/xem/tải tệp đính kèm mobile; hiện chỉ có metadata tệp công việc, thao tác tệp trên web.
 - [x] Mobile: đổi mật khẩu, thiết lập/bật/tắt TOTP, mã dự phòng một lần và đăng xuất mọi thiết bị; che secrets khi background/blur, không giả báo remote logout thành công khi mất mạng.
 - [x] Mobile sửa họ tên/số liên hệ qua /me; giữ số đã có khi chỉ sửa tên, không gửi thay đổi quyền/phòng/ảnh.
-- [ ] Deep link OS; hiện kích hoạt/reset bằng dán liên kết.
+- [x] Android custom scheme kích hoạt/reset, warm/cold/session guard và nút từ web; không tự POST khi mở.
+- [ ] Nghiệm thu OS link trọn vòng trên OPPO; HTTPS App Links xác minh miền/iOS chưa có. Dán liên kết web vẫn dùng được.
 - [ ] Push khi ứng dụng đóng/realtime; hiện làm mới khi focus/foreground hoặc bấm cập nhật.
 - [ ] Điều phối hỗ trợ mở rộng (chuyển phòng/đề nghị hủy/đổi người kèm rà soát), tạo/sửa việc từ mobile nếu chốt cần mang khỏi web. Hiện thực hiện đầy đủ trên web, không hiện nút giả.
 - [x] Build/cài Android debug arm64-v8a trên OPPO thật qua USB; vẫn phụ thuộc Metro/backend local. Đã xác nhận lượt IN bằng camera điện thoại thật trong môi trường thử local; OUT còn chờ.
@@ -73,3 +74,5 @@ Ngày31/10 người dùng cho phép tiếp tục dù hạn mức tuần còn5%, 
 - [x] Một đầu mối PROJECT_GUIDE: kiến trúc, vai trò, luồng, bảng giao việc/đầu ra/nghiệm thu và khung báo cáo/slide.
 - [x] README/STATUS/COURSE_SCOPE/RUNNING gọn, xóa năm kế hoạch/trạng thái bị thay thế; giữ bằng chứng riêng và nguồn gốc.
 - [ ] Đối chiếu rubric/mẫu giảng viên; tạo báo cáo/slide thực tế sau khi chốt bằng chứng.
+
+- [x] Ngày31/10: toàn bộ mobile95 suites/830 tests và TypeScript đạt; lint5 file thay đổi0errors/2warnings. Backend150 là kết quả30/10, không chạy lại hôm nay.

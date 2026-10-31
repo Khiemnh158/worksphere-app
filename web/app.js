@@ -3031,13 +3031,21 @@ function recoveryView(mode, token) {
               max: 20,
             })
           : "") +
-        field("password", "Mật khẩu mới (12–128 ký tự)", "password", {
+        field("password", "Mật khẩu mới (ít nhất 12 ký tự, tối đa 72 byte UTF-8)", "password", {
           max: 128,
         }) +
         field("confirmPassword", "Nhập lại mật khẩu", "password", { max: 128 })
   }<div class="form-error" role="alert"></div><button class="btn primary" type="submit">${
     forgot ? "Gửi liên kết" : "Xác nhận"
   }</button></form><p class="login-foot"><a href="#login">Về đăng nhập</a></p>`;
+  if (!forgot && /^[A-Za-z0-9_-]{43}$/.test(token || "")) {
+    const openApp = document.createElement("a");
+    openApp.className = "btn secondary";
+    openApp.textContent = "Mở trong ứng dụng Android";
+    openApp.href = `worksphere://${activate ? "activate" : "reset"}/${token}`;
+    openApp.rel = "noreferrer";
+    box.append(openApp);
+  }
   document
     .querySelector("#recovery-form")
     .addEventListener("submit", async (e) => {
