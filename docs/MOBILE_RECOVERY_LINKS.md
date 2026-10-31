@@ -19,4 +19,4 @@ Custom scheme phù hợp demo local, chưa phải Android App Links đã xác mi
 
 ## Kiểm chứng
 
-31/10: parser và lifecycle có test warm/cold, bootstrap, khôi phục phiên, late initial URL, cleanup và URI sai; test navigator mở activation đúng token mà không POST. TypeScript và toàn bộ mobile95 suites/830 tests đạt. Web đã xác minh nút bằng token fixture không có giá trị. Build/cài/kiểm tra thiết bị ghi riêng trong báo cáo đợt này; không dùng Jest thay cho nghiệm thu Android thật.
+31/10: parser và lifecycle có test warm/cold, bootstrap, khôi phục phiên, late initial URL, cleanup và URI sai; test navigator mở activation đúng token mà không POST. TypeScript và toàn bộ mobile95 suites/832 tests đạt. Web đã xác minh nút bằng token fixture không có giá trị. Build/cài/kiểm tra thiết bị ghi riêng trong báo cáo đợt này; không dùng Jest thay cho nghiệm thu Android thật.

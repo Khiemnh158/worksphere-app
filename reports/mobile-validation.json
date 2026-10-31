@@ -7,10 +7,10 @@
   "jest": {
     "suitesPassed": 95,
     "suitesTotal": 95,
-    "testsPassed": 830,
-    "testsTotal": 830,
+    "testsPassed": 832,
+    "testsTotal": 832,
     "skipped": 0,
-    "seconds": 72.331,
+    "seconds": 32.174,
     "notes": "Inherited act warnings remain"
   },
   "lintChangedSource": {
@@ -75,7 +75,7 @@
     "environment": "loopback local, debug signed",
     "emulatorLoginAndAttendance": "PASS",
     "physicalNewBuildOut": "NOT_VERIFIED",
-    "buildSeconds": 277,
+    "buildSeconds": 47,
     "tasks": 151,
     "profileBasics": "IMPLEMENTED; two regression tests pass; physical UI not verified",
     "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made",
@@ -83,14 +83,20 @@
     "physicalRecoveryLink": "PENDING"
   },
   "lintLatestIncrement": {
-    "files": 5,
+    "files": 7,
     "errors": 0,
-    "warnings": 2
+    "warnings": 5,
+    "batches": "recovery5files + dayoff2files"
   },
   "recoveryLinks": {
     "implementation": "Android custom scheme with strict parser and session guard",
     "webFixtureButton": "VERIFIED",
     "automaticCredentialSubmission": false,
     "physicalFormAcceptance": "PENDING"
+  },
+  "dayOffLabel": {
+    "weeklyOffAndHolidayRegression": "PASS",
+    "webActualUi": "VERIFIED",
+    "physicalUpdatedLabel": "PENDING_USER_ACCEPTANCE"
   }
 }

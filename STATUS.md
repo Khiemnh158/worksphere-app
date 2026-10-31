@@ -27,4 +27,4 @@ Không tính % hoàn thành bằng số ô TODO, không khẳng định hết l�
 
 ## Cập nhật kiểm chứng31/10
 
-Mobile95 suites/830 tests và TypeScript đạt (72.331s); lint5 file liên quan0errors/2warnings, act warnings kế thừa còn. Android localDemo build4m37s/151tasks, cài cập nhật OPPO và người dùng xác nhận mở ứng dụng; OSlink/QR đủ vòng vẫn cần nghiệm thu riêng. Web có nút mở Android trên biểu mẫu khôi phục với token fixture; không đổi credential thật. Backend không thay đổi,150 tests là bằng chứng30/10. Xem [báo cáo31/10](reports/INCREMENT_2026-10-31.md).
+Mobile95 suites/832 tests và TypeScript đạt (32.174s); lint5 file liên quan0errors/2warnings, act warnings kế thừa còn. Android localDemo build4m37s/151tasks, cài cập nhật OPPO và người dùng xác nhận mở ứng dụng; OSlink/QR đủ vòng vẫn cần nghiệm thu riêng. Web có nút mở Android trên biểu mẫu khôi phục với token fixture; không đổi credential thật. Backend không thay đổi,150 tests là bằng chứng30/10. Xem [báo cáo31/10](reports/INCREMENT_2026-10-31.md).

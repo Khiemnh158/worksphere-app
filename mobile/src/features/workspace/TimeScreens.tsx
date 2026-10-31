@@ -198,23 +198,31 @@ export function TimeScreen() {
           người khác.
         </Copy>
         <Copy>
-          {(
-            {
-              NOT_STARTED: 'Chưa vào ca',
-              WORKING: 'Đã vào — chưa ra ca',
-              COMPLETED: 'Đã kết thúc ca',
-            } as Record<string, string>
-          )[state.data?.today?.status ?? ''] ??
-            'Đang kiểm tra trạng thái máy chủ'}
+          {state.data?.today?.status === 'NOT_STARTED' &&
+          ['WEEKLY_OFF', 'HOLIDAY'].includes(
+            state.data.today.calendar?.day_kind ?? '',
+          )
+            ? 'Ngày nghỉ theo lịch · công thường không mở'
+            : (
+                {
+                  NOT_STARTED: 'Chưa vào ca',
+                  WORKING: 'Đã vào — chưa ra ca',
+                  COMPLETED: 'Đã kết thúc ca',
+                } as Record<string, string>
+              )[state.data?.today?.status ?? ''] ??
+              'Đang kiểm tra trạng thái máy chủ'}
         </Copy>
-        {state.data?.today?.calendar && (
-          <Copy muted>
-            Ca {state.data.today.calendar.shift_start}–
-            {state.data.today.calendar.shift_end} · Nghỉ{' '}
-            {state.data.today.calendar.break_start ?? 'chưa cấu hình'}–
-            {state.data.today.calendar.break_end ?? ''}
-          </Copy>
-        )}
+        {state.data?.today?.calendar &&
+          !['WEEKLY_OFF', 'HOLIDAY'].includes(
+            state.data.today.calendar.day_kind ?? '',
+          ) && (
+            <Copy muted>
+              Ca {state.data.today.calendar.shift_start}–
+              {state.data.today.calendar.shift_end} · Nghỉ{' '}
+              {state.data.today.calendar.break_start ?? 'chưa cấu hình'}–
+              {state.data.today.calendar.break_end ?? ''}
+            </Copy>
+          )}
         <Copy muted>{state.data?.today?.message}</Copy>
         {state.data?.today && !state.data.today.actions.length && (
           <Copy muted>

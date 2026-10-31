@@ -34,6 +34,41 @@ const request = {
 };
 beforeEach(() => jest.clearAllMocks());
 
+test.each(['WEEKLY_OFF', 'HOLIDAY'])(
+  'a %s day does not tell the employee to start a regular shift, but preserves approved OT actions',
+  async dayKind => {
+    (workspaceApi.time as jest.Mock).mockResolvedValue({
+      attendance: [],
+      balances: [],
+      requests: [],
+      today: {
+        status: 'NOT_STARTED',
+        actions: ['OT_IN'],
+        punches: [],
+        calendar: {
+          day_kind: dayKind,
+          shift_start: '08:00',
+          shift_end: '17:00',
+        },
+      },
+    });
+    const ui = await render(
+      <ThemeProvider theme={theme}>
+        <TimeScreen />
+      </ThemeProvider>,
+    );
+    await waitFor(() =>
+      expect(
+        ui.getByText('Ngày nghỉ theo lịch · công thường không mở'),
+      ).toBeTruthy(),
+    );
+    expect(ui.queryByText('Chưa vào ca')).toBeNull();
+    expect(ui.queryByText('Quét QR · Vào ca')).toBeNull();
+    expect(ui.queryByText(/Ca 08:00/)).toBeNull();
+    expect(ui.getByText('Quét QR · Bắt đầu OT')).toBeTruthy();
+  },
+);
+
 test('an open IN only exposes the server-provided OUT action and preserves the saved punch', async () => {
   (workspaceApi.time as jest.Mock).mockResolvedValue({
     attendance: [],

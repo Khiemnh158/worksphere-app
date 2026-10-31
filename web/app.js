@@ -1981,7 +1981,10 @@ async function timeView() {
     )}</div><section class="panel"><h2>Chấm công hôm nay</h2><p>${esc(
       data.today?.message || ""
     )}</p><p>${
-      {
+      data.today?.status === "NOT_STARTED" &&
+      ["WEEKLY_OFF", "HOLIDAY"].includes(data.today?.calendar?.day_kind)
+        ? "Ngày nghỉ theo lịch · công thường không mở"
+        : {
         NOT_STARTED: "Chưa vào ca",
         WORKING: "Đã vào — chưa ra ca",
         COMPLETED: "Đã kết thúc ca",
@@ -1991,7 +1994,8 @@ async function timeView() {
     } phút · Về sớm ${
       data.today?.earlyMinutes || 0
     } phút. Không tự sinh khoản phạt.</p>${
-      data.today?.calendar
+      data.today?.calendar &&
+      !["WEEKLY_OFF", "HOLIDAY"].includes(data.today.calendar.day_kind)
         ? `<p class="muted">Ca ${esc(data.today.calendar.shift_start)}–${esc(
             data.today.calendar.shift_end
           )} · Nghỉ ${esc(

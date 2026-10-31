@@ -151,6 +151,7 @@ export interface AttendanceToday {
   actions: PunchAction[];
   punches: PunchRow[];
   calendar: {
+    day_kind?: 'NORMAL' | 'WEEKLY_OFF' | 'HOLIDAY';
     shift_start: string;
     shift_end: string;
     break_start?: string;
