@@ -1,4 +1,6 @@
-# Web: hợp đồng nghiệp vụ đang triển khai
+# Web: hợp đồng nghiệp vụ nền
+
+Đọc các bổ sung hiện hành [WEB_PHASE2_CONTRACT](WEB_PHASE2_CONTRACT.md) và [ATTENDANCE_POLICY](ATTENDANCE_POLICY.md): các mục mới thay giới hạn cũ tương ứng. Mobile/QR/email local đã có; xem STATUS cho kết quả mới nhất.
 
 Nguồn yêu cầu: các quyết định người dùng chốt trong cuộc trao đổi ngày 29/10/2026. Đây là cổng web nối máy chủ và PostgreSQL, thay bản prototype đổi persona. Dữ liệu thực hành của An Phát được tạo riêng, không phải dữ liệu doanh nghiệp thật.
 

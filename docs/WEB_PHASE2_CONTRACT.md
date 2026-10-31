@@ -1,5 +1,7 @@
 # Hợp đồng web giai đoạn 2
 
+Bổ sung chấm công hiện hành: [ATTENDANCE_POLICY](ATTENDANCE_POLICY.md). Các giới hạn mobile/OT/QR cũ bên dưới được thay ở phần tương ứng; xem STATUS để biết đã kiểm chứng đến đâu.
+
 Ngày 30/10/2026. Tài liệu này bổ sung và thay các giới hạn cũ tương ứng trong WEB_WORKFLOWS.md. Không phải một bộ quy trình pháp lý áp dụng cho mọi doanh nghiệp.
 
 ## Tổ chức và quyền

@@ -1,6 +1,6 @@
 # Kết quả web giai đoạn 2 — 30/10/2026
 
-Triển khai theo phản hồi bảy ảnh và kế hoạch WEB_PHASE2_PLAN. Người dùng đã chọn hộp thư thử local, QR xoay vòng và yêu cầu dừng trước mobile để kiểm tra web.
+Triển khai theo phản hồi bảy ảnh và hợp đồng WEB_PHASE2_CONTRACT (kế hoạch triển khai cũ đã gộp vào PROJECT_GUIDE). Người dùng đã chọn hộp thư thử local, QR xoay vòng và yêu cầu dừng trước mobile để kiểm tra web.
 
 ## Thay đổi chính
 

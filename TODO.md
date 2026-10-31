@@ -1,4 +1,4 @@
-# TODO hiện hành — 30/10/2026
+# TODO hiện hành — 31/10/2026
 
 Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/history/TODO-before-mobile-2026-10-30.md). Dấu hoàn thành chỉ áp dụng phạm vi mô tả, không xác nhận production/toàn bộ module kế thừa.
 
@@ -51,7 +51,7 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 
 ## Hạn mức
 
-Kiểm tra hạn mức thực sau mỗi chặng. Khi một cửa sổ còn ≤5%, dừng, lưu trạng thái/việc tiếp theo và báo người dùng. Chờ người dùng yêu cầu mới tiếp tục.
+Ngày31/10 người dùng cho phép tiếp tục dù hạn mức tuần còn5%, thay ngưỡng dừng trước đó. Theo dõi và lưu bàn giao trước khi hết; không cam kết đủ hạn mức để xong mọi việc.
 
 ## Chấm công sau rà soát — đã triển khai, còn nghiệm thu thiết bị
 
@@ -67,3 +67,9 @@ Kiểm tra hạn mức thực sau mỗi chặng. Khi một cửa sổ còn ≤5%
 - [ ] Phân trang punches (đang giới hạn 1000/kỳ) và giám sát tải khi mở rộng.
 
 Đọc docs/ATTENDANCE_POLICY.md và docs/FRESH_CLONE_RUNNING.md. Không khẳng định QR/IP chứng minh hiện diện tuyệt đối; không tự phạt tiền. Các chính sách/mạng thật chưa cung cấp không được tự giả định.
+
+## Tài liệu và giao việc — 31/10
+
+- [x] Một đầu mối PROJECT_GUIDE: kiến trúc, vai trò, luồng, bảng giao việc/đầu ra/nghiệm thu và khung báo cáo/slide.
+- [x] README/STATUS/COURSE_SCOPE/RUNNING gọn, xóa năm kế hoạch/trạng thái bị thay thế; giữ bằng chứng riêng và nguồn gốc.
+- [ ] Đối chiếu rubric/mẫu giảng viên; tạo báo cáo/slide thực tế sau khi chốt bằng chứng.
