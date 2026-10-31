@@ -39,18 +39,21 @@ public class ProjectMemberApplicationService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessPolicy accessPolicy;
     private final com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher;
 
     public ProjectMemberApplicationService(
             ProjectRepository projectRepository,
             ProjectMemberRepository projectMemberRepository,
             UserRepository userRepository,
-            com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher
+            com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher,
+            ProjectAccessPolicy accessPolicy
     ) {
         this.projectRepository = projectRepository;
         this.projectMemberRepository = projectMemberRepository;
         this.userRepository = userRepository;
         this.eventDispatcher = eventDispatcher;
+        this.accessPolicy = accessPolicy;
     }
 
     @Transactional(readOnly = true)
@@ -74,7 +77,7 @@ public class ProjectMemberApplicationService {
         Project project = projectRepository.findActiveById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
 
-        verifyProjectReadAccess(project.getId(), principal);
+        accessPolicy.requireRead(project.getId(), principal != null ? principal.userId() : null);
 
         Page<ProjectMember> page = projectMemberRepository.searchMembers(project.getId(), role, active, pageable);
 
@@ -92,8 +95,9 @@ public class ProjectMemberApplicationService {
 
     @Transactional
     public ProjectMemberResponse addMember(UUID projectId, AddProjectMemberRequest request, UUID currentUserId) {
-        Project project = projectRepository.findActiveById(projectId)
+        Project project = projectRepository.findActiveByIdForUpdate(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
+        accessPolicy.requireManage(projectId, currentUserId, "PROJECT_MEMBER_MANAGE");
 
         if (project.getStatus() != ProjectStatus.ACTIVE && project.getStatus() != ProjectStatus.DRAFT) {
             throw new BusinessRuleException("PROJECT_NOT_ACTIVE", "Dự án không ở trạng thái hoạt động");
@@ -129,9 +133,10 @@ public class ProjectMemberApplicationService {
     }
 
     @Transactional
-    public ProjectMemberResponse updateMemberRole(UUID projectId, UUID memberId, UpdateProjectMemberRoleRequest request) {
-        projectRepository.findActiveById(projectId)
+    public ProjectMemberResponse updateMemberRole(UUID projectId, UUID memberId, UpdateProjectMemberRoleRequest request, UUID currentUserId) {
+        projectRepository.findActiveByIdForUpdate(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
+        accessPolicy.requireManage(projectId, currentUserId, "PROJECT_MEMBER_MANAGE");
 
         ProjectMember member = projectMemberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("MEMBER_NOT_FOUND", "Thành viên dự án không tồn tại"));
@@ -164,9 +169,10 @@ public class ProjectMemberApplicationService {
     }
 
     @Transactional
-    public void removeMember(UUID projectId, UUID memberId) {
-        projectRepository.findActiveById(projectId)
+    public void removeMember(UUID projectId, UUID memberId, UUID currentUserId) {
+        projectRepository.findActiveByIdForUpdate(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
+        accessPolicy.requireManage(projectId, currentUserId, "PROJECT_MEMBER_MANAGE");
 
         ProjectMember member = projectMemberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("MEMBER_NOT_FOUND", "Thành viên dự án không tồn tại"));
@@ -188,38 +194,4 @@ public class ProjectMemberApplicationService {
         log.info("Project member removed. projectId={}, memberId={}", projectId, memberId);
     }
 
-    private void verifyProjectReadAccess(UUID projectId, WorkSphereUserPrincipal principal) {
-        if (principal == null) {
-            throw new AccessDeniedException("Yêu cầu xác thực");
-        }
-        if (hasSystemAdminRole(principal)) {
-            return;
-        }
-        boolean isMember = projectMemberRepository.existsByProjectIdAndUserIdAndActiveTrue(projectId, principal.userId());
-        if (!isMember) {
-            throw new AccessDeniedException("Bạn không có quyền truy cập dự án này");
-        }
-    }
-
-    private boolean hasSystemAdminRole(WorkSphereUserPrincipal principal) {
-        if (principal == null) {
-            return false;
-        }
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getAuthorities() != null) {
-            boolean hasAdminAuthority = auth.getAuthorities().stream()
-                    .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()) || "ADMIN".equals(a.getAuthority()));
-            if (hasAdminAuthority) {
-                return true;
-            }
-        }
-        if (principal.user() != null && principal.user().getRoles() != null) {
-            try {
-                return principal.user().getRoles().stream()
-                        .anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getCode()));
-            } catch (Exception ignored) {
-            }
-        }
-        return false;
-    }
 }

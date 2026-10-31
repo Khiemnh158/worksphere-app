@@ -128,6 +128,7 @@ public class DashboardMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         OpenEntityManagerInViewFilter osivFilter = new OpenEntityManagerInViewFilter();
         osivFilter.setServletContext(context.getServletContext());
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
@@ -141,8 +142,8 @@ public class DashboardMockMvcTest {
         createTestUser(user1Id, "dash_u1", "dash_u1@test.com", "EMPLOYEE");
         createTestUser(user2Id, "dash_u2", "dash_u2@test.com", "EMPLOYEE");
 
-        user1Token = jwtService.generateAccessToken(user1Id, UUID.randomUUID());
-        user2Token = jwtService.generateAccessToken(user2Id, UUID.randomUUID());
+        user1Token = authorizationAccessToken(user1Id);
+        user2Token = authorizationAccessToken(user2Id);
 
         categoryId = UUID.randomUUID();
         ServiceCategory category = ServiceCategory.create(
@@ -361,5 +362,15 @@ public class DashboardMockMvcTest {
 
         TaskAssignment assignment = TaskAssignment.create(UUID.randomUUID(), taskId, assigneeId, assigneeId);
         taskAssignmentRepository.save(assignment);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

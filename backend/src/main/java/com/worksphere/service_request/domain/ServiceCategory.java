@@ -7,19 +7,30 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * JPA Entity for service_categories table.
- * Per 05_DATABASE_DESIGN.md section 9.1 and V007 migration.
+ * JPA Entity for service_categories table. Per 05_DATABASE_DESIGN.md section 9.1 and V007
+ * migration.
  */
 @Entity
 @Table(name = "service_categories")
 public class ServiceCategory {
 
-    @Id
-    private UUID id;
+    @Column(name = "receiving_department_id")
+    private UUID receivingDepartmentId;
+
+    public UUID getReceivingDepartmentId() {
+        return receivingDepartmentId;
+    }
+
+    public void routeTo(UUID departmentId) {
+        this.receivingDepartmentId = departmentId;
+    }
+
+    @Id private UUID id;
 
     @Column(name = "parent_id")
     private UUID parentId;
@@ -53,8 +64,7 @@ public class ServiceCategory {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    protected ServiceCategory() {
-    }
+    protected ServiceCategory() {}
 
     public static ServiceCategory create(
             UUID id,
@@ -64,15 +74,15 @@ public class ServiceCategory {
             String description,
             ServicePriority defaultPriority,
             boolean active,
-            Instant now
-    ) {
+            Instant now) {
         ServiceCategory category = new ServiceCategory();
         category.id = id != null ? id : UUID.randomUUID();
         category.parentId = parentId;
         category.code = code;
         category.name = name;
         category.description = description;
-        category.defaultPriority = defaultPriority != null ? defaultPriority : ServicePriority.MEDIUM;
+        category.defaultPriority =
+                defaultPriority != null ? defaultPriority : ServicePriority.MEDIUM;
         category.active = active;
         category.deleted = false;
         category.createdAt = now != null ? now : Instant.now();
@@ -86,8 +96,7 @@ public class ServiceCategory {
             UUID parentId,
             ServicePriority defaultPriority,
             Boolean active,
-            Instant now
-    ) {
+            Instant now) {
         this.name = name;
         this.description = description;
         this.parentId = parentId;

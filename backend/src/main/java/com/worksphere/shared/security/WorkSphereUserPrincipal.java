@@ -7,7 +7,11 @@ import java.util.UUID;
 /**
  * Principal object stored in SecurityContext representing the authenticated user.
  */
-public record WorkSphereUserPrincipal(User user) {
+public record WorkSphereUserPrincipal(User user, UUID sessionId) {
+
+    public WorkSphereUserPrincipal(User user) {
+        this(user, null);
+    }
 
     public UUID userId() {
         return user.getId();

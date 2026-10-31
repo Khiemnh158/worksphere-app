@@ -9,9 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * User profile response per API Contract section 9.1.
- */
+/** User profile response per API Contract section 9.1. */
 public record UserProfileResponse(
         UUID id,
         String username,
@@ -24,23 +22,27 @@ public record UserProfileResponse(
         Set<String> roles,
         Set<String> permissions,
         Instant createdAt,
-        Instant lastLoginAt
-) {
+        Instant lastLoginAt) {
 
-    public record DepartmentInfo(UUID id, String code, String name) {
-    }
+    public record DepartmentInfo(UUID id, String code, String name) {}
 
     public static UserProfileResponse from(User user) {
-        Set<String> roleCodes = user.getRoles().stream()
-                .filter(Role::isActive)
-                .map(Role::getCode)
-                .collect(Collectors.toSet());
+        return from(user, null);
+    }
 
-        Set<String> permissionCodes = user.getRoles().stream()
-                .filter(Role::isActive)
-                .flatMap(role -> role.getPermissions().stream())
-                .map(Permission::getCode)
-                .collect(Collectors.toSet());
+    public static UserProfileResponse from(User user, DepartmentInfo department) {
+        Set<String> roleCodes =
+                user.getRoles().stream()
+                        .filter(Role::isActive)
+                        .map(Role::getCode)
+                        .collect(Collectors.toSet());
+
+        Set<String> permissionCodes =
+                user.getRoles().stream()
+                        .filter(Role::isActive)
+                        .flatMap(role -> role.getPermissions().stream())
+                        .map(Permission::getCode)
+                        .collect(Collectors.toSet());
 
         return new UserProfileResponse(
                 user.getId(),
@@ -50,11 +52,10 @@ public record UserProfileResponse(
                 user.getPhoneNumber(),
                 null, // avatarUrl: resolved via file module in Phase 6+
                 user.getStatus().name(),
-                null, // department: org module Phase 5
+                department,
                 roleCodes,
                 permissionCodes,
                 user.getCreatedAt(),
-                user.getLastLoginAt()
-        );
+                user.getLastLoginAt());
     }
 }

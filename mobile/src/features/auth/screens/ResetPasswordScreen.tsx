@@ -19,7 +19,11 @@ import { mapAuthError, AuthPresentationError } from '../errors/authErrorMapper';
 import { AppTextInput } from '../../../shared/components/AppTextInput';
 import { PasswordInput } from '../../../shared/components/PasswordInput';
 import { AppButton } from '../../../shared/components/AppButton';
-import type { AuthNavigationProp, AuthRouteProp } from '../../../app/navigation/types';
+import type {
+  AuthNavigationProp,
+  AuthRouteProp,
+} from '../../../app/navigation/types';
+import { recoveryToken } from '../validation/recoveryToken';
 
 export function ResetPasswordScreen() {
   const theme = useAppTheme();
@@ -31,8 +35,12 @@ export function ResetPasswordScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors<'resetToken' | 'newPassword' | 'confirmPassword'>>({});
-  const [globalError, setGlobalError] = useState<AuthPresentationError | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<
+    FieldErrors<'resetToken' | 'newPassword' | 'confirmPassword'>
+  >({});
+  const [globalError, setGlobalError] = useState<AuthPresentationError | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
@@ -43,7 +51,7 @@ export function ResetPasswordScreen() {
       return;
     }
 
-    const effectiveToken = routeToken || resetToken;
+    const effectiveToken = recoveryToken(routeToken || resetToken, 'reset');
 
     // Strict validation: passwords are untrimmed
     const validationErrors = validateResetPassword({
@@ -110,33 +118,66 @@ export function ResetPasswordScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { padding: theme.spacing.lg }]}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { padding: theme.spacing.lg },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
           {/* Canonical Screen ID badge */}
-          <View style={[styles.badge, { backgroundColor: theme.colors.primaryContainer, borderRadius: theme.radii.small }]}>
-            <Text style={[theme.typography.caption, { color: theme.colors.onPrimaryContainer }]}>
-              SCR-AUTH-04
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: theme.colors.primaryContainer,
+                borderRadius: theme.radii.small,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                theme.typography.caption,
+                { color: theme.colors.onPrimaryContainer },
+              ]}
+            >
+              KHÔI PHỤC TRUY CẬP
             </Text>
           </View>
 
-          <Text style={[theme.typography.heading1, { color: theme.colors.textPrimary, marginTop: theme.spacing.sm }]}>
+          <Text
+            style={[
+              theme.typography.heading1,
+              { color: theme.colors.textPrimary, marginTop: theme.spacing.sm },
+            ]}
+          >
             Đặt lại mật khẩu
           </Text>
 
           {resetSuccess ? (
-            <View style={styles.successSection} testID="reset-password-success-view">
+            <View
+              style={styles.successSection}
+              testID="reset-password-success-view"
+            >
               <View
                 style={[
                   styles.successBanner,
-                  { backgroundColor: theme.colors.successContainer, borderRadius: theme.radii.medium },
+                  {
+                    backgroundColor: theme.colors.successContainer,
+                    borderRadius: theme.radii.medium,
+                  },
                 ]}
                 accessible={true}
                 accessibilityRole="alert"
                 testID="reset-password-success-banner"
               >
-                <Text style={[theme.typography.bodyMedium, { color: theme.colors.success }]}>
-                  Mật khẩu của bạn đã được cập nhật thành công. Vui lòng đăng nhập lại bằng mật khẩu mới.
+                <Text
+                  style={[
+                    theme.typography.bodyMedium,
+                    { color: theme.colors.success },
+                  ]}
+                >
+                  Mật khẩu của bạn đã được cập nhật thành công. Vui lòng đăng
+                  nhập lại bằng mật khẩu mới.
                 </Text>
               </View>
 
@@ -151,25 +192,48 @@ export function ResetPasswordScreen() {
             </View>
           ) : (
             <View style={styles.formSection}>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginBottom: theme.spacing.xl }]}>
-                Nhập mã xác thực nhận được cùng với mật khẩu mới của bạn (từ 8 đến 128 ký tự).
+              <Text
+                style={[
+                  theme.typography.body,
+                  {
+                    color: theme.colors.textSecondary,
+                    marginBottom: theme.spacing.xl,
+                  },
+                ]}
+              >
+                Nhập mã xác thực nhận được cùng với mật khẩu mới của bạn (từ 8
+                đến 128 ký tự).
               </Text>
 
               {globalError ? (
                 <View
                   style={[
                     styles.errorBanner,
-                    { backgroundColor: theme.colors.errorContainer, borderRadius: theme.radii.medium },
+                    {
+                      backgroundColor: theme.colors.errorContainer,
+                      borderRadius: theme.radii.medium,
+                    },
                   ]}
                   accessible={true}
                   accessibilityRole="alert"
                   testID="reset-password-global-error"
                 >
-                  <Text style={[theme.typography.bodyMedium, { color: theme.colors.error }]}>
+                  <Text
+                    style={[
+                      theme.typography.bodyMedium,
+                      { color: theme.colors.error },
+                    ]}
+                  >
                     {globalError.message}
                   </Text>
                   {globalError.traceId ? (
-                    <Text style={[theme.typography.caption, styles.traceIdText, { color: theme.colors.error }]}>
+                    <Text
+                      style={[
+                        theme.typography.caption,
+                        styles.traceIdText,
+                        { color: theme.colors.error },
+                      ]}
+                    >
                       Mã tham chiếu: {globalError.traceId}
                     </Text>
                   ) : null}

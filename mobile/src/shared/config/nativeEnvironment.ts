@@ -2,6 +2,7 @@ import { NativeModules } from 'react-native';
 
 export interface NativeEnvironmentConstants {
   API_BASE_URL?: string;
+  BUNDLED_LOCAL?: boolean;
 }
 
 /**
@@ -14,6 +15,7 @@ export function getNativeEnvironmentConstants(): NativeEnvironmentConstants {
     | {
         getConstants?: () => NativeEnvironmentConstants;
         API_BASE_URL?: string;
+        BUNDLED_LOCAL?: boolean;
       }
     | undefined;
 
@@ -28,5 +30,6 @@ export function getNativeEnvironmentConstants(): NativeEnvironmentConstants {
 
   return {
     API_BASE_URL: constants?.API_BASE_URL,
+    BUNDLED_LOCAL: constants?.BUNDLED_LOCAL === true,
   };
 }

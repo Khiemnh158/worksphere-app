@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-30",
+  "scope": "Selected backend tests, not entire legacy Testcontainers suite",
+  "suites": [
+    {
+      "name": "com.worksphere.file.application.FilenameSanitizerTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.177"
+    },
+    {
+      "name": "com.worksphere.file.application.FileValidationServiceTest",
+      "tests": "25",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.318"
+    },
+    {
+      "name": "com.worksphere.file.domain.StoredFileTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.073"
+    },
+    {
+      "name": "com.worksphere.identity.AuthorizationPostgresTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "21.45"
+    },
+    {
+      "name": "com.worksphere.identity.dev.E2eUserProvisionerTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.963"
+    },
+    {
+      "name": "com.worksphere.identity.SessionAuthorizationTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.546"
+    },
+    {
+      "name": "com.worksphere.identity.WorkplacePostgresTest",
+      "tests": "48",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "138.632"
+    },
+    {
+      "name": "com.worksphere.project.ProjectAccessPolicyTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.19"
+    },
+    {
+      "name": "com.worksphere.service_request.ServiceRequestAccessPolicyTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005"
+    },
+    {
+      "name": "com.worksphere.task.TaskTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.015"
+    },
+    {
+      "name": "com.worksphere.task.TaskWorkflowTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.018"
+    },
+    {
+      "name": "com.worksphere.identity.application.TwoFactorServiceTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.024"
+    },
+    {
+      "name": "com.worksphere.workplace.AttendanceRulesTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.008"
+    }
+  ],
+  "total": {
+    "tests": 150,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "postgresIntegrationTests": 56,
+  "clientSessionTests": {
+    "tests": 5,
+    "pass": 5,
+    "script": "scripts/test-web-session.mjs"
+  },
+  "browserScenarios": [
+    "Admin has management-only navigation",
+    "CSV department-code preview without creating accounts",
+    "department directory scoped to three IT members",
+    "logo/menu, retained navigation position, responsive and light/dark",
+    "forgot-password writes a private local test email",
+    "HR attendance station produces rotating QR",
+    "executive approval workspace and personnel/delegation forms",
+    "Admin and employee work/handover reviewed again; cancel/reopen forms",
+    "Android work comment appears in web with progress still 65%",
+    "Open IN visible before OUT; configured explicit break through web",
+    "Station hours and network settings form present; no real office network assumed"
+  ],
+  "mobile": "Android first client implemented; see reports/mobile-validation.json and MOBILE_FIRST_CLIENT_2026-10-30.md. Device QR end-to-end, ARM/iOS/release and attachment workflows remain pending."
+}

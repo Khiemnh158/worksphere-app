@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-31",
+  "scope": "Android first client on shared web backend; not complete mobile release",
+  "typecheck": {
+    "exitCode": 0
+  },
+  "jest": {
+    "suitesPassed": 95,
+    "suitesTotal": 95,
+    "testsPassed": 832,
+    "testsTotal": 832,
+    "skipped": 0,
+    "seconds": 32.174,
+    "notes": "Inherited act warnings remain"
+  },
+  "lintChangedSource": {
+    "errors": 0,
+    "warnings": 32,
+    "date": "2026-10-30"
+  },
+  "android": {
+    "target": "debug x86_64",
+    "build": "SUCCESS",
+    "seconds": 18,
+    "tasks": 191,
+    "requiresMetro": true,
+    "emulator": "Small_Phone",
+    "install": "PASS",
+    "coldStartSessionRestored": true,
+    "cameraOpened": true,
+    "physicalQrInOut": "NOT_VERIFIED"
+  },
+  "manualScenarios": [
+    "Employee session, own department directory and assigned work",
+    "Lan to Hai handover retains progress 65%",
+    "Android work comment visible on web after reload",
+    "Native Android QR camera opens; full real-camera rotating QR IN/OUT not verified"
+  ],
+  "backendEvidence": "web-validation.json",
+  "remaining": [
+    "Physical QR IN/OUT and camera/network edge cases",
+    "Mobile attachment workflows",
+    "Physical OS-link acceptance; verified HTTPS App Links and iOS",
+    "Push/realtime/offline",
+    "ARM release signing and iOS",
+    "User acceptance"
+  ],
+  "androidPhysical": {
+    "target": "debug arm64-v8a",
+    "model": "OPPO CPH2603",
+    "android": "16",
+    "build": "SUCCESS",
+    "buildSeconds": 225,
+    "tasks": 191,
+    "install": "PASS",
+    "launchCommand": "SUCCESS",
+    "requiresMetro": true,
+    "connection": "USB adb reverse 18120/8081",
+    "physicalQrInOut": "IN_VERIFIED_OUT_PENDING",
+    "apkSha256": "22df4ec3cb77afd874836dbcff6de54d3ea7299c708bc33a02d1fa5e62c80d40",
+    "inEvidence": {
+      "result": "IN persisted after a physical camera scan in local test environment",
+      "out": "NOT_VERIFIED",
+      "details": "Identifying activity details retained locally, not published"
+    }
+  },
+  "bundledLocal": {
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "build": "SUCCESS",
+    "metroRequired": false,
+    "backendRequired": true,
+    "environment": "loopback local, debug signed",
+    "emulatorLoginAndAttendance": "PASS",
+    "physicalNewBuildOut": "NOT_VERIFIED",
+    "buildSeconds": 47,
+    "tasks": 151,
+    "profileBasics": "IMPLEMENTED; two regression tests pass; physical UI not verified",
+    "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made",
+    "physicalInstallAndUserLaunch": "PASS; Android localDemo on existing USB device",
+    "physicalRecoveryLink": "PENDING"
+  },
+  "lintLatestIncrement": {
+    "files": 7,
+    "errors": 0,
+    "warnings": 5,
+    "batches": "recovery5files + dayoff2files"
+  },
+  "recoveryLinks": {
+    "implementation": "Android custom scheme with strict parser and session guard",
+    "webFixtureButton": "VERIFIED",
+    "automaticCredentialSubmission": false,
+    "physicalFormAcceptance": "PENDING"
+  },
+  "dayOffLabel": {
+    "weeklyOffAndHolidayRegression": "PASS",
+    "webActualUi": "VERIFIED",
+    "physicalUpdatedLabel": "PENDING_USER_ACCEPTANCE"
+  }
+}

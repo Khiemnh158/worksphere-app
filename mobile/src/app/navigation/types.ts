@@ -13,6 +13,7 @@ export type AuthStackParamList = {
   Login: undefined;
   ForgotPassword: { email?: string } | undefined;
   ResetPassword: { token?: string } | undefined;
+  ActivateAccount: { token?: string } | undefined;
 };
 
 export type MainTabParamList = {
@@ -35,7 +36,11 @@ export type MainTabParamList = {
   TaskDetail: { taskId: string };
   CreateTask: { projectId?: string; parentTaskId?: string } | undefined;
   EditTask: { taskId: string };
-  SubtaskList: { parentTaskId: string; projectId: string; parentTaskTitle?: string };
+  SubtaskList: {
+    parentTaskId: string;
+    projectId: string;
+    parentTaskTitle?: string;
+  };
   TaskComments: { taskId: string; taskTitle?: string };
   // Phase 16 Service Request Stack Screens (Type contracts only - routes registered in later subphases)
   ServiceRequestDetail: { requestId: string };

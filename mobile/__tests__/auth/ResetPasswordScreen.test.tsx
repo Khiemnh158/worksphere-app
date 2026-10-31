@@ -5,8 +5,9 @@ import { ThemeProvider } from '../../src/app/providers/ThemeProvider';
 import { theme } from '../../src/shared/theme';
 import { authApi } from '../../src/features/auth/api/authApi';
 
-jest.mock('react-native-safe-area-context', () =>
-  require('react-native-safe-area-context/jest/mock').default
+jest.mock(
+  'react-native-safe-area-context',
+  () => require('react-native-safe-area-context/jest/mock').default,
 );
 
 const mockReset = jest.fn();
@@ -33,12 +34,12 @@ jest.mock('../../src/features/auth/api/authApi', () => ({
   },
 }));
 
-describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
+describe('ResetPasswordScreen Component (KHÔI PHỤC TRUY CẬP)', () => {
   async function renderResetPasswordScreen() {
     return await render(
       <ThemeProvider theme={theme}>
         <ResetPasswordScreen />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   }
 
@@ -53,7 +54,7 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     const { getByTestId, getByText } = await renderResetPasswordScreen();
 
     expect(getByTestId('screen-reset-password')).toBeTruthy();
-    expect(getByText('SCR-AUTH-04')).toBeTruthy();
+    expect(getByText('KHÔI PHỤC TRUY CẬP')).toBeTruthy();
     expect(getByTestId('input-reset-token')).toBeTruthy();
     expect(getByTestId('input-new-password')).toBeTruthy();
     expect(getByTestId('input-confirm-password')).toBeTruthy();
@@ -90,14 +91,17 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     expect(authApi.resetPassword).not.toHaveBeenCalled();
   });
 
-  test('rejects new password shorter than 8 characters', async () => {
+  test('rejects new password shorter than 12 characters', async () => {
     mockRouteParams = { token: 'synthetic-test-token-123' };
 
     const { getByTestId, getByText } = await renderResetPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-new-password'), '1234567'); // 7 chars
-      fireEvent.changeText(getByTestId('input-confirm-password'), '1234567');
+      fireEvent.changeText(getByTestId('input-new-password'), '12345678901'); // 11 chars
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        '12345678901',
+      );
     });
 
     await act(async () => {
@@ -105,21 +109,26 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Mật khẩu phải có từ 8 đến 128 ký tự')).toBeTruthy();
+      expect(
+        getByText('Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8'),
+      ).toBeTruthy();
     });
 
     expect(authApi.resetPassword).not.toHaveBeenCalled();
   });
 
-  test('accepts new password with exactly 8 characters', async () => {
+  test('accepts new password with exactly 12 characters', async () => {
     (authApi.resetPassword as jest.Mock).mockResolvedValue(undefined);
     mockRouteParams = { token: 'synthetic-test-token-123' };
 
     const { getByTestId } = await renderResetPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-new-password'), '12345678'); // 8 chars
-      fireEvent.changeText(getByTestId('input-confirm-password'), '12345678');
+      fireEvent.changeText(getByTestId('input-new-password'), '123456789012'); // 12 chars
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        '123456789012',
+      );
     });
 
     await act(async () => {
@@ -129,22 +138,22 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     await waitFor(() => {
       expect(authApi.resetPassword).toHaveBeenCalledWith({
         resetToken: 'synthetic-test-token-123',
-        newPassword: '12345678',
-        confirmPassword: '12345678',
+        newPassword: '123456789012',
+        confirmPassword: '123456789012',
       });
     });
   });
 
-  test('accepts new password with exactly 128 characters', async () => {
+  test('accepts new password with exactly 72 ASCII bytes', async () => {
     (authApi.resetPassword as jest.Mock).mockResolvedValue(undefined);
     mockRouteParams = { token: 'synthetic-test-token-123' };
 
-    const valid128 = 'a'.repeat(128);
+    const valid72 = 'a'.repeat(72);
     const { getByTestId } = await renderResetPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-new-password'), valid128);
-      fireEvent.changeText(getByTestId('input-confirm-password'), valid128);
+      fireEvent.changeText(getByTestId('input-new-password'), valid72);
+      fireEvent.changeText(getByTestId('input-confirm-password'), valid72);
     });
 
     await act(async () => {
@@ -154,21 +163,21 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     await waitFor(() => {
       expect(authApi.resetPassword).toHaveBeenCalledWith({
         resetToken: 'synthetic-test-token-123',
-        newPassword: valid128,
-        confirmPassword: valid128,
+        newPassword: valid72,
+        confirmPassword: valid72,
       });
     });
   });
 
-  test('rejects new password longer than 128 characters (129 chars)', async () => {
+  test('rejects new password longer than 72 bytes (73 ASCII chars)', async () => {
     mockRouteParams = { token: 'synthetic-test-token-123' };
 
-    const invalid129 = 'a'.repeat(129);
+    const invalid73 = 'a'.repeat(73);
     const { getByTestId, getByText } = await renderResetPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-new-password'), invalid129);
-      fireEvent.changeText(getByTestId('input-confirm-password'), invalid129);
+      fireEvent.changeText(getByTestId('input-new-password'), invalid73);
+      fireEvent.changeText(getByTestId('input-confirm-password'), invalid73);
     });
 
     await act(async () => {
@@ -176,7 +185,9 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Mật khẩu phải có từ 8 đến 128 ký tự')).toBeTruthy();
+      expect(
+        getByText('Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8'),
+      ).toBeTruthy();
     });
 
     expect(authApi.resetPassword).not.toHaveBeenCalled();
@@ -189,7 +200,10 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
 
     await act(async () => {
       fireEvent.changeText(getByTestId('input-new-password'), 'validPass123');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'differentPass456');
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'differentPass456',
+      );
     });
 
     await act(async () => {
@@ -210,8 +224,14 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     const { getByTestId } = await renderResetPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-new-password'), '  password with spaces  ');
-      fireEvent.changeText(getByTestId('input-confirm-password'), '  password with spaces  ');
+      fireEvent.changeText(
+        getByTestId('input-new-password'),
+        '  password with spaces  ',
+      );
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        '  password with spaces  ',
+      );
     });
 
     await act(async () => {
@@ -239,7 +259,10 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
 
     await act(async () => {
       fireEvent.changeText(getByTestId('input-new-password'), 'validPass123');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'validPass123');
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'validPass123',
+      );
     });
 
     await act(async () => {
@@ -268,7 +291,10 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     await act(async () => {
       fireEvent.changeText(getByTestId('input-reset-token'), 'invalid-token');
       fireEvent.changeText(getByTestId('input-new-password'), 'validPass123');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'validPass123');
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'validPass123',
+      );
     });
 
     await act(async () => {
@@ -276,7 +302,9 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Mã đặt lại mật khẩu không hợp lệ hoặc đã được sử dụng.')).toBeTruthy();
+      expect(
+        getByText('Mã đặt lại mật khẩu không hợp lệ hoặc đã được sử dụng.'),
+      ).toBeTruthy();
     });
   });
 
@@ -293,7 +321,10 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     await act(async () => {
       fireEvent.changeText(getByTestId('input-reset-token'), 'expired-token');
       fireEvent.changeText(getByTestId('input-new-password'), 'validPass123');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'validPass123');
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'validPass123',
+      );
     });
 
     await act(async () => {
@@ -301,7 +332,9 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Mã đặt lại mật khẩu đã hết hạn. Vui lòng yêu cầu mã mới.')).toBeTruthy();
+      expect(
+        getByText('Mã đặt lại mật khẩu đã hết hạn. Vui lòng yêu cầu mã mới.'),
+      ).toBeTruthy();
     });
   });
 
@@ -313,7 +346,10 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
 
     await act(async () => {
       fireEvent.changeText(getByTestId('input-new-password'), 'validPass123');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'validPass123');
+      fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'validPass123',
+      );
     });
 
     await act(async () => {
@@ -323,7 +359,9 @@ describe('ResetPasswordScreen Component (SCR-AUTH-04)', () => {
     await waitFor(() => {
       expect(getByTestId('reset-password-success-view')).toBeTruthy();
       expect(
-        getByText('Mật khẩu của bạn đã được cập nhật thành công. Vui lòng đăng nhập lại bằng mật khẩu mới.')
+        getByText(
+          'Mật khẩu của bạn đã được cập nhật thành công. Vui lòng đăng nhập lại bằng mật khẩu mới.',
+        ),
       ).toBeTruthy();
     });
 
