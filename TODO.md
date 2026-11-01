@@ -14,7 +14,7 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [x] Công/nghỉ/OT/đối soát thay; bảng lương lập/duyệt độc lập, phát hành khóa nguồn, điều chỉnh bổ sung; không tự phạt/chuyển tiền.
 - [x] Điểm QR xoay vòng, hạn mã/thời gian máy chủ, chặn OUT thiếu IN/trùng/điểm đóng/kỳ khóa.
 - [x] Sáng/tối, logo mở điều hướng, cuộn menu độc lập, reduced-motion, biểu mẫu mở lại sau hủy.
-- [x] Rà soát mới: 150 backend tests chọn lọc (56 PostgreSQL), 5 tests phiên web, package thành công; sửa lộ trạng thái login khi sai mật khẩu và nhãn hủy công việc.
+- [x] Rà soát 01/11: 152 backend tests chọn lọc (58 PostgreSQL), 5 tests phiên web, package thành công; sửa lộ trạng thái login khi sai mật khẩu và nhãn hủy công việc.
 - [x] Khởi động bản mới; kiểm tra UI Admin, tài khoản/chức vụ, nhân viên, bàn giao giữ 65%, mở → hủy → mở biểu mẫu.
 
 Đủ điều kiện bắt đầu mobile trong phạm vi đồ án. Xem [báo cáo cổng web](reports/WEB_READINESS_2026-10-30.md).
@@ -28,7 +28,7 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [x] Công/nghỉ/OT/sửa công; xem và duyệt theo canReview, phiên bản; OT phải xác nhận thực tế.
 - [x] Bridge camera QR Android; chặn mã sai, hủy camera không chấm, kết quả camera sau đổi phiên bị bỏ. Đã mở camera trên giả lập.
 - [x] Thông báo trong app, danh bạ phòng 20/trang, hồ sơ đọc, phiếu thu nhập của chính mình đã phát hành; che số tiền mặc định.
-- [x] TypeScript; toàn bộ 97 suites/848 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
+- [x] TypeScript; toàn bộ 98 suites/852 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
 - [x] Ghi chú Android → web đồng bộ; công việc bàn giao giữ 65%. Khôi phục Wrapper chính thức, ghim checksum.
 - [ ] Nghiệm thu camera quét QR đang xoay và lượt IN/OUT trên điện thoại thật; thử mất mạng, hết hạn, trùng lượt bằng thiết bị. Test backend cho các điều kiện này đã có, không thay thế thử thiết bị.
 - [x] Android chọn/gắn tệp cho công việc và hỗ trợ, mở/Save As có xác thực, giới hạn/purpose/phiên/cache; unit và giả lập/API đạt, OPPO mở/lưu được người dùng xác nhận. Xem MOBILE_ATTACHMENTS và báo cáo 01/11.
@@ -66,7 +66,8 @@ Người dùng đã cho phép tiếp tục và ngày 01/11 báo có tín dụng 
 - [ ] Nghiệm thu OUT/cảnh báo mạng/OT bằng điện thoại thật trên bản mới; hiện đã kiểm IN thật và các nhánh nghiệp vụ bằng PostgreSQL tests.
 - [ ] Lịch riêng/ca khác nhau theo từng nhân viên; hiện lịch công chung doanh nghiệp. Ca đêm vẫn ngoài phạm vi hiện tại.
 - [ ] Biểu mẫu giải trình riêng gắn từng punch; hiện căn cứ ở quyết định đối soát/đơn bổ sung, kèm thông báo người phụ trách.
-- [ ] Phân trang punches (đang giới hạn 1000/kỳ) và giám sát tải khi mở rộng.
+- [x] Phân trang punches web/mobile 20/trang, quyền cho rows/total và thứ tự cùng timestamp; 1.116 lượt fixture PostgreSQL đọc đủ.
+- [ ] Giám sát tải/trang sâu và xuất snapshot cố định khi mở rộng; nghiệm thu nhiều trang thực tế trên OPPO (lịch sử tháng đã được người dùng xác nhận).
 
 Đọc docs/ATTENDANCE_POLICY.md và docs/FRESH_CLONE_RUNNING.md. Không khẳng định QR/IP chứng minh hiện diện tuyệt đối; không tự phạt tiền. Các chính sách/mạng thật chưa cung cấp không được tự giả định.
 
@@ -87,3 +88,9 @@ Người dùng đã cho phép tiếp tục và ngày 01/11 báo có tín dụng 
 - [x] Native/JS ngăn phản hồi tệp của phiên cũ; hủy tải khi rời màn hình; giữ ID upload để thử gắn lại; không tự mở URL metadata.
 - [x] Kiểm tra bytes/tiến độ, Save As và hủy trên giả lập; API từ chối ngoài phòng/sai purpose; OPPO mở/lưu có xác nhận.
 - [x] Đăng xuất riêng phiên giả lập đưa về màn đăng nhập và dọn hết cache tệp native; không đăng xuất phiên OPPO.
+
+## Phân trang lịch sử công — 01/11
+
+- [x] 152 backend tests chọn lọc (58 PostgreSQL), package; 98 suites/852 mobile tests và TypeScript. 5 tests phiên web và 3 tests pager đạt.
+- [x] Không cho tổng số lượt lộ phạm vi khác; web không dựng lại cả màn khi chuyển trang; mobile đổi tháng bỏ phản hồi cũ và về trang đầu, lỗi có thể thử lại.
+- [x] Web đổi tháng thấy IN/điểm và trạng thái biên trang; OPPO lịch sử tháng có xác nhận người dùng. API main đối chiếu page/overview theo hai nhân viên khác phòng đạt, không sửa lượt chấm công.

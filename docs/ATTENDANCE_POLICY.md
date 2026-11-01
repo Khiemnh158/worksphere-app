@@ -7,7 +7,7 @@ Hợp đồng triển khai sau đợt thử QR. Web và Android dùng cùng API/
 1. Người có TIME_REVIEW quản lý điểm đặt tại văn phòng/tầng/chi nhánh, cấu hình giờ mở và mạng IP/CIDR. Điểm không mặc định phải ở lễ tân. Mặc định kỹ thuật 06:00–22:00, có thể thu hẹp trong web.
 2. Màn web phát QR chung khi điểm hoạt động và trong giờ mở. Mã đổi sau 30 giây, hạn 40 giây; đóng/đổi cấu hình làm hết hạn các mã đang phát. Nhiều nhân viên dùng cùng mã, mỗi lượt gắn với tài khoản đăng nhập.
 3. GET /workplace/attendance/today trả ngày/giờ máy chủ, lịch, các lượt đã lưu và actions. Mobile chỉ hiện actions này. IN xong chuyển WORKING và chỉ còn OUT; OUT xong COMPLETED. Không chấm trùng, không OUT thiếu IN. Đến muộn/về sớm vẫn ghi giờ thật trong phạm vi ca ban ngày và giờ mở điểm.
-4. /workplace/time?period=YYYY-MM trả punches riêng với attendance. Lượt IN hiện ngay, không cần đợi OUT. OUT tạo bản ghi PENDING; nếu đã có nguồn công khác thì yêu cầu đối soát, không ghi đè hoặc giả báo hoàn thành.
+4. /workplace/time?period=YYYY-MM trả punches riêng với attendance (trang đầu 20 lượt và metadata punchPage). Lượt IN hiện ngay, không cần đợi OUT. OUT tạo bản ghi PENDING; nếu đã có nguồn công khác thì yêu cầu đối soát, không ghi đè hoặc giả báo hoàn thành.
 5. QR chỉ là bằng chứng quét mã ngắn hạn, không chứng minh hiện diện hoặc làm việc thực tế. Không xác nhận chống chấm hộ tuyệt đối, không tự trừ tiền phạt.
 
 ## Mạng và người duyệt
@@ -40,6 +40,14 @@ late_minutes = max(0, phút từ đầu ca đến IN − dung sai); early_minute
 - Luồng đối soát nhập/bổ sung công cũ vẫn được hỗ trợ: nếu không có cặp quét OT, cần bản ghi công APPROVED bao phủ khoảng OT. Không có bằng chứng thì không xác nhận số phút dương; có thể xác nhận 0.
 - Thu nhập chỉ lấy OT CONFIRMED; chưa phải chuyển tiền hoặc bảng lương pháp lý đầy đủ.
 
+## Lịch sử lượt quét và phân trang
+
+GET /workplace/attendance/punches?period=YYYY-MM&page=0&size=20 trả items, page, size, total và hasNext. Page bắt đầu từ 0, được giới hạn trong 0–1.000.000; size trong 1–100. Web/mobile dùng 20 lượt/trang, không cắt toàn bộ kỳ ở 1.000 lượt. /workplace/time giữ mảng punches của trang đầu để tương thích và thêm punchPage cùng metadata.
+
+Mỗi yêu cầu áp dụng lại cùng phạm vi cho cả items và total: chính người dùng, các phòng đang được quyền duyệt công hoặc chuyên trách TIME_REVIEW. Admin kỹ thuật không tự có quyền đọc toàn doanh nghiệp. Thứ tự recorded_at DESC, id DESC cố định cả khi nhiều lượt cùng timestamp. Các trang là dữ liệu sống; thêm lượt hoặc thay quyền trong lúc xem có thể làm vị trí trang đổi. Quay về trang đầu để cập nhật, chưa phải xuất báo cáo theo snapshot cố định.
+
+Web đổi riêng vùng lịch sử, giữ phần còn lại của màn công. Mobile mở “Xem lịch sử lượt quét trong kỳ”; đổi tháng về trang đầu, lỗi mạng cho thử lại và không trình bày trang cũ như dữ liệu trang mới. Đây là lịch sử bằng chứng, không tự duyệt công, tính tiền hoặc cho sửa giờ gốc.
+
 ## Giới hạn nghiệm thu
 
-Có unit tests cho giao khoảng nghỉ/CIDR/dung sai, PostgreSQL tests cho scope/lượt mở/cảnh báo mạng/OT ngoại lệ và thời lượng thực, mobile tests cho actions và xác nhận mạng. QR IN đã từng kiểm chứng bằng điện thoại thật; OUT trọn vòng, thử mạng văn phòng thật, ca riêng từng người và phản hồi mạng mất trên thiết bị vẫn còn phải nghiệm thu. Danh sách punches hiện giới hạn 1000/kỳ, chưa phân trang.
+Có unit tests cho giao khoảng nghỉ/CIDR/dung sai, PostgreSQL tests cho scope/lượt mở/cảnh báo mạng/OT ngoại lệ và thời lượng thực, mobile tests cho actions và xác nhận mạng. QR IN đã từng kiểm chứng bằng điện thoại thật; OUT trọn vòng, thử mạng văn phòng thật, ca riêng từng người và phản hồi mạng mất trên thiết bị vẫn còn phải nghiệm thu. Phân trang đã triển khai; kiểm thử tải lớn và hiệu năng ở trang sâu vẫn còn TODO.

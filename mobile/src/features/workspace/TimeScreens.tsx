@@ -13,6 +13,7 @@ import {
   validLocalDay,
 } from './rules';
 import { scanAndPunch } from './attendance';
+import { PunchHistory, punchLabels } from './PunchHistory';
 
 export function TimeScreen() {
   const navigation = useNavigation<WorkspaceNavigation>();
@@ -20,6 +21,7 @@ export function TimeScreen() {
   const [period, setPeriod] = useState(currentMonth());
   const [monthText, setMonthText] = useState(period);
   const [scope, setScope] = useState('mine');
+  const [showPunchHistory, setShowPunchHistory] = useState(false);
   const state = useLoad(useCallback(() => workspaceApi.time(period), [period]));
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
@@ -33,12 +35,6 @@ export function TimeScreen() {
   const [actual, setActual] = useState('');
   const [acknowledgeNetwork, setAcknowledgeNetwork] = useState(false);
   const [exceptionReason, setExceptionReason] = useState('');
-  const punchLabels: Record<PunchAction, string> = {
-    IN: 'Vào ca',
-    OUT: 'Ra ca',
-    OT_IN: 'Bắt đầu OT',
-    OT_OUT: 'Kết thúc OT',
-  };
   async function scan(type: PunchAction) {
     if (busy) return;
     if (Platform.OS !== 'android' || !NativeModules.WorkplaceDevice?.scanQr) {
@@ -295,6 +291,16 @@ export function TimeScreen() {
             : []),
         ]}
       />
+      <Button
+        title={
+          showPunchHistory
+            ? 'Thu gọn lịch sử lượt quét'
+            : 'Xem lịch sử lượt quét trong kỳ'
+        }
+        secondary
+        onPress={() => setShowPunchHistory(value => !value)}
+      />
+      {showPunchHistory && <PunchHistory key={period} period={period} />}
       {review && (
         <Card>
           <Copy title>

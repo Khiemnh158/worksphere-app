@@ -86,3 +86,5 @@ Các hợp đồng bổ sung mới thay giới hạn cũ tương ứng. Reports 
 Liên kết Android: [cách dùng và giới hạn](MOBILE_RECOVERY_LINKS.md), [kết quả31/10](../reports/INCREMENT_2026-10-31.md).
 
 Tệp Android: [hợp đồng và cách dùng](MOBILE_ATTACHMENTS.md), [kiểm chứng 01/11](../reports/INCREMENT_2026-11-01.md). Không giao lại phần đã triển khai như việc viết mới; giao nghiệm thu các giới hạn theo TODO.
+
+Lịch sử chấm công đã phân trang trên web/mobile. Bàn giao tiếp là nghiệm thu thiết bị và thử tải, không giao lại phần phân trang như chưa được viết. Hợp đồng nằm trong ATTENDANCE_POLICY; bằng chứng ở báo cáo 01/11.

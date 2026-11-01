@@ -103,3 +103,16 @@ describe('mobile shares server workflow contracts', () => {
     expect(http.put).not.toHaveBeenCalled();
   });
 });
+test('punch history always requests a bounded page for the chosen period', async () => {
+  (http.get as jest.Mock).mockResolvedValue({
+    items: [],
+    page: 2,
+    size: 20,
+    total: 0,
+    hasNext: false,
+  });
+  await workspaceApi.punchHistory('2032-01', 2);
+  expect(http.get).toHaveBeenCalledWith('/workplace/attendance/punches', {
+    params: { period: '2032-01', page: 2, size: 20 },
+  });
+});

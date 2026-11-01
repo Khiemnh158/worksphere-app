@@ -2323,6 +2323,94 @@ class WorkplacePostgresTest {
         }
     }
 
+    @Test
+    void punchHistoryPagesBeyondOneThousandWithoutLeakingRowsOrTotals() throws Exception {
+        String challengeToken = attendanceFixture("");
+        UUID challenge =
+                db.queryForObject(
+                        "SELECT id FROM attendance_qr_challenges WHERE token_hash=?",
+                        UUID.class,
+                        recoveryService.hash(challengeToken));
+        var members = new ArrayList<User>();
+        members.add(employee);
+        for (int i = 0; i < 8; i++) members.add(user("EMPLOYEE", department));
+        for (var member : members) {
+            db.update(
+                    "INSERT INTO"
+                        + " attendance_punches(id,user_id,work_date,punch_type,recorded_at,challenge_id)"
+                        + " SELECT"
+                        + " gen_random_uuid(),?::uuid,d::date,t.kind,'2032-01-01T01:00:00Z'::timestamptz,?::uuid"
+                        + " FROM generate_series('2032-01-01'::date,'2032-01-31'::date,interval '1"
+                        + " day') d CROSS JOIN (VALUES ('IN'),('OUT'),('OT_IN'),('OT_OUT'))"
+                        + " t(kind)",
+                    member.getId(),
+                    challenge);
+        }
+        String path = "/workplace/attendance/punches?period=2032-01&size=100&page=";
+        var seen = new HashSet<String>();
+        for (int page = 0; page < 12; page++) {
+            var response = call("GET", path + page, m, null);
+            status(response, 200);
+            var body = data(response);
+            assertThat(body.path("total").asInt()).isEqualTo(1116);
+            assertThat(body.path("page").asInt()).isEqualTo(page);
+            assertThat(body.path("hasNext").asBoolean()).isEqualTo(page < 11);
+            for (var row : body.path("items")) {
+                assertThat(row.path("department_id").asText()).isEqualTo(department.toString());
+                assertThat(seen.add(row.path("id").asText())).isTrue();
+            }
+        }
+        assertThat(seen).hasSize(1116);
+        var first = data(call("GET", path + 0, e, null));
+        assertThat(first.path("total").asInt()).isEqualTo(124);
+        assertThat(first.path("items")).hasSize(100);
+        assertThat(data(call("GET", path + 0, e, null)).path("items"))
+                .isEqualTo(first.path("items"));
+        var last = data(call("GET", path + 1, e, null));
+        assertThat(last.path("items")).hasSize(24);
+        assertThat(last.path("hasNext").asBoolean()).isFalse();
+        for (var row : last.path("items"))
+            assertThat(row.path("user_id").asText()).isEqualTo(employee.getId().toString());
+        for (String token : List.of(x, a)) {
+            var hidden = data(call("GET", path + 0, token, null));
+            assertThat(hidden.path("total").asInt()).isZero();
+            assertThat(hidden.path("items")).isEmpty();
+        }
+        assertThat(data(call("GET", path + 0, h, null)).path("total").asInt())
+                .isGreaterThanOrEqualTo(1116);
+        var overview = data(call("GET", "/workplace/time?period=2032-01", e, null));
+        assertThat(overview.path("punches")).hasSize(20);
+        assertThat(overview.path("punchPage").path("total").asInt()).isEqualTo(124);
+        assertThat(overview.path("punchPage").path("hasNext").asBoolean()).isTrue();
+    }
+
+    @Test
+    void punchHistoryBoundsAndInvalidParametersRemainScoped() throws Exception {
+        var empty =
+                data(
+                        call(
+                                "GET",
+                                "/workplace/attendance/punches?period=2033-02&page=-1&size=0",
+                                e,
+                                null));
+        assertThat(empty.path("page").asInt()).isZero();
+        assertThat(empty.path("size").asInt()).isEqualTo(1);
+        assertThat(empty.path("total").asInt()).isZero();
+        var bounded =
+                data(
+                        call(
+                                "GET",
+                                "/workplace/attendance/punches?period=2033-02&page=2147483647&size=2147483647",
+                                e,
+                                null));
+        assertThat(bounded.path("page").asInt()).isEqualTo(1_000_000);
+        assertThat(bounded.path("size").asInt()).isEqualTo(100);
+        assertThat(bounded.path("items")).isEmpty();
+        status(call("GET", "/workplace/attendance/punches?period=not-a-month", e, null), 422);
+        status(call("GET", "/workplace/attendance/punches?period=2033-02&page=abc", e, null), 400);
+        status(call("GET", "/workplace/attendance/punches?period=2033-02", null, null), 401);
+    }
+
     String attendanceFixture(String networks) throws Exception {
         attendanceClock("2030-05-06T01:00:00Z");
         db.update(
@@ -2345,8 +2433,8 @@ class WorkplacePostgresTest {
         String token = "attendance-fixture-" + UUID.randomUUID();
         db.update(
                 "INSERT INTO"
-                    + " attendance_qr_challenges(id,station_id,token_hash,issued_by,expires_at)"
-                    + " VALUES (?,?,?,?,?)",
+                        + " attendance_qr_challenges(id,station_id,token_hash,issued_by,expires_at)"
+                        + " VALUES (?,?,?,?,?)",
                 UUID.randomUUID(),
                 station,
                 recoveryService.hash(token),
@@ -2384,7 +2472,7 @@ class WorkplacePostgresTest {
         UUID record =
                 db.queryForObject(
                         "SELECT id FROM attendance_records WHERE user_id=? AND"
-                            + " work_date='2030-05-06'",
+                                + " work_date='2030-05-06'",
                         UUID.class,
                         employee.getId());
         status(

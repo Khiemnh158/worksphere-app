@@ -1933,6 +1933,66 @@ function canReview(user, dept) {
     C.timeDepartments.includes(dept) || C.capabilities.includes("TIME_REVIEW")
   );
 }
+function punchHistoryHTML(history) {
+  return `    <div class="section-head"><h2>Lượt quét đã lưu</h2><span class="muted">${history.total} lượt trong phạm vi của bạn · Giờ máy chủ</span></div>
+    ${
+      (history.items || []).length
+        ? `<div class="table-wrap"><table><thead><tr><th>Nhân viên</th><th>Thao tác / thời gian</th><th>Điểm / mạng</th></tr></thead><tbody>${history.items
+            .map(
+              (p) =>
+                `<tr><td>${esc(p.full_name)}</td><td>${esc(
+                  {
+                    IN: "Vào ca",
+                    OUT: "Ra ca",
+                    OT_IN: "Bắt đầu OT",
+                    OT_OUT: "Kết thúc OT",
+                  }[p.punch_type]
+                )}<br>${fmt(p.recorded_at, true)}</td><td>${esc(
+                  p.station_name
+                )}<br>${esc(
+                  {
+                    MATCH: "Khớp mạng cấu hình",
+                    MISMATCH: "Khác mạng — cần xác minh",
+                    UNCONFIGURED: "Chưa cấu hình mạng",
+                    UNVERIFIED: "Lượt cũ chưa kiểm tra mạng",
+                  }[p.network_status]
+                )}</td></tr>`
+            )
+            .join("")}</tbody></table></div>`
+        : empty("Chưa có lượt quét trong kỳ.")
+    }
+    <nav class="pager" aria-label="Phân trang lượt quét">
+      <button class="btn small" data-action="punch-prev" ${history.page === 0 ? 'disabled' : ''}>Lượt quét: trang trước</button>
+      <span>Trang ${history.page + 1} · ${history.size} lượt/trang</span>
+      <button class="btn small" data-action="punch-next" ${!history.hasNext ? 'disabled' : ''}>Lượt quét: trang sau</button>
+    </nav>
+    <p class="muted">Danh sách cập nhật trực tiếp. Khi có lượt mới, tải lại trang đầu trước khi đối chiếu.</p>`;
+}
+async function changePunchPage(direction) {
+  const state = current, root = $("#punch-history"), epoch = authEpoch, serial = routeSerial;
+  if (state?.type !== "time" || !root || state.punchBusy) return;
+  const old = state.data.punchPage;
+  if (!old || (direction < 0 ? old.page === 0 : !old.hasNext)) return;
+  state.punchBusy = true;
+  root.querySelectorAll("button").forEach(button => { button.disabled = true; });
+  const stillCurrent = () => current === state && authEpoch === epoch && routeSerial === serial && root.isConnected;
+  try {
+    const history = await api("/workplace/attendance/punches?" + new URLSearchParams({
+      period: periodValue, page: String(old.page + direction), size: "20",
+    }));
+    if (!stillCurrent()) return;
+    state.data.punchPage = history;
+    state.data.punches = history.items;
+  } finally {
+    state.punchBusy = false;
+    if (stillCurrent()) {
+      root.innerHTML = punchHistoryHTML(state.data.punchPage);
+      const next = root.querySelector(`[data-action="${direction < 0 ? "punch-prev" : "punch-next"}"]`);
+      if (next && !next.disabled) next.focus({preventScroll: true});
+    }
+  }
+}
+
 async function timeView() {
   const data = await api("/workplace/time?period=" + periodValue);
   current = { type: "time", data };
@@ -2003,33 +2063,7 @@ async function timeView() {
           )}–${esc(data.today.calendar.break_end || "")}</p>`
         : ""
     }</section>
-    <div class="section-head"><h2>Lượt quét đã lưu</h2><span class="muted">Giờ máy chủ · Vào ca vẫn hiện khi chưa có lượt Ra</span></div>
-    ${
-      (data.punches || []).length
-        ? `<div class="table-wrap"><table><thead><tr><th>Nhân viên</th><th>Thao tác / thời gian</th><th>Điểm / mạng</th></tr></thead><tbody>${data.punches
-            .map(
-              (p) =>
-                `<tr><td>${esc(p.full_name)}</td><td>${esc(
-                  {
-                    IN: "Vào ca",
-                    OUT: "Ra ca",
-                    OT_IN: "Bắt đầu OT",
-                    OT_OUT: "Kết thúc OT",
-                  }[p.punch_type]
-                )}<br>${fmt(p.recorded_at, true)}</td><td>${esc(
-                  p.station_name
-                )}<br>${esc(
-                  {
-                    MATCH: "Khớp mạng cấu hình",
-                    MISMATCH: "Khác mạng — cần xác minh",
-                    UNCONFIGURED: "Chưa cấu hình mạng",
-                    UNVERIFIED: "Lượt cũ chưa kiểm tra mạng",
-                  }[p.network_status]
-                )}</td></tr>`
-            )
-            .join("")}</tbody></table></div>`
-        : empty("Chưa có lượt quét trong kỳ.")
-    }
+    <section id="punch-history" aria-live="polite">${punchHistoryHTML(data.punchPage)}</section>
     ${
       !data.calendar.length
         ? '<div class="error-box" style="margin-bottom:20px">Kỳ này chưa có lịch công. Người phụ trách đối soát công cần cấu hình trước khi ghi nhận và tính thu nhập.</div>'
@@ -2745,6 +2779,8 @@ document.addEventListener("click", async (e) => {
       periodValue = $("#period-select").value;
       if (!periodValue) throw new Error("Chọn kỳ công.");
       await route();
+    } else if (a === "punch-prev" || a === "punch-next") {
+      await changePunchPage(a === "punch-prev" ? -1 : 1);
     } else if (a === "time-request") timeRequest();
     else if (a === "calendar-config") calendarConfig();
     else if (a === "income-flow") {

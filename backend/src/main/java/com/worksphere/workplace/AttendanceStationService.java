@@ -196,7 +196,8 @@ public class AttendanceStationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> punches(String period, WorkSphereUserPrincipal p) {
+    public Map<String, Object> punchPage(
+            String period, int page, int size, WorkSphereUserPrincipal p) {
         UUID actor = access.actor(p);
         YearMonth month;
         try {
@@ -208,18 +209,42 @@ public class AttendanceStationService {
                 authority.managed(actor, "TIME", true).stream()
                         .map(UUID::toString)
                         .collect(java.util.stream.Collectors.joining(","));
-        return db.queryForList(
-                "SELECT r.*,u.full_name,u.department_id,s.name station_name FROM attendance_punches"
-                    + " r JOIN users u ON u.id=r.user_id JOIN attendance_qr_challenges q ON"
-                    + " q.id=r.challenge_id JOIN attendance_stations s ON s.id=q.station_id WHERE"
-                    + " r.work_date BETWEEN ? AND ? AND (r.user_id=? OR u.department_id IN (SELECT"
-                    + " unnest(string_to_array(?,',')::uuid[])) OR ?) ORDER BY r.recorded_at DESC"
-                    + " LIMIT 1000",
-                java.sql.Date.valueOf(month.atDay(1)),
-                java.sql.Date.valueOf(month.atEndOfMonth()),
-                actor,
-                departments,
-                access.capability(actor, "TIME_REVIEW"));
+        int at = Math.max(0, Math.min(page, 1_000_000));
+        int limit = Math.max(1, Math.min(size, 100));
+        String from =
+                " FROM attendance_punches r JOIN users u ON u.id=r.user_id JOIN"
+                    + " attendance_qr_challenges q ON q.id=r.challenge_id JOIN attendance_stations"
+                    + " s ON s.id=q.station_id WHERE r.work_date BETWEEN ? AND ? AND (r.user_id=?"
+                    + " OR u.department_id IN (SELECT unnest(string_to_array(?,',')::uuid[])) OR"
+                    + " ?)";
+        Object[] scope = {
+            java.sql.Date.valueOf(month.atDay(1)),
+            java.sql.Date.valueOf(month.atEndOfMonth()),
+            actor,
+            departments,
+            access.capability(actor, "TIME_REVIEW")
+        };
+        Long total = db.queryForObject("SELECT count(*)" + from, Long.class, scope);
+        var args = new ArrayList<>(Arrays.asList(scope));
+        args.add(limit);
+        args.add((long) at * limit);
+        var items =
+                db.queryForList(
+                        "SELECT r.*,u.full_name,u.department_id,s.name station_name"
+                                + from
+                                + " ORDER BY r.recorded_at DESC,r.id DESC LIMIT ? OFFSET ?",
+                        args.toArray());
+        return Map.of(
+                "items",
+                items,
+                "page",
+                at,
+                "size",
+                limit,
+                "total",
+                total,
+                "hasNext",
+                ((long) at + 1) * limit < total);
     }
 
     @Transactional(readOnly = true)

@@ -142,6 +142,13 @@ export interface PunchRow {
   network_status: string;
   station_name?: string;
 }
+export interface PunchPage {
+  items: PunchRow[];
+  page: number;
+  size: number;
+  total: number;
+  hasNext: boolean;
+}
 export interface AttendanceToday {
   lateMinutes?: number;
   earlyMinutes?: number;
@@ -337,6 +344,12 @@ export const workspaceApi = {
   },
   time: (period: string) =>
     required(http.get<TimeOverview>('/workplace/time', { params: { period } })),
+  punchHistory: (period: string, page: number) =>
+    required(
+      http.get<PunchPage>('/workplace/attendance/punches', {
+        params: { period, page, size: 20 },
+      }),
+    ),
   timeRequest: (
     requestType: string,
     workDate: string,

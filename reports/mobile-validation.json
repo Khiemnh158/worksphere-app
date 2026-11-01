@@ -5,12 +5,12 @@
     "exitCode": 0
   },
   "jest": {
-    "suitesPassed": 97,
-    "suitesTotal": 97,
-    "testsPassed": 848,
-    "testsTotal": 848,
+    "suitesPassed": 98,
+    "suitesTotal": 98,
+    "testsPassed": 852,
+    "testsTotal": 852,
     "skipped": 0,
-    "seconds": 36.037,
+    "seconds": 49.081,
     "notes": "Inherited act warnings remain"
   },
   "lintChangedSource": {
@@ -75,17 +75,18 @@
     "environment": "loopback local, debug signed",
     "emulatorLoginAndAttendance": "PASS",
     "physicalNewBuildOut": "NOT_VERIFIED",
-    "buildSeconds": 49,
+    "buildSeconds": 59,
     "tasks": 151,
     "profileBasics": "IMPLEMENTED; two regression tests pass; physical UI not verified",
     "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made",
-    "physicalInstallAndUserLaunch": "PASS; OPPO updated; user verified fixture opening and saving",
+    "physicalInstallAndUserLaunch": "PASS; pagination APK installed; user confirms existing history on OPPO. File open/save confirmation is from the earlier attachment APK.",
     "physicalRecoveryLink": "PENDING"
   },
   "lintLatestIncrement": {
-    "files": 8,
+    "files": 3,
     "errors": 0,
-    "warnings": 24
+    "warnings": 4,
+    "scope": "Punch pagination increment; attachment lint evidence remains in dated report"
   },
   "recoveryLinks": {
     "implementation": "Android custom scheme with strict parser and session guard",
@@ -113,5 +114,10 @@
     "sessionBoundary": "UNIT_TESTED_AND_NATIVE_EPOCH_GUARDS",
     "logoutCachePurge": "PASS_EMULATOR_NATIVE_CACHE_ONE_FILE_TO_EMPTY_AND_LOGIN_SCREEN",
     "fixtureCleanup": "ONE_OWNED_HASH_MATCHING_UNLINKED_FILE_SOFT_DELETED"
+  },
+  "punchHistory": {
+    "implementation": "20 per page, scoped API, chosen month resets to first page",
+    "tests": "PASS_PAGE_SWITCH_RETRY_AND_LATE_OLD_MONTH_DISCARDED",
+    "nativeUi": "USER_CONFIRMED_EXISTING_IN_AND_STATION_ON_OPPO"
   }
 }

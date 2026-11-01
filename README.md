@@ -14,7 +14,7 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ cho do
 
 ## Trạng thái
 
-Đã có web nghiệp vụ và client Android dùng chung API; chưa production hoặc nghiệm thu toàn bộ. Kết quả mới nhất: [tệp Android và kiểm chứng 01/11](reports/INCREMENT_2026-11-01.md). Backend 150 tests chọn lọc là bằng chứng 30/10; mobile 97 suites/848 tests được chạy 01/11. Đọc STATUS/TODO để phân biệt đã triển khai và đã kiểm chứng.
+Đã có web nghiệp vụ và client Android dùng chung API; chưa production hoặc nghiệm thu toàn bộ. Kết quả mới nhất: [tệp Android và kiểm chứng 01/11](reports/INCREMENT_2026-11-01.md). Backend 152 tests chọn lọc (58 PostgreSQL) được chạy 01/11; mobile 98 suites/852 tests được chạy 01/11. Đọc STATUS/TODO để phân biệt đã triển khai và đã kiểm chứng.
 
 ## Ba repository
 

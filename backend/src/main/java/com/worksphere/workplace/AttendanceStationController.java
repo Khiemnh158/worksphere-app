@@ -59,4 +59,13 @@ public class AttendanceStationController {
         // Do not trust a client-supplied X-Forwarded-For header as presence evidence.
         return ApiResponse.success(service.punch(r, p, request.getRemoteAddr()));
     }
+
+    @GetMapping("/punches")
+    public ApiResponse<?> history(
+            @RequestParam String period,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal WorkSphereUserPrincipal p) {
+        return ApiResponse.success(service.punchPage(period, page, size, p));
+    }
 }

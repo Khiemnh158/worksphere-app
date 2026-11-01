@@ -422,7 +422,9 @@ public class TimeIncomeService {
                                         (UUID) r.get("user_id"),
                                         actor));
         var extended = new LinkedHashMap<>(result);
-        extended.put("punches", attendanceStation.punches(monthText, p));
+        var punchPage = attendanceStation.punchPage(monthText, 0, 20, p);
+        extended.put("punches", punchPage.get("items"));
+        extended.put("punchPage", punchPage);
         extended.put("today", attendanceStation.today(p));
         return extended;
     }
