@@ -4,6 +4,7 @@ import { accessTokenStore } from '../storage/accessTokenStore';
 import { normalizeError } from './apiError';
 import { isApiResponse, unwrapApiResponse } from './apiEnvelope';
 import { getSessionCredentialGeneration } from '../../app/auth/sessionCredentialCoordinator';
+import { binaryErrorEnvelope } from './binaryError';
 
 export type UnauthorizedHandler = () => void | Promise<void>;
 export type TokenRefreshHandler = () => Promise<string>;
@@ -194,6 +195,12 @@ function createApiClient(): AxiosInstance {
     },
     async error => {
       assertCurrentSession(error.config);
+      if (error.response)
+        error.response.data = binaryErrorEnvelope(
+          error.response.data,
+          error.response.headers?.['content-type'] ??
+            error.response.headers?.get?.('content-type'),
+        );
       if (isEligibleForRefresh(error) && tokenRefreshHandler) {
         const originalConfig = error.config;
         originalConfig._retry = true;

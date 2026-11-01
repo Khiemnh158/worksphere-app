@@ -1,30 +1,29 @@
-# Hiện trạng WorkSphere — 31/10/2026
+# Hiện trạng WorkSphere — 01/11/2026
 
-Tài liệu được rà soát ngày 31/10; bằng chứng phân biệt theo ngày bên dưới. Lịch sử thay đổi xem Git và báo cáo từng đợt, không ghép nhiều hiện trạng cũ vào trang này.
+Ứng dụng có web nghiệp vụ và Android dùng chung API. Đây là bản đồ án đang kiểm chứng, chưa nghiệm thu toàn bộ hoặc production. Lịch sử xem Git và báo cáo có ngày, không dùng kế hoạch cũ như tính năng đã hoàn tất.
 
 ## Đã triển khai
 
-- Web: đăng nhập/thu hồi phiên/TOTP; tài khoản và CSV kích hoạt; phòng ban động, quản lý theo phòng, chuyên trách/lãnh đạo/duyệt thay; danh bạ cùng phòng.
-- Hỗ trợ trọn vòng; công việc, trao đổi/tệp, nghiệm thu và bàn giao giữ tiến độ; nhân sự/cutoff truy cập; đối soát công và phát hành phiếu thu nhập có kiểm soát độc lập.
-- QR xoay vòng, giờ điểm, timestamp máy chủ, IP peer/CIDR và cảnh báo xác minh; IN mở; nghỉ cụ thể; OT cặp riêng có duyệt trước/ngoại lệ. Không tự phạt tiền hoặc tự cộng OT vì về muộn.
-- Android dùng chung API: việc/hỗ trợ/công/QR/thông báo/danh bạ/phiếu riêng; bảo mật và sửa tên/số liên hệ. APK localDemo ARM64+x86_64 có bundle, không Metro; vẫn cần backend và đường kết nối local/USB.
+- Danh bạ theo phòng, tài khoản/CSV kích hoạt/thư local/TOTP/session; phòng ban động, trưởng phòng, lãnh đạo và chuyên trách độc lập; người duyệt thay có phạm vi/thời hạn.
+- Hỗ trợ trọn vòng; công việc/trao đổi/tệp/nghiệm thu/bàn giao giữ tiến độ; hồ sơ nhân sự/cutoff truy cập; công/nghỉ/OT và phát hành phiếu thu nhập có kiểm soát.
+- QR giờ máy chủ, giờ điểm và mạng cần xác minh, IN mở, nghỉ cụ thể, OT riêng có duyệt trước/ngoại lệ. Không tự phạt hoặc cộng OT do ra muộn. Lịch hiện chung doanh nghiệp, chưa ca riêng/ca đêm.
+- Android có tuyến nhân viên, bảo mật/sửa thông tin, custom-scheme recovery link và tệp chọn/gắn/mở/Save As qua API có xác thực. Tệp một lần gửi; ảnh 10 MiB, tài liệu 20 MiB. Phiên cũ không tiếp tục thao tác dưới tài khoản mới, cache riêng dọn khi thu hồi phiên.
 
-## Đã kiểm chứng ngày 30/10
+## Bằng chứng theo ngày
 
-- 150 backend tests được chọn: 94 unit và 56 PostgreSQL thật; package đạt. Chưa toàn bộ legacy Testcontainers.
-- 824 mobile tests/93 suites, TypeScript đạt; lint nguồn thay đổi 0 lỗi/32 cảnh báo, còn act warnings kế thừa.
-- 5 tests phiên web, kiểm tra cú pháp/diff/credentials. Một số luồng UI web và Android đã kiểm tra; không suy rộng thành mọi vai trò/chức năng đều nghiệm thu.
-- Clone sạch cùng máy với Maven Wrapper/cache, database/cổng riêng: login/logout, thư reset đúng origin, reuse/Stop/restart đạt. Chưa kiểm tra trên máy thứ hai hoàn toàn mới.
-- Camera OPPO đã lưu một lượt IN ở bản trước. APK mới build/cài/mở trên giả lập; OUT/OT/network trên OPPO mới chưa nghiệm thu.
+| Ngày | Kết quả | Giới hạn |
+|---|---|---|
+|30/10|150 backend tests chọn lọc (56 PostgreSQL), Maven package; clone sạch cùng máy/database riêng|Chưa toàn bộ legacy hoặc máy thứ hai hoàn toàn mới|
+|01/11|97 suites/848 mobile tests, TypeScript; lint 8 file: 0 errors/24 warnings; 5 web session tests và kiểm tra cú pháp/diff/secrets/liên kết|Còn act/style warnings; backend không thay đổi/chạy lại trong đợt tệp|
+|01/11|Giả lập chọn/gắn tệp thật qua UI; bytes download và Save As khớp fixture; mở ảnh, hủy lưu và dọn cache khi đăng xuất đúng; tiến độ giữ 65%; API chặn sai purpose 415 và ngoài phạm vi 403|Tệp mẫu PNG nhỏ; chưa tệp 20 MiB/cloud/mọi ứng dụng đọc|
+|01/11|APK ARM64+x86_64 build 49s/151 tasks, cài OPPO; người dùng xác nhận mở và lưu mẫu thành công|Không coi đây là hash/thiết bị-e2e cho mọi chức năng|
 
-## Chưa hoàn thành
+Chi tiết: [báo cáo 01/11](reports/INCREMENT_2026-11-01.md), [mobile JSON](reports/mobile-validation.json). QR thật từng có IN ở bản trước; OUT/OT/network đủ vòng trên APK hiện hành vẫn chờ nghiệm thu. Recovery custom scheme có tests guard, chưa verified HTTPS App Links/iOS.
 
-Xem [TODO](TODO.md) cho các việc có điều kiện hoàn thành. Chính: nghiệm thu thiết bị, tệp và OS links mobile, ca cá nhân, phân trang/giải trình từng lượt công; kiểm thử tải/toàn bộ mã kế thừa và nghiệm thu người dùng.
+## Còn lại
 
-Mạng văn phòng chưa được cung cấp, giữ UNCONFIGURED; USB không chứng minh vị trí. Lịch local được người dùng chọn 08–17 T2–T6, nghỉ11:30–12:30, không seed lương giả. Chưa ca đêm, tính thuế/BHXH/thực lĩnh, máy vân tay, ký production/iOS/SMTP thật. Hai repo chuyên đề chưa được nhận là triển khai hoàn chỉnh.
+[TODO](TODO.md) là backlog chuẩn: nghiệm thu thiết bị/quyền/cutoff; ca cá nhân; phân trang/giải trình punches; load/toàn bộ legacy, release và yêu cầu chính thức ba môn. Mạng văn phòng chưa cung cấp nên giữ UNCONFIGURED; USB không chứng minh vị trí.
 
-Không tính % hoàn thành bằng số ô TODO, không khẳng định hết lỗi hoặc an toàn production. Đọc [hướng dẫn đầu mối](docs/PROJECT_GUIDE.md) và [bằng chứng đợt gần nhất](reports/ATTENDANCE_INCREMENT_2026-10-30.md).
+Lịch thử được chọn 08–17 T2–T6, nghỉ 11:30–12:30. Không seed lương giả; chưa thuế/BHXH/thực lĩnh, ngân hàng, pháp lý bồi thường/sa thải, vân tay/SSO, SMTP/SMS thật, iOS/production. Hai repo chuyên đề chưa được coi là hoàn tất. Không tính % bằng số tests/ô TODO.
 
-## Cập nhật kiểm chứng31/10
-
-Mobile95 suites/832 tests và TypeScript đạt (32.174s); lint5 file liên quan0errors/2warnings, act warnings kế thừa còn. Android localDemo build4m37s/151tasks, cài cập nhật OPPO và người dùng xác nhận mở ứng dụng; OSlink/QR đủ vòng vẫn cần nghiệm thu riêng. Web có nút mở Android trên biểu mẫu khôi phục với token fixture; không đổi credential thật. Backend không thay đổi,150 tests là bằng chứng30/10. Xem [báo cáo31/10](reports/INCREMENT_2026-10-31.md).
+Đọc [PROJECT_GUIDE](docs/PROJECT_GUIDE.md) để giao việc và chuẩn bị báo cáo/slide, [FRESH_CLONE_RUNNING](docs/FRESH_CLONE_RUNNING.md) để chạy từ source.

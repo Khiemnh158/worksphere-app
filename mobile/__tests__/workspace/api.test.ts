@@ -9,6 +9,44 @@ describe('mobile shares server workflow contracts', () => {
     jest.clearAllMocks();
     (http.post as jest.Mock).mockResolvedValue({ id: 'result' });
   });
+  test('file-linked work, support creation and comments carry the original session generation and server file IDs', async () => {
+    await workspaceApi.command(
+      { id: 'w', version: 3 } as Work,
+      'COMMENT',
+      'fixture',
+      undefined,
+      undefined,
+      ['file-w'],
+      21,
+    );
+    expect(http.post).toHaveBeenLastCalledWith(
+      '/workplace/work/w/commands',
+      expect.objectContaining({ version: 3, fileIds: ['file-w'] }),
+      { _sessionGeneration: 21 },
+    );
+    await workspaceApi.createTicket(
+      'category',
+      'title',
+      'body',
+      'MEDIUM',
+      ['file-r'],
+      21,
+    );
+    expect(http.post).toHaveBeenLastCalledWith(
+      '/service-requests',
+      expect.objectContaining({ attachmentFileIds: ['file-r'] }),
+      { _sessionGeneration: 21 },
+    );
+    await workspaceApi.ticketComment('r', 'reply', ['file-c'], 21);
+    expect(http.post).toHaveBeenLastCalledWith(
+      '/service-requests/r/comments',
+      expect.objectContaining({
+        attachmentFileIds: ['file-c'],
+        isInternal: false,
+      }),
+      { _sessionGeneration: 21 },
+    );
+  });
   test('work command carries the current version and handover review, never resets progress implicitly', async () => {
     await workspaceApi.command(
       { id: 'w', version: 7 } as Work,

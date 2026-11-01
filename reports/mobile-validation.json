@@ -1,16 +1,16 @@
 {
-  "date": "2026-10-31",
+  "date": "2026-11-01",
   "scope": "Android first client on shared web backend; not complete mobile release",
   "typecheck": {
     "exitCode": 0
   },
   "jest": {
-    "suitesPassed": 95,
-    "suitesTotal": 95,
-    "testsPassed": 832,
-    "testsTotal": 832,
+    "suitesPassed": 97,
+    "suitesTotal": 97,
+    "testsPassed": 848,
+    "testsTotal": 848,
     "skipped": 0,
-    "seconds": 32.174,
+    "seconds": 36.037,
     "notes": "Inherited act warnings remain"
   },
   "lintChangedSource": {
@@ -39,7 +39,7 @@
   "backendEvidence": "web-validation.json",
   "remaining": [
     "Physical QR IN/OUT and camera/network edge cases",
-    "Mobile attachment workflows",
+    "Large files/cloud providers/additional viewer acceptance",
     "Physical OS-link acceptance; verified HTTPS App Links and iOS",
     "Push/realtime/offline",
     "ARM release signing and iOS",
@@ -75,18 +75,17 @@
     "environment": "loopback local, debug signed",
     "emulatorLoginAndAttendance": "PASS",
     "physicalNewBuildOut": "NOT_VERIFIED",
-    "buildSeconds": 47,
+    "buildSeconds": 49,
     "tasks": 151,
     "profileBasics": "IMPLEMENTED; two regression tests pass; physical UI not verified",
     "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made",
-    "physicalInstallAndUserLaunch": "PASS; Android localDemo on existing USB device",
+    "physicalInstallAndUserLaunch": "PASS; OPPO updated; user verified fixture opening and saving",
     "physicalRecoveryLink": "PENDING"
   },
   "lintLatestIncrement": {
-    "files": 7,
+    "files": 8,
     "errors": 0,
-    "warnings": 5,
-    "batches": "recovery5files + dayoff2files"
+    "warnings": 24
   },
   "recoveryLinks": {
     "implementation": "Android custom scheme with strict parser and session guard",
@@ -98,5 +97,21 @@
     "weeklyOffAndHolidayRegression": "PASS",
     "webActualUi": "VERIFIED",
     "physicalUpdatedLabel": "PENDING_USER_ACCEPTANCE"
+  },
+  "fileWorkflows": {
+    "implemented": "Android single file per work command/support creation/comment, authenticated opening and Save As",
+    "emulatorPickerAndWorkUpload": "PASS_NATIVE_UI_AND_API_BYTES_MATCH",
+    "progress": "RETAINED_65",
+    "emulatorOpen": "VERIFIED_IMAGE_VIEWER",
+    "emulatorSaveAs": "BYTES_MATCH",
+    "emulatorSaveCancellation": "PASS_NO_FALSE_SUCCESS",
+    "wrongPurpose": "REJECTED_415",
+    "outsideWorkDepartment": "REJECTED_403",
+    "outsideSupportScope": "REJECTED_403",
+    "oppoOpen": "USER_CONFIRMED",
+    "oppoSave": "USER_CONFIRMED",
+    "sessionBoundary": "UNIT_TESTED_AND_NATIVE_EPOCH_GUARDS",
+    "logoutCachePurge": "PASS_EMULATOR_NATIVE_CACHE_ONE_FILE_TO_EMPTY_AND_LOGIN_SCREEN",
+    "fixtureCleanup": "ONE_OWNED_HASH_MATCHING_UNLINKED_FILE_SOFT_DELETED"
   }
 }

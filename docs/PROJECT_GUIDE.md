@@ -1,6 +1,6 @@
 # WorkSphere — hướng dẫn dự án, báo cáo và giao việc
 
-Cập nhật 31/10/2026. Đây là tài liệu đầu mối cho người mới; xem STATUS/TODO để biết mức độ hoàn thiện, không suy diễn một luồng mô tả là đã nghiệm thu mọi nhánh.
+Cập nhật 01/11/2026. Đây là tài liệu đầu mối cho người mới; xem STATUS/TODO để biết mức độ hoàn thiện, không suy diễn một luồng mô tả là đã nghiệm thu mọi nhánh.
 
 ## 1. Mục tiêu và cách đọc
 
@@ -40,7 +40,7 @@ Ba phòng là dữ liệu mẫu, thêm được phòng. Trưởng phòng theo ma
 7. OT: đề nghị và duyệt trước → cặp OT_IN/OT_OUT riêng → xác nhận phút thực trong khoảng được duyệt. Trễ quy trình cần căn cứ ngoại lệ; quét ra muộn không tự thành tiền OT.
 8. Thu nhập: dữ liệu lương/công/nghỉ/OT đã xác nhận → lập/gửi → duyệt độc lập → phát hành và khóa nguồn. Điều chỉnh bổ sung riêng, không ghi đè phiếu gốc; không thực hiện chuyển tiền hoặc tự phạt.
 
-Lịch thử chung đã được chọn08–17 T2–T6, nghỉ11:30–12:30. Chưa lịch cá nhân/ca đêm. Mạng văn phòng chưa cấu hình; QR/IP không chứng minh hiện diện tuyệt đối, USB chỉ là đường thử. Xem [ATTENDANCE_POLICY](ATTENDANCE_POLICY.md) trước khi viết công thức/chính sách.
+Lịch thử chung đã được chọn 08–17 T2–T6, nghỉ 11:30–12:30. Chưa lịch cá nhân/ca đêm. Mạng văn phòng chưa cấu hình; QR/IP không chứng minh hiện diện tuyệt đối, USB chỉ là đường thử. Xem [ATTENDANCE_POLICY](ATTENDANCE_POLICY.md) trước khi viết công thức/chính sách.
 
 ## 5. Bảng giao việc cho nhóm bốn người
 
@@ -50,7 +50,7 @@ Lịch thử chung đã được chọn08–17 T2–T6, nghỉ11:30–12:30. Ch�
 |---|---|---|---|
 | A1 / P0 | Nghiệm thu OPPO: IN/OUT, OT, mã trùng/hết hạn/điểm đóng/mất mạng | Bảng ca thử + lỗi/tái hiện + ảnh đã che | Web/mobile/API khớp; không ghi nhận thành công giả, không sửa lịch sử thật |
 | A2 / P0 | Rà soát web theo vai trò và truy cập vượt phạm vi | Bảng actor–resource–action–expected–actual | Có ca bị từ chối; sửa lỗi có test liên quan, không chỉ kiểm menu |
-| A3 / P1 | Tệp mobile và nghiệm thu OSlinks | PR nhỏ, hợp đồng API, tests và demo thiết bị | File đúng phạm vi; link đúng loại/hạn, không tự kích hoạt/reset khi mở |
+| A3 / P1 | Nghiệm thu tệp mobile và OSlinks | PR nhỏ, hợp đồng API, tests và demo thiết bị | File đúng phạm vi; link đúng loại/hạn, không tự kích hoạt/reset khi mở |
 | A4 / P1 | Chạy clone sạch và kiểm tra hướng dẫn | Phiên bản/môi trường/lệnh/kết quả/vướng mắc | Không dùng credentials/database máy tác giả; tách lỗi môi trường và lỗi sản phẩm |
 | B1 / song song | Viết báo cáo Lập trình nâng cao | Bản theo mẫu giảng viên, sơ đồ và trích nguồn code | Phân biệt kế thừa/tự sửa, đã có/chưa có/đã kiểm chứng |
 | B2 / sau B1 | Slide và kịch bản demo | 10–12 slide đề xuất + demo5–8 phút + phương án dự phòng | Khớp báo cáo/source, có giới hạn, không dùng mockup chứng minh chức năng |
@@ -84,3 +84,5 @@ Mỗi hình phải ghi môi trường, commit hoặc phiên bản, ca thử và 
 Các hợp đồng bổ sung mới thay giới hạn cũ tương ứng. Reports cũ là kết quả tại ngày ghi, không phải hiện trạng mới. Sơ đồ bảng/endpoint chi tiết phải đối chiếu migration/controller hiện hành, không sao chép nguyên database/API trong docs/legacy.
 
 Liên kết Android: [cách dùng và giới hạn](MOBILE_RECOVERY_LINKS.md), [kết quả31/10](../reports/INCREMENT_2026-10-31.md).
+
+Tệp Android: [hợp đồng và cách dùng](MOBILE_ATTACHMENTS.md), [kiểm chứng 01/11](../reports/INCREMENT_2026-11-01.md). Không giao lại phần đã triển khai như việc viết mới; giao nghiệm thu các giới hạn theo TODO.

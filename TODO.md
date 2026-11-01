@@ -1,4 +1,4 @@
-# TODO hiện hành — 31/10/2026
+# TODO hiện hành — 01/11/2026
 
 Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/history/TODO-before-mobile-2026-10-30.md). Dấu hoàn thành chỉ áp dụng phạm vi mô tả, không xác nhận production/toàn bộ module kế thừa.
 
@@ -28,10 +28,11 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [x] Công/nghỉ/OT/sửa công; xem và duyệt theo canReview, phiên bản; OT phải xác nhận thực tế.
 - [x] Bridge camera QR Android; chặn mã sai, hủy camera không chấm, kết quả camera sau đổi phiên bị bỏ. Đã mở camera trên giả lập.
 - [x] Thông báo trong app, danh bạ phòng 20/trang, hồ sơ đọc, phiếu thu nhập của chính mình đã phát hành; che số tiền mặc định.
-- [x] TypeScript; toàn bộ 93 suites/824 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
+- [x] TypeScript; toàn bộ 97 suites/848 Jest tests đạt; Android debug x86_64 build/cài/đăng nhập/khởi động nguội.
 - [x] Ghi chú Android → web đồng bộ; công việc bàn giao giữ 65%. Khôi phục Wrapper chính thức, ghim checksum.
 - [ ] Nghiệm thu camera quét QR đang xoay và lượt IN/OUT trên điện thoại thật; thử mất mạng, hết hạn, trùng lượt bằng thiết bị. Test backend cho các điều kiện này đã có, không thay thế thử thiết bị.
-- [ ] Tải lên/xem/tải tệp đính kèm mobile; hiện chỉ có metadata tệp công việc, thao tác tệp trên web.
+- [x] Android chọn/gắn tệp cho công việc và hỗ trợ, mở/Save As có xác thực, giới hạn/purpose/phiên/cache; unit và giả lập/API đạt, OPPO mở/lưu được người dùng xác nhận. Xem MOBILE_ATTACHMENTS và báo cáo 01/11.
+- [ ] Nghiệm thu tệp 20 MiB/provider cloud/các ứng dụng đọc khác và xử lý mất mạng dài trên OPPO; iOS chưa triển khai.
 - [x] Mobile: đổi mật khẩu, thiết lập/bật/tắt TOTP, mã dự phòng một lần và đăng xuất mọi thiết bị; che secrets khi background/blur, không giả báo remote logout thành công khi mất mạng.
 - [x] Mobile sửa họ tên/số liên hệ qua /me; giữ số đã có khi chỉ sửa tên, không gửi thay đổi quyền/phòng/ảnh.
 - [x] Android custom scheme kích hoạt/reset, warm/cold/session guard và nút từ web; không tự POST khi mở.
@@ -52,7 +53,7 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 
 ## Hạn mức
 
-Ngày31/10 người dùng cho phép tiếp tục dù hạn mức tuần còn5%, thay ngưỡng dừng trước đó. Theo dõi và lưu bàn giao trước khi hết; không cam kết đủ hạn mức để xong mọi việc.
+Người dùng đã cho phép tiếp tục và ngày 01/11 báo có tín dụng mới. Ngưỡng dừng 5% trước đây đã được thay thế; lưu bàn giao theo tiến độ thực tế, không cam kết hoàn thành dựa trên hạn mức.
 
 ## Chấm công sau rà soát — đã triển khai, còn nghiệm thu thiết bị
 
@@ -75,7 +76,14 @@ Ngày31/10 người dùng cho phép tiếp tục dù hạn mức tuần còn5%, 
 - [x] README/STATUS/COURSE_SCOPE/RUNNING gọn, xóa năm kế hoạch/trạng thái bị thay thế; giữ bằng chứng riêng và nguồn gốc.
 - [ ] Đối chiếu rubric/mẫu giảng viên; tạo báo cáo/slide thực tế sau khi chốt bằng chứng.
 
-- [x] Ngày31/10: toàn bộ mobile95 suites/832 tests và TypeScript đạt; lint5 file thay đổi0errors/2warnings. Backend150 là kết quả30/10, không chạy lại hôm nay.
+- [x] Ngày31/10: toàn bộ mobile95 suites/832 tests và TypeScript đạt; lint5 file thay đổi0errors/2warnings. Backend 150 là kết quả30/10, không chạy lại hôm nay.
 
 - [x] Nhãn ngày nghỉ/ngày lễ và khung ca thường web/mobile đúng day_kind; OT tiếp tục theo actions máy chủ, thêm2 tests, không đổi lịch.
 - [x] Biểu mẫu kích hoạt Android có lối quay về Login trước khi kích hoạt; mở rộng test không POST và biểu mẫu/token rời màn hình. Kiểm tra trên OPPO vẫn cần nghiệm thu.
+
+## Tệp Android — 01/11
+
+- [x] 97 suites/848 tests, TypeScript; lint 8 file: 0 errors/24 warnings; 5 web session tests và kiểm tra cú pháp/diff/secrets/liên kết đạt.
+- [x] Native/JS ngăn phản hồi tệp của phiên cũ; hủy tải khi rời màn hình; giữ ID upload để thử gắn lại; không tự mở URL metadata.
+- [x] Kiểm tra bytes/tiến độ, Save As và hủy trên giả lập; API từ chối ngoài phòng/sai purpose; OPPO mở/lưu có xác nhận.
+- [x] Đăng xuất riêng phiên giả lập đưa về màn đăng nhập và dọn hết cache tệp native; không đăng xuất phiên OPPO.

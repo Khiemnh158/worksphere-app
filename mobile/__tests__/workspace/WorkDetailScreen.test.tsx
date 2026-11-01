@@ -75,6 +75,8 @@ describe('handover review on mobile', () => {
       expect.stringContaining('Đã kiểm tra'),
       undefined,
       undefined,
+      [],
+      expect.any(Number),
     );
   });
   test('a concurrent update refreshes detail and does not silently retry an old command', async () => {

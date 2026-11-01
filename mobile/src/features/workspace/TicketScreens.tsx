@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { normalizeError } from '../../shared/api/apiError';
 import { Ticket, TicketPriority, ticketPriorities, workspaceApi } from './api';
@@ -9,6 +9,12 @@ import {
 } from './WorkspaceNavigator';
 import { Button, Card, Choices, Copy, Field, Page, useLoad } from './ui';
 import { dateTime, label, ticketActionLabels } from './rules';
+import {
+  AttachmentList,
+  AttachmentPicker,
+  useAttachmentDraft,
+} from './AttachmentControls';
+import { submitWithAttachment } from './attachmentFiles';
 
 export function TicketListScreen() {
   const { context } = useWorkplace();
@@ -99,6 +105,8 @@ export function TicketListScreen() {
   );
 }
 export function CreateTicketScreen() {
+  const attachment = useAttachmentDraft();
+  const submitLock = useRef(false);
   const navigation = useNavigation<WorkspaceNavigation>();
   const { context } = useWorkplace();
   const [category, setCategory] = useState('');
@@ -108,7 +116,7 @@ export function CreateTicketScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   async function submit() {
-    if (busy) return;
+    if (busy || submitLock.current) return;
     if (
       !category ||
       !title.trim() ||
@@ -118,20 +126,29 @@ export function CreateTicketScreen() {
       setError('Chọn nơi hỗ trợ và điền tiêu đề (tối đa 255 ký tự), nội dung.');
       return;
     }
+    submitLock.current = true;
     setBusy(true);
     setError('');
     try {
-      const result = await workspaceApi.createTicket(
-        category,
-        title.trim(),
-        description.trim(),
-        priority,
-        [],
+      const result = await submitWithAttachment(
+        attachment.draft,
+        'SERVICE_ATTACHMENT',
+        (ids, generation) =>
+          workspaceApi.createTicket(
+            category,
+            title.trim(),
+            description.trim(),
+            priority,
+            ids,
+            generation,
+          ),
       );
+      attachment.clear();
       navigation.replace('TicketDetail', { id: result.id });
     } catch (e) {
       setError(normalizeError(e).message);
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   }
@@ -164,6 +181,11 @@ export function CreateTicketScreen() {
         onChange={value => setPriority(value as TicketPriority)}
         values={ticketPriorities.map(id => ({ id, name: label(id) }))}
       />
+      <AttachmentPicker
+        draft={attachment.draft}
+        onChange={attachment.setDraft}
+        busy={busy}
+      />
       <Button title="Gửi yêu cầu" busy={busy} onPress={() => void submit()} />
     </Page>
   );
@@ -180,6 +202,8 @@ const supported = new Set([
   'COMMENT',
 ]);
 export function TicketDetailScreen() {
+  const attachment = useAttachmentDraft();
+  const submitLock = useRef(false);
   const { context } = useWorkplace();
   const route = useRoute<RouteProp<WorkspaceRoutes, 'TicketDetail'>>();
   const state = useLoad(
@@ -191,7 +215,7 @@ export function TicketDetailScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   async function submit(ticket: Ticket) {
-    if (busy) return;
+    if (busy || submitLock.current) return;
     if (
       [
         'COMMENT',
@@ -209,11 +233,22 @@ export function TicketDetailScreen() {
       setError('Chọn người nhận xử lý trong phòng.');
       return;
     }
+    submitLock.current = true;
     setBusy(true);
     setError('');
     try {
       if (action === 'COMMENT')
-        await workspaceApi.ticketComment(ticket.id, content.trim(), []);
+        await submitWithAttachment(
+          attachment.draft,
+          'SERVICE_ATTACHMENT',
+          (ids, generation) =>
+            workspaceApi.ticketComment(
+              ticket.id,
+              content.trim(),
+              ids,
+              generation,
+            ),
+        );
       else
         await workspaceApi.ticketAction(
           ticket,
@@ -222,21 +257,35 @@ export function TicketDetailScreen() {
           person || undefined,
         );
       setAction('');
+      attachment.clear();
       setContent('');
       await state.refresh();
     } catch (e) {
       setError(normalizeError(e).message);
       await state.refresh();
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   }
   const ticket = state.data;
+  useEffect(() => {
+    if (
+      attachment.draft?.uploadedId &&
+      ticket?.attachments?.some(
+        f => (f.fileId ?? f.id) === attachment.draft?.uploadedId,
+      )
+    ) {
+      attachment.draft.linked = true;
+      attachment.clear();
+    }
+  }, [ticket?.attachments, attachment]);
   return (
     <Page
       error={state.error}
       loading={state.loading}
       onRefresh={() => {
+        attachment.clear();
         setAction('');
         void state.refresh();
       }}
@@ -264,6 +313,7 @@ export function TicketDetailScreen() {
                   title={ticketActionLabels[a] ?? a}
                   secondary={a !== 'CONFIRM' && a !== 'START'}
                   onPress={() => {
+                    attachment.clear();
                     setAction(a);
                     setError('');
                   }}
@@ -301,6 +351,13 @@ export function TicketDetailScreen() {
                 multiline
               />
               {!!error && <Copy>{error}</Copy>}
+              {action === 'COMMENT' && (
+                <AttachmentPicker
+                  draft={attachment.draft}
+                  onChange={attachment.setDraft}
+                  busy={busy}
+                />
+              )}
               <Button
                 busy={busy}
                 title={ticketActionLabels[action] ?? 'Xác nhận'}
@@ -311,6 +368,7 @@ export function TicketDetailScreen() {
                 title="Hủy thao tác"
                 secondary
                 onPress={() => {
+                  attachment.clear();
                   setAction('');
                   setContent('');
                 }}
@@ -325,6 +383,7 @@ export function TicketDetailScreen() {
               trên web.
             </Copy>
           )}
+          <AttachmentList files={ticket.attachments ?? []} />
           <Copy title>Kết quả & lịch sử</Copy>
           {ticket.histories?.map((h, i) => (
             <Card key={h.id ?? String(i)}>

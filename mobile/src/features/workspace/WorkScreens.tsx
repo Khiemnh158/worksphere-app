@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { View } from 'react-native';
 import { useAppTheme } from '../../app/providers/ThemeProvider';
@@ -11,6 +11,12 @@ import {
 } from './WorkspaceNavigator';
 import { actionLabels, dateTime, label, personalWorks } from './rules';
 import { Button, Card, Choices, Copy, Field, Page, useLoad } from './ui';
+import {
+  AttachmentList,
+  AttachmentPicker,
+  useAttachmentDraft,
+} from './AttachmentControls';
+import { submitWithAttachment } from './attachmentFiles';
 
 function WorkCard({ work }: { work: Work }) {
   const navigation = useNavigation<WorkspaceNavigation>();
@@ -155,6 +161,8 @@ export function WorkScreen() {
   );
 }
 export function WorkDetailScreen() {
+  const attachment = useAttachmentDraft();
+  const submitLock = useRef(false);
   const route = useRoute<RouteProp<WorkspaceRoutes, 'WorkDetail'>>();
   const { context } = useWorkplace();
   const state = useLoad(
@@ -170,8 +178,19 @@ export function WorkDetailScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const work = state.data;
+  useEffect(() => {
+    if (
+      attachment.draft?.uploadedId &&
+      work?.attachments?.some(
+        f => (f.fileId ?? f.id) === attachment.draft?.uploadedId,
+      )
+    ) {
+      attachment.draft.linked = true;
+      attachment.clear();
+    }
+  }, [work?.attachments, attachment]);
   const submit = async () => {
-    if (!work || busy) return;
+    if (!work || busy || submitLock.current) return;
     const note = content.trim();
     if (!['START', 'APPROVE', 'PROGRESS'].includes(action) && !note) {
       setError('Hãy ghi rõ nội dung và phần cần tiếp tục.');
@@ -188,16 +207,25 @@ export function WorkDetailScreen() {
       setError('Chọn người nhận bàn giao.');
       return;
     }
+    submitLock.current = true;
     setBusy(true);
     setError('');
     try {
-      await workspaceApi.command(
-        work,
-        action,
-        note,
-        action === 'PROGRESS' ? Number(progress) : undefined,
-        receiver || undefined,
+      await submitWithAttachment(
+        attachment.draft,
+        'TASK_ATTACHMENT',
+        (fileIds, generation) =>
+          workspaceApi.command(
+            work,
+            action,
+            note,
+            action === 'PROGRESS' ? Number(progress) : undefined,
+            receiver || undefined,
+            fileIds,
+            generation,
+          ),
       );
+      attachment.clear();
       setAction('');
       setContent('');
       await state.refresh();
@@ -205,6 +233,7 @@ export function WorkDetailScreen() {
       setError(normalizeError(e).message);
       await state.refresh();
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   };
@@ -213,6 +242,7 @@ export function WorkDetailScreen() {
       loading={state.loading}
       error={state.error}
       onRefresh={() => {
+        attachment.clear();
         setAction('');
         void state.refresh();
       }}
@@ -250,6 +280,7 @@ export function WorkDetailScreen() {
                     secondary={a !== 'ACCEPT_HANDOVER' && a !== 'START'}
                     title={actionLabels[a] ?? a}
                     onPress={() => {
+                      attachment.clear();
                       setAction(a);
                       setProgress(String(work.progress));
                       setError('');
@@ -293,6 +324,13 @@ export function WorkDetailScreen() {
                 multiline
               />
               {!!error && <Copy>{error}</Copy>}
+              {['COMMENT', 'PROGRESS', 'SUBMIT'].includes(action) && (
+                <AttachmentPicker
+                  draft={attachment.draft}
+                  onChange={attachment.setDraft}
+                  busy={busy}
+                />
+              )}
               <Button
                 busy={busy}
                 title={actionLabels[action] ?? 'Xác nhận'}
@@ -303,21 +341,14 @@ export function WorkDetailScreen() {
                 busy={busy}
                 title="Hủy thao tác"
                 onPress={() => {
+                  attachment.clear();
                   setAction('');
                   setContent('');
                 }}
               />
             </Card>
           )}
-          {!!work.attachments?.length && (
-            <Card>
-              <Copy title>Tệp công việc</Copy>
-              {work.attachments.map(file => (
-                <Copy key={file.id}>{file.original_name}</Copy>
-              ))}
-              <Copy muted>Tải tệp trên web trong bản mobile đầu tiên.</Copy>
-            </Card>
-          )}
+          <AttachmentList files={work.attachments ?? []} />
           <Copy title>Lịch sử & trao đổi</Copy>
           {work.events?.map(e => (
             <Card key={e.id}>

@@ -73,7 +73,8 @@ export interface WorkEvent {
   created_at: string;
 }
 export interface Attachment {
-  id: string;
+  id?: string;
+  fileId?: string;
   original_name?: string;
   originalName?: string;
   size_bytes?: number;
@@ -226,6 +227,11 @@ async function required<T>(value: Promise<T | null>): Promise<T> {
     throw new Error('Máy chủ chưa trả dữ liệu. Vui lòng thử lại.');
   return result;
 }
+function sessionPost<T>(url: string, body: object, generation?: number) {
+  return generation === undefined
+    ? http.post<object, T>(url, body)
+    : http.post<object, T>(url, body, { _sessionGeneration: generation });
+}
 export const workspaceApi = {
   context: () => required(http.get<WorkplaceContext>('/workplace/context')),
   work: () => required(http.get<Work[]>('/workplace/work')),
@@ -237,16 +243,21 @@ export const workspaceApi = {
     progress?: number,
     userId?: string,
     fileIds?: string[],
+    generation?: number,
   ) =>
     required(
-      http.post<object, Work>(`/workplace/work/${work.id}/commands`, {
-        version: work.version,
-        action,
-        content,
-        progress,
-        userId,
-        fileIds,
-      }),
+      sessionPost<Work>(
+        `/workplace/work/${work.id}/commands`,
+        {
+          version: work.version,
+          action,
+          content,
+          progress,
+          userId,
+          fileIds,
+        },
+        generation,
+      ),
     ),
   tickets: (scope: string, page: number, search = '') =>
     required(
@@ -261,22 +272,36 @@ export const workspaceApi = {
     description: string,
     priority: TicketPriority,
     attachmentFileIds: string[],
+    generation?: number,
   ) =>
     required(
-      http.post<object, { id: string }>('/service-requests', {
-        categoryId,
-        title,
-        description,
-        priority,
-        attachmentFileIds,
-      }),
+      sessionPost<{ id: string }>(
+        '/service-requests',
+        {
+          categoryId,
+          title,
+          description,
+          priority,
+          attachmentFileIds,
+        },
+        generation,
+      ),
     ),
-  ticketComment: (id: string, content: string, attachmentFileIds: string[]) =>
-    http.post(`/service-requests/${id}/comments`, {
-      content,
-      attachmentFileIds,
-      isInternal: false,
-    }),
+  ticketComment: (
+    id: string,
+    content: string,
+    attachmentFileIds: string[],
+    generation?: number,
+  ) =>
+    sessionPost(
+      `/service-requests/${id}/comments`,
+      {
+        content,
+        attachmentFileIds,
+        isInternal: false,
+      },
+      generation,
+    ),
   ticketAction: async (
     r: Ticket,
     action: string,
