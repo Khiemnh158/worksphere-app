@@ -1,4 +1,4 @@
-# TODO hiện hành — 01/11/2026
+# TODO hiện hành — 02/11/2026
 
 Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/history/TODO-before-mobile-2026-10-30.md). Dấu hoàn thành chỉ áp dụng phạm vi mô tả, không xác nhận production/toàn bộ module kế thừa.
 
@@ -48,7 +48,7 @@ Checklist cũ trùng/lỗi thời được giữ tại [lịch sử](docs/histor
 - [ ] Người dùng nghiệm thu UI/quy trình; rubric chính thức môn Lập trình nâng cao chưa được cung cấp.
 - [ ] Toàn bộ legacy Testcontainers trên Docker; audit hết project/task/assets kế thừa. 150 tests không đại diện toàn bộ suite.
 - [ ] Thử tải/phân trang hồ sơ/nhật ký còn giới hạn 200 và bộ chọn 1000 nếu mở rộng quy mô.
-- [ ] Release signing, HTTPS/SMTP thật, backup/restore, CI triển khai hai repo chuyên đề.
+- [ ] Release signing, HTTPS/SMTP thật, backup/restore, CI cho môn Triển khai phần mềm.
 - [ ] Thuế/BHXH/thực lĩnh/ca đêm/vân tay/SSO chỉ mở khi có yêu cầu/chính sách cụ thể; hiện chưa làm.
 
 ## Hạn mức
@@ -94,3 +94,8 @@ Người dùng đã cho phép tiếp tục và ngày 01/11 báo có tín dụng 
 - [x] 152 backend tests chọn lọc (58 PostgreSQL), package; 98 suites/852 mobile tests và TypeScript. 5 tests phiên web và 3 tests pager đạt.
 - [x] Không cho tổng số lượt lộ phạm vi khác; web không dựng lại cả màn khi chuyển trang; mobile đổi tháng bỏ phản hồi cũ và về trang đầu, lỗi có thể thử lại.
 - [x] Web đổi tháng thấy IN/điểm và trạng thái biên trang; OPPO lịch sử tháng có xác nhận người dùng. API main đối chiếu page/overview theo hai nhân viên khác phòng đạt, không sửa lượt chấm công.
+
+## Phạm vi môn học — 02/11
+
+- [x] Người dùng xác nhận An toàn thông tin thi trắc nghiệm, bỏ bài tập lớn/chuyên đề riêng. Hai môn dự án còn Lập trình nâng cao và Triển khai phần mềm.
+- [x] Gỡ tham chiếu repo/chuyên đề An toàn thông tin khỏi tài liệu hiện hành; giữ bảo vệ và kiểm thử bảo mật của ứng dụng. Tài liệu có ngày cũ là lịch sử.

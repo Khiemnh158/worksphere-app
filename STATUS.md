@@ -1,4 +1,4 @@
-# Hiện trạng WorkSphere — 01/11/2026
+# Hiện trạng WorkSphere — 02/11/2026
 
 Ứng dụng có web nghiệp vụ và Android dùng chung API. Đây là bản đồ án đang kiểm chứng, chưa nghiệm thu toàn bộ hoặc production. Lịch sử xem Git và báo cáo có ngày, không dùng kế hoạch cũ như tính năng đã hoàn tất.
 
@@ -26,8 +26,8 @@ Ca dữ liệu tổng hợp 1.116 lượt: đủ các trang, thứ tự cùng ti
 
 ## Còn lại
 
-[TODO](TODO.md) là backlog chuẩn: nghiệm thu thiết bị/quyền/cutoff; ca cá nhân; giải trình punches và thử tải phân trang; load/toàn bộ legacy, release và yêu cầu chính thức ba môn. Mạng văn phòng chưa cung cấp nên giữ UNCONFIGURED; USB không chứng minh vị trí.
+[TODO](TODO.md) là backlog chuẩn: nghiệm thu thiết bị/quyền/cutoff; ca cá nhân; giải trình punches và thử tải phân trang; load/toàn bộ legacy, release và yêu cầu chính thức hai môn. Mạng văn phòng chưa cung cấp nên giữ UNCONFIGURED; USB không chứng minh vị trí.
 
-Lịch thử được chọn 08–17 T2–T6, nghỉ 11:30–12:30. Không seed lương giả; chưa thuế/BHXH/thực lĩnh, ngân hàng, pháp lý bồi thường/sa thải, vân tay/SSO, SMTP/SMS thật, iOS/production. Hai repo chuyên đề chưa được coi là hoàn tất. Không tính % bằng số tests/ô TODO.
+Lịch thử được chọn 08–17 T2–T6, nghỉ 11:30–12:30. Không seed lương giả; chưa thuế/BHXH/thực lĩnh, ngân hàng, pháp lý bồi thường/sa thải, vân tay/SSO, SMTP/SMS thật, iOS/production. Môn Triển khai phần mềm chưa hoàn tất. An toàn thông tin thi trắc nghiệm, không còn bài tập lớn theo xác nhận 02/11. Không tính % bằng số tests/ô TODO.
 
 Đọc [PROJECT_GUIDE](docs/PROJECT_GUIDE.md) để giao việc và chuẩn bị báo cáo/slide, [FRESH_CLONE_RUNNING](docs/FRESH_CLONE_RUNNING.md) để chạy từ source.

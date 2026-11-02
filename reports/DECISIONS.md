@@ -22,3 +22,5 @@
 - D017: Nhân sự tách quyết định/cutoff/bàn giao/đối soát; JWT và refresh kiểm tra cutoff, không xóa lịch sử.
 - D018: Người lập–duyệt bảng tính độc lập; phát hành kiểm tra nguồn và giữ phiếu gốc khi điều chỉnh.
 - D019: Người dùng chọn QR xoay vòng; chỉ làm web/backend trước, mobile đợi nghiệm thu.
+
+- D-2026-11-02: Người dùng xác nhận An toàn thông tin thi trắc nghiệm, không làm bài tập lớn và yêu cầu xóa repo chuyên đề trên GitHub. Phạm vi dự án còn Kỹ năng lập trình nâng cao + Triển khai phần mềm; quyết định này thay D-003 về ba môn. Các chức năng/kiểm thử bảo mật của ứng dụng được giữ.

@@ -1,12 +1,12 @@
 # WorkSphere — hướng dẫn dự án, báo cáo và giao việc
 
-Cập nhật 01/11/2026. Đây là tài liệu đầu mối cho người mới; xem STATUS/TODO để biết mức độ hoàn thiện, không suy diễn một luồng mô tả là đã nghiệm thu mọi nhánh.
+Cập nhật 02/11/2026. Đây là tài liệu đầu mối cho người mới; xem STATUS/TODO để biết mức độ hoàn thiện, không suy diễn một luồng mô tả là đã nghiệm thu mọi nhánh.
 
 ## 1. Mục tiêu và cách đọc
 
 Nền tảng tiếp nhận yêu cầu hỗ trợ và quản lý công việc nội bộ doanh nghiệp vừa và nhỏ. Nhân viên tìm đúng nơi hỗ trợ; trưởng phòng điều phối; người nhận thực hiện; người có thẩm quyền nghiệm thu. Lưu lịch sử khi bàn giao/ngừng truy cập.
 
-Đọc lần lượt: tài liệu này → [STATUS](../STATUS.md) → [TODO](../TODO.md) → [chạy clone](FRESH_CLONE_RUNNING.md). Khi xử lý nghiệp vụ, đọc hợp đồng tương ứng trong mục7. Nguồn app là repo này; hai môn chuyên đề ghim commit app, không có database hoặc backend thứ hai.
+Đọc lần lượt: tài liệu này → [STATUS](../STATUS.md) → [TODO](../TODO.md) → [chạy clone](FRESH_CLONE_RUNNING.md). Khi xử lý nghiệp vụ, đọc hợp đồng tương ứng trong mục7. Nguồn app là repo này; môn Triển khai phần mềm ghim commit app, không có database hoặc backend thứ hai.
 
 ## 2. Kiến trúc và công nghệ
 
@@ -54,8 +54,7 @@ Lịch thử chung đã được chọn 08–17 T2–T6, nghỉ 11:30–12:30. C
 | A4 / P1 | Chạy clone sạch và kiểm tra hướng dẫn | Phiên bản/môi trường/lệnh/kết quả/vướng mắc | Không dùng credentials/database máy tác giả; tách lỗi môi trường và lỗi sản phẩm |
 | B1 / song song | Viết báo cáo Lập trình nâng cao | Bản theo mẫu giảng viên, sơ đồ và trích nguồn code | Phân biệt kế thừa/tự sửa, đã có/chưa có/đã kiểm chứng |
 | B2 / sau B1 | Slide và kịch bản demo | 10–12 slide đề xuất + demo5–8 phút + phương án dự phòng | Khớp báo cáo/source, có giới hạn, không dùng mockup chứng minh chức năng |
-| C1 / sau release target | Chuyên đề An toàn thông tin | Threat model, test quyền/session/input và bằng chứng trước/sau | Ghim commit, không scan mục tiêu ngoài phạm vi; không khẳng định hết lỗi |
-| C2 / sau release target | Chuyên đề Triển khai phần mềm | Pipeline/Compose/chất lượng/giám sát, backup/restore/rollback và log | Tự chạy theo yêu cầu môn; cùng app commit, không nộp cấu hình giả |
+| C1 / sau release target | Chuyên đề Triển khai phần mềm | Pipeline/Compose/chất lượng/giám sát, backup/restore/rollback và log | Tự chạy theo yêu cầu môn; cùng app commit, không nộp cấu hình giả |
 
 Mẫu phiếu giao việc: mã; người nhận; commit bắt đầu; phạm vi; tài liệu/API liên quan; đầu ra; điều kiện hoàn thành; ca thử; hạn do nhóm thống nhất; người kiểm tra; kết quả và commit bàn giao. Không nhận trạng thái “xong” nếu thiếu đầu ra/bằng chứng.
 
@@ -63,7 +62,7 @@ Mẫu phiếu giao việc: mã; người nhận; commit bắt đầu; phạm vi;
 
 Báo cáo: bối cảnh/phạm vi → yêu cầu và phân quyền → kiến trúc/dữ liệu/API → các luồng chính → phần triển khai thực → kiểm thử → kết quả/giới hạn → hướng phát triển/phân công/tài liệu tham khảo. Đối chiếu mẫu từng môn, không tự coi bố cục đề xuất này thay đề cương.
 
-Slide đề xuất: vấn đề; phạm vi ba môn; actor/quyền; kiến trúc; hỗ trợ; công việc/bàn giao; nhân sự/truy cập; QR/OT; demo; kiểm thử; giới hạn; phân công. Không cần đưa toàn bộ chi tiết lương/pháp lý lên slide.
+Slide đề xuất: vấn đề; phạm vi hai môn; actor/quyền; kiến trúc; hỗ trợ; công việc/bàn giao; nhân sự/truy cập; QR/OT; demo; kiểm thử; giới hạn; phân công. Không cần đưa toàn bộ chi tiết lương/pháp lý lên slide.
 
 Mỗi hình phải ghi môi trường, commit hoặc phiên bản, ca thử và kết quả. Dùng tài khoản fixture, không public mật khẩu/token/phiếu thu nhập riêng hoặc giờ/IP nhận diện. Chụp bằng chứng chức năng thật; không dựng số liệu hoặc dùng số tests để suy ra % sản phẩm.
 
@@ -88,3 +87,5 @@ Liên kết Android: [cách dùng và giới hạn](MOBILE_RECOVERY_LINKS.md), [
 Tệp Android: [hợp đồng và cách dùng](MOBILE_ATTACHMENTS.md), [kiểm chứng 01/11](../reports/INCREMENT_2026-11-01.md). Không giao lại phần đã triển khai như việc viết mới; giao nghiệm thu các giới hạn theo TODO.
 
 Lịch sử chấm công đã phân trang trên web/mobile. Bàn giao tiếp là nghiệm thu thiết bị và thử tải, không giao lại phần phân trang như chưa được viết. Hợp đồng nằm trong ATTENDANCE_POLICY; bằng chứng ở báo cáo 01/11.
+
+Phạm vi 02/11: An toàn thông tin thi trắc nghiệm, không làm bài tập lớn. Công việc dự án còn Lập trình nâng cao và Triển khai phần mềm; bảo vệ dữ liệu/phân quyền vẫn nằm trong chất lượng ứng dụng.
