@@ -846,6 +846,8 @@ public class WorkplaceService {
                         email)
                 .isEmpty()) throw invalid("Tên đăng nhập hoặc email đã tồn tại");
         if (input.departmentId() != null) activeDepartment(input.departmentId());
+        if ("ADMIN".equals(input.role()) && input.departmentId() != null)
+            throw invalid("Tài khoản quản trị kỹ thuật không gắn phòng nghiệp vụ");
         Role role = roles.findByCode(validRole(input.role())).orElseThrow();
         User user =
                 User.create(

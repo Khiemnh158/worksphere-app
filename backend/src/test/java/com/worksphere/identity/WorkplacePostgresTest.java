@@ -35,6 +35,25 @@ import java.util.concurrent.*;
 @EnabledIfEnvironmentVariable(named = "WORKSPHERE_AUTHZ_TEST_JDBC_URL", matches = ".+")
 class WorkplacePostgresTest {
     @Test
+    void technicalAdminCreationCannotAttachBusinessDepartment() throws Exception {
+        String username = "technical-" + UUID.randomUUID().toString().substring(0, 8);
+        var input = new HashMap<String, Object>();
+        input.put("username", username);
+        input.put("email", username + "@example.invalid");
+        input.put("fullName", "Technical admin fixture");
+        input.put("role", "ADMIN");
+        input.put("departmentId", department.toString());
+        status(call("POST", "/workplace/staff", a, input), 422);
+        assertThat(db.queryForObject("SELECT count(*) FROM users WHERE username=?", Integer.class, username)).isZero();
+        input.remove("departmentId");
+        var created = call("POST", "/workplace/staff", a, input);
+        status(created, 200);
+        var row = db.queryForMap("SELECT status,department_id FROM users WHERE id=?", UUID.fromString(data(created).asText()));
+        assertThat(row.get("department_id")).isNull();
+        assertThat(row.get("status")).isEqualTo("PENDING");
+    }
+
+    @Test
     void personalIncomeEndpointNeverReturnsOtherPeopleEvenForPayrollSpecialist() throws Exception {
         timeSetup();
         UUID id = income("2020-02-03");

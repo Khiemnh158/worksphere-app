@@ -332,6 +332,8 @@ public class ProjectMockMvcTest {
                 LocalDate.now().plusMonths(2),
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         UpdateProjectRequest req = new UpdateProjectRequest(
                 "Tên mới",
@@ -367,6 +369,8 @@ public class ProjectMockMvcTest {
                 null,
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         UpdateProjectRequest req = new UpdateProjectRequest(
                 "Tên sửa",
@@ -400,6 +404,8 @@ public class ProjectMockMvcTest {
                 null,
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         // DRAFT -> ACTIVE
         ChangeProjectStatusRequest req = new ChangeProjectStatusRequest(
@@ -436,6 +442,8 @@ public class ProjectMockMvcTest {
                 null,
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         // DRAFT -> COMPLETED is invalid per 06_API_CONTRACT.md section 11.5
         ChangeProjectStatusRequest req = new ChangeProjectStatusRequest(

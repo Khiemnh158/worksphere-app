@@ -186,6 +186,7 @@ public class ServiceRequestMockMvcTest {
         jdbcTemplate.update("DELETE FROM service_categories");
         jdbcTemplate.update("DELETE FROM stored_files");
         jdbcTemplate.update("DELETE FROM user_roles");
+        jdbcTemplate.update("DELETE FROM workplace_notices");
         jdbcTemplate.update("DELETE FROM users");
 
         // 1. Admin user

@@ -201,8 +201,8 @@ export function ResetPasswordScreen() {
                   },
                 ]}
               >
-                Nhập mã xác thực nhận được cùng với mật khẩu mới của bạn (từ 8
-                đến 128 ký tự).
+                Nhập mã xác thực nhận được cùng với mật khẩu mới của bạn (ít
+                nhất 12 ký tự, tối đa 72 byte UTF-8).
               </Text>
 
               {globalError ? (
@@ -264,7 +264,7 @@ export function ResetPasswordScreen() {
                 onChangeText={setNewPassword}
                 error={fieldErrors.newPassword}
                 required
-                placeholder="Nhập mật khẩu mới (8-128 ký tự)"
+                placeholder="Ít nhất 12 ký tự, tối đa 72 byte UTF-8"
                 accessibilityLabel="Mật khẩu mới"
                 testID="input-new-password"
                 disabled={submitting}
