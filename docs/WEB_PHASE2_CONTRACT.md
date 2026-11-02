@@ -52,7 +52,7 @@ approval_state: DRAFT → SUBMITTED → APPROVED → PUBLISHED. Người lập/g
 
 TIME_REVIEW quản lý điểm chấm công. QR tạo bằng ZXing core 3.5.3 tại máy chủ, nonce ngẫu nhiên, hạn 40 giây; web thay sau 30 giây. Đóng điểm vô hiệu hóa challenge ngay. Payload worksphere-attendance:<nonce>; API punches yêu cầu tài khoản người chấm và token không có tiền tố. Không nhận userId hoặc thời gian do client tự khai.
 
-Một IN/OUT/người/ngày, không OUT trước IN, không dùng mã hết hạn/điểm đóng, không tạo công đã chốt. OUT tạo bản ghi PENDING nếu chưa có nguồn khác, không ghi đè dữ liệu nhập. QR là một kiểm soát, không chứng minh tuyệt đối người thật có mặt; chưa có ràng buộc thiết bị/GPS. Mobile quét và luồng mất mạng sẽ làm sau khi người dùng nghiệm thu web. Không có thay đổi native mobile trong giai đoạn này.
+Một IN/OUT/người/ngày, không OUT trước IN, không dùng mã hết hạn/điểm đóng, không tạo công đã chốt. OUT tạo bản ghi PENDING nếu chưa có nguồn khác, không ghi đè dữ liệu nhập. QR là một kiểm soát, không chứng minh tuyệt đối người thật có mặt; chưa có ràng buộc thiết bị/GPS. Android đã có camera QR, trạng thái/actions máy chủ và báo lỗi khi không lưu; ngày 02/11 nghiệm thu bốn lượt trên OPPO trong môi trường mô phỏng riêng. Chính sách mới và giới hạn hiện hành đọc ATTENDANCE_POLICY, không lấy kế hoạch mobile cũ làm hiện trạng.
 
 ## Giới hạn vận hành
 

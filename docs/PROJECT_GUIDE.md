@@ -10,7 +10,7 @@ Nền tảng tiếp nhận yêu cầu hỗ trợ và quản lý công việc n�
 
 ## 2. Kiến trúc và công nghệ
 
-Web JavaScript và Android React Native/TypeScript → API Spring Boot → PostgreSQL. Backend quyết định quyền, trạng thái, version, thời gian và phép tính; menu chỉ phản ánh khả năng. Flyway quản lý schema; không sửa migration đã chạy. Backend mục tiêu Java21; bản build local gần nhất dùng JVM25, chưa coi là đã kiểm chứng riêng runtime21. Maven Wrapper, Node24 và Android SDK theo file cấu hình source.
+Web JavaScript và Android React Native/TypeScript → API Spring Boot → PostgreSQL. Backend quyết định quyền, trạng thái, version, thời gian và phép tính; menu chỉ phản ánh khả năng. Flyway quản lý schema; không sửa migration đã chạy. Backend đã build, chạy và kiểm thử toàn bộ bằng JDK 21.0.13+9 ngày 02/11; bytecode Java 21. Maven Wrapper, Node24 và Android SDK theo file cấu hình source.
 
 Web dành cho quản trị, điều phối, hồ sơ và đối soát; mobile dành cho thao tác công việc/hỗ trợ, quét QR, xem công/phiếu riêng. Cùng API và database; làm mới theo focus/foreground hoặc nút cập nhật, chưa realtime/push. LocalDemo có sẵn bundle, nhưng backend local/USB vẫn cần; không hoạt động độc lập ở mọi nơi.
 
@@ -48,7 +48,7 @@ Lịch thử chung đã được chọn 08–17 T2–T6, nghỉ 11:30–12:30. C
 
 | Mã / ưu tiên | Đầu việc có thể giao | Đầu ra bắt buộc | Điều kiện hoàn thành |
 |---|---|---|---|
-| A1 / P0 | Nghiệm thu OPPO: IN/OUT, OT, mã trùng/hết hạn/điểm đóng/mất mạng | Bảng ca thử + lỗi/tái hiện + ảnh đã che | Web/mobile/API khớp; không ghi nhận thành công giả, không sửa lịch sử thật |
+| A1 / P0 | Nghiệm thu OPPO: đủ IN/OUT/OT_IN/OT_OUT; nhánh lỗi theo tests và giới hạn ghi riêng | Bảng ca thử + lỗi/tái hiện + ảnh đã che | Web/mobile/API khớp; không ghi nhận thành công giả, không sửa lịch sử thật; không suy ra mọi nhánh lỗi đã thử camera |
 | A2 / P0 | Rà soát web theo vai trò và truy cập vượt phạm vi | Bảng actor–resource–action–expected–actual | Có ca bị từ chối; sửa lỗi có test liên quan, không chỉ kiểm menu |
 | A3 / P1 | Nghiệm thu tệp mobile và OSlinks | PR nhỏ, hợp đồng API, tests và demo thiết bị | File đúng phạm vi; link đúng loại/hạn, không tự kích hoạt/reset khi mở |
 | A4 / P1 | Chạy clone sạch và kiểm tra hướng dẫn | Phiên bản/môi trường/lệnh/kết quả/vướng mắc | Không dùng credentials/database máy tác giả; tách lỗi môi trường và lỗi sản phẩm |
@@ -56,7 +56,7 @@ Lịch thử chung đã được chọn 08–17 T2–T6, nghỉ 11:30–12:30. C
 | B2 / sau B1 | Slide và kịch bản demo | 10–12 slide đề xuất + demo5–8 phút + phương án dự phòng | Khớp báo cáo/source, có giới hạn, không dùng mockup chứng minh chức năng |
 | C1 / sau release target | Chuyên đề Triển khai phần mềm | Pipeline/Compose/chất lượng/giám sát, backup/restore/rollback và log | Tự chạy theo yêu cầu môn; cùng app commit, không nộp cấu hình giả |
 
-Mẫu phiếu giao việc: mã; người nhận; commit bắt đầu; phạm vi; tài liệu/API liên quan; đầu ra; điều kiện hoàn thành; ca thử; hạn do nhóm thống nhất; người kiểm tra; kết quả và commit bàn giao. Không nhận trạng thái “xong” nếu thiếu đầu ra/bằng chứng.
+Mẫu phiếu giao việc: mã; người nhận; commit bắt đầu; phạm vi; tài liệu/API liên quan; đầu ra; điều kiện hoàn thành; ca thử; hạn do nhóm thống nhất; người kiểm tra; kết quả và commit bàn giao. Không nhận trạng thái “xong” nếu thiếu đầu ra/bằng chứng. A1-A4 đã có bằng chứng MVP ngày 02/11 (A4 cùng máy, chưa máy thành viên khác); việc giao tiếp theo ưu tiên B1/B2/C1. Các nhánh thiết bị/tải lớn chưa kiểm chứng ghi rõ trong TODO, không nhận là đã nghiệm thu.
 
 ## 6. Chuẩn bị báo cáo và slide
 
@@ -89,3 +89,22 @@ Tệp Android: [hợp đồng và cách dùng](MOBILE_ATTACHMENTS.md), [kiểm c
 Lịch sử chấm công đã phân trang trên web/mobile. Bàn giao tiếp là nghiệm thu thiết bị và thử tải, không giao lại phần phân trang như chưa được viết. Hợp đồng nằm trong ATTENDANCE_POLICY; bằng chứng ở báo cáo 01/11.
 
 Phạm vi 02/11: An toàn thông tin thi trắc nghiệm, không làm bài tập lớn. Công việc dự án còn Lập trình nâng cao và Triển khai phần mềm; bảo vệ dữ liệu/phân quyền vẫn nằm trong chất lượng ứng dụng.
+
+## 8. Kịch bản demo 8 phút và phần giải thích code
+
+Chuẩn bị trước: chạy theo FRESH_CLONE_RUNNING, dùng tài khoản fixture từ .local/accounts.txt, không chiếu mật khẩu/thư reset. Giữ API/web và USB khi demo Android; thử camera trước. Cấu hình lịch chung và điểm QR theo chính sách thử, không bịa mức lương. Nếu demo ca OT, dùng giờ phù hợp hoặc clip/ảnh nghiệm thu có nhãn đồng hồ mô phỏng, không đổi giờ máy sản phẩm.
+
+| Thời lượng | Người trình bày/thao tác | Điều cần chứng minh |
+|---|---|---|
+| 0:00-0:45 | Giới thiệu bài toán, phạm vi ba phòng mẫu và web/Android | Một backend, một DB; phòng mẫu thêm được; không xây ERP toàn diện |
+| 0:45-1:30 | Admin kỹ thuật rồi nhân viên | Menu/quyền khác nhau; Admin quản lý truy cập, không xem dữ liệu nghiệp vụ tùy ý |
+| 1:30-3:00 | Nhân viên gửi hỗ trợ → trưởng phòng phân công → người xử lý → người gửi xác nhận | Phân quyền trên API, trạng thái và lịch sử; không chỉ ảnh giao diện |
+| 3:00-4:15 | Công việc/bàn giao Lan → Hải | Giữ tiến độ/tệp/tác giả; Hải phải rà soát; 100% không tự nghiệm thu |
+| 4:15-5:30 | Android quét QR, web xem lịch sử | Giờ máy chủ, cảnh báo mạng, không ra muộn tự có OT; trình bày ca thử 470/45 phút |
+| 5:30-6:15 | Hồ sơ HR/lãnh đạo và cutoff | Người quyết định độc lập, không xóa tác giả; hồ sơ không thay quyết định pháp lý |
+| 6:15-7:15 | Source và báo cáo kiểm thử | JDK21, transaction, policy/state/version, test âm; 407 backend/852 mobile/8 web là bằng chứng kiểm thử, không phải % bao phủ |
+| 7:15-8:00 | Kết quả, giới hạn và phân công | Kế thừa/sửa mới rõ; chưa production; chuyển sang môn Triển khai phần mềm |
+
+Khi vấn đáp: trỏ tới WorkplaceService, AttendanceStationService/AttendanceRules, TimeIncomeService, PeopleOperations, IncomeWorkflow và RequestOperations/RequestDispatchService thay vì đọc thuộc menu; giải thích vì sao quyền cần actor + tài nguyên + trạng thái, vì sao optimistic locking chống ghi đè, vì sao reset thu hồi cả access/refresh, và vì sao OUT muộn không phải bằng chứng tăng ca. Tên service/file cụ thể tra theo source hiện hành, không bịa mẫu thiết kế chưa dùng. Bằng chứng 02/11 nằm trong reports/COURSEWORK_ACCEPTANCE_2026-11-02.md/json.
+
+Phương án dự phòng demo: ảnh/clip dữ liệu fixture và log kiểm thử có ngày; nói rõ đây là bản ghi đã nghiệm thu nếu không có thiết bị/mạng tại lớp. Không trình ảnh thay cho thao tác đang chạy mà không giải thích. Điền tên/MSSV, phân công thực tế và mẫu giảng viên khi nhóm có; không tự ghi công cho thành viên chưa làm.

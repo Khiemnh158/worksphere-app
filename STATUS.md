@@ -1,33 +1,27 @@
-# Hiện trạng WorkSphere — 02/11/2026
+# Hiện trạng WorkSphere - 02/11/2026
 
-Ứng dụng có web nghiệp vụ và Android dùng chung API. Đây là bản đồ án đang kiểm chứng, chưa nghiệm thu toàn bộ hoặc production. Lịch sử xem Git và báo cáo có ngày, không dùng kế hoạch cũ như tính năng đã hoàn tất.
+Đã chốt mốc phần mềm MVP cho Kỹ năng lập trình nâng cao theo phạm vi giờ hành chính SME đã thống nhất. Web và Android dùng chung API Java/Spring Boot/PostgreSQL. Chưa phải production hoặc bảo đảm điểm số; nhóm còn hoàn thiện báo cáo/slide theo mẫu và diễn tập.
 
-## Đã triển khai
+## Đã có
 
-- Danh bạ theo phòng, tài khoản/CSV kích hoạt/thư local/TOTP/session; phòng ban động, trưởng phòng, lãnh đạo và chuyên trách độc lập; người duyệt thay có phạm vi/thời hạn.
-- Hỗ trợ trọn vòng; công việc/trao đổi/tệp/nghiệm thu/bàn giao giữ tiến độ; hồ sơ nhân sự/cutoff truy cập; công/nghỉ/OT và phát hành phiếu thu nhập có kiểm soát.
-- QR giờ máy chủ, giờ điểm và mạng cần xác minh, IN mở, nghỉ cụ thể, OT riêng có duyệt trước/ngoại lệ. Không tự phạt hoặc cộng OT do ra muộn. Lịch hiện chung doanh nghiệp, chưa ca riêng/ca đêm.
-- Android có tuyến nhân viên, bảo mật/sửa thông tin, custom-scheme recovery link và tệp chọn/gắn/mở/Save As qua API có xác thực. Tệp một lần gửi; ảnh 10 MiB, tài liệu 20 MiB. Phiên cũ không tiếp tục thao tác dưới tài khoản mới, cache riêng dọn khi thu hồi phiên.
+Tài khoản/CSV/kích hoạt/reset local/TOTP/session; phòng ban động và quyền theo phòng/nhiệm vụ; hỗ trợ trọn vòng; công việc/tệp/nghiệm thu/bàn giao giữ tiến độ; hồ sơ nhân sự/cutoff; công/nghỉ/OT/QR và phiếu thu nhập có kiểm soát. Admin kỹ thuật không tự có quyền nghiệp vụ/lương. Web điều phối/quản trị; Android thao tác nhân viên, không yêu cầu ngang mọi màn web. Giao diện sáng/tối, danh bạ và lịch sử quét có phân trang.
 
-- Lịch sử lượt quét web/mobile phân trang 20, cùng quyền cho dữ liệu và tổng số; không cắt toàn bộ kỳ ở 1.000 lượt. Chưa xuất snapshot cố định.
+## Bằng chứng mới nhất
 
-## Bằng chứng theo ngày
+| Kiểm tra | Kết quả |
+|---|---|
+| JDK 21 backend | 407 tests, 0 fail/error/skip; Docker/Testcontainers và 59 ca PostgreSQL opt-in; package đạt, bytecode Java 21 |
+| Web | 8 tests phiên/phân trang đạt |
+| Mobile | 98 suites/852 tests và TypeScript đạt |
+| APK | JDK 21 localDemo ARM64+x86_64 có bundle; cập nhật OPPO, không cần Metro; cần backend local/USB |
+| OPPO QR | Người dùng quét đủ bốn loại trong môi trường riêng/đồng hồ mô phỏng; công thường 470 phút, OT45 phút, không tự cộng OT do ra muộn |
+| OPPO recovery | Kích hoạt/reset qua OS link và đăng nhập thành công, máy chủ xác nhận sự kiện/token dùng một lần |
+| Clone sạch | Cùng máy/cache, DB mới: JDK 21/Maven Wrapper build/chạy, login/logout/mail đúng origin, reuse/Stop/restart đạt |
 
-| Ngày | Kết quả | Giới hạn |
-|---|---|---|
-|01/11|152 backend tests chọn lọc (58 PostgreSQL), Maven package; clone sạch cùng máy/database riêng là bằng chứng 30/10|Chưa toàn bộ legacy hoặc máy thứ hai hoàn toàn mới|
-|01/11|98 suites/852 mobile tests, TypeScript; lint đợt phân trang 3 file: 0 errors/4 warnings; 5 web session tests và 3 tests pager và kiểm tra cú pháp/diff/secrets/liên kết|Còn act/style warnings; backend đã chạy lại khi bổ sung phân trang|
-|01/11|Giả lập chọn/gắn tệp thật qua UI; bytes download và Save As khớp fixture; mở ảnh, hủy lưu và dọn cache khi đăng xuất đúng; tiến độ giữ 65%; API chặn sai purpose 415 và ngoài phạm vi 403|Tệp mẫu PNG nhỏ; chưa tệp 20 MiB/cloud/mọi ứng dụng đọc|
-|01/11|APK ARM64+x86_64 build cuối 59s/151 tasks, cài OPPO; OPPO xác nhận lịch sử tháng; mở/lưu tệp được xác nhận ở bản tệp trước đó|Không coi đây là hash/thiết bị-e2e cho mọi chức năng|
+Chi tiết và giới hạn: [nghiệm thu 02/11](reports/COURSEWORK_ACCEPTANCE_2026-11-02.md), [JSON](reports/COURSEWORK_ACCEPTANCE_2026-11-02.json). Kết quả có ngày cũ là lịch sử. Có cảnh báo đóng fork trong runner backend và act warnings Jest; không ghi là kiểm chứng tải/production.
 
-Chi tiết: [báo cáo 01/11](reports/INCREMENT_2026-11-01.md), [mobile JSON](reports/mobile-validation.json). QR thật từng có IN ở bản trước; OUT/OT/network đủ vòng trên APK hiện hành vẫn chờ nghiệm thu. Recovery custom scheme có tests guard, chưa verified HTTPS App Links/iOS.
+## Phạm vi và việc tiếp theo
 
-Ca dữ liệu tổng hợp 1.116 lượt: đủ các trang, thứ tự cùng timestamp ổn định; nhân viên chỉ xem của mình, ngoài phòng/Admin kỹ thuật không thấy cả rows lẫn total. Chi tiết trong báo cáo 01/11.
+Lịch chung T2-T6, 08:00-17:00, nghỉ 11:30-12:30. Không tự tạo lịch/lương khi thiếu dữ liệu; không tự phạt tiền. Mạng thật chưa cung cấp, USB/QR/IP không chứng minh tuyệt đối hiện diện. Chưa lịch riêng/ca đêm, thuế/BHXH/thực lĩnh, ngân hàng, vân tay/SSO, SMTP/SMS thật, push nền, iOS/production. Đây là giới hạn được công khai, không phải các chức năng bắt buộc còn dở của MVP.
 
-## Còn lại
-
-[TODO](TODO.md) là backlog chuẩn: nghiệm thu thiết bị/quyền/cutoff; ca cá nhân; giải trình punches và thử tải phân trang; load/toàn bộ legacy, release và yêu cầu chính thức hai môn. Mạng văn phòng chưa cung cấp nên giữ UNCONFIGURED; USB không chứng minh vị trí.
-
-Lịch thử được chọn 08–17 T2–T6, nghỉ 11:30–12:30. Không seed lương giả; chưa thuế/BHXH/thực lĩnh, ngân hàng, pháp lý bồi thường/sa thải, vân tay/SSO, SMTP/SMS thật, iOS/production. Môn Triển khai phần mềm chưa hoàn tất. An toàn thông tin thi trắc nghiệm, không còn bài tập lớn theo xác nhận 02/11. Không tính % bằng số tests/ô TODO.
-
-Đọc [PROJECT_GUIDE](docs/PROJECT_GUIDE.md) để giao việc và chuẩn bị báo cáo/slide, [FRESH_CLONE_RUNNING](docs/FRESH_CLONE_RUNNING.md) để chạy từ source.
+[TODO](TODO.md) tách rõ phần mềm đã nghiệm thu, chuẩn bị nộp, giới hạn và môn Triển khai phần mềm. An toàn thông tin thi trắc nghiệm, repo riêng đã bỏ theo xác nhận 02/11. Đọc [PROJECT_GUIDE](docs/PROJECT_GUIDE.md) để giao việc/báo cáo/demo và [chạy source](docs/FRESH_CLONE_RUNNING.md) cho thành viên khác.

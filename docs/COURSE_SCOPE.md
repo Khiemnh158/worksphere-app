@@ -19,3 +19,5 @@ An toàn thông tin thi trắc nghiệm, không có bài tập lớn theo xác n
 Môn Phát triển ứng dụng di động của nhóm khác không thuộc hai học phần làm dự án của nhóm này. Đề cương chấm điểm Lập trình nâng cao chưa được cung cấp; nội dung trên phải đối chiếu giảng viên. Ngoài phạm vi hiện tại: đa công ty, microservices, pháp lý sa thải/bồi thường, ngân hàng, thuế/BHXH/thực lĩnh, ca đêm/vân tay/SSO, iOS/production nếu chưa có đầu vào và nghiệm thu.
 
 Đọc [PROJECT_GUIDE](PROJECT_GUIDE.md), [hiện trạng](../STATUS.md), [TODO](../TODO.md). Hợp đồng hiện hành: WEB_WORKFLOWS → WEB_PHASE2_CONTRACT → ATTENDANCE_POLICY; bổ sung mới thay giới hạn cũ tương ứng, không coi các kế hoạch đã xóa là yêu cầu mới.
+
+Mốc 02/11/2026: người dùng xác nhận chưa có yêu cầu bổ sung từ giảng viên. Chốt MVP lịch giờ hành chính chung; web quản trị/điều phối và Android nhân viên. Kết quả và giới hạn ở [nghiệm thu](../reports/COURSEWORK_ACCEPTANCE_2026-11-02.md). Không mở thuế/BHXH/thực lĩnh/ca đêm/vân tay/SSO để kéo dài môn này; đối chiếu rubric khi có.

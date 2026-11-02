@@ -9,12 +9,12 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ cho do
 | Chạy bản clone và Android | [Hướng dẫn chạy](docs/FRESH_CLONE_RUNNING.md) |
 | Biết đã làm và còn thiếu | [Hiện trạng](STATUS.md), [TODO](TODO.md) |
 | Quyền và luồng nghiệp vụ | [Luồng nền](docs/WEB_WORKFLOWS.md), [bổ sung hiện hành](docs/WEB_PHASE2_CONTRACT.md), [QR/công/OT](docs/ATTENDANCE_POLICY.md) |
-| Kiểm thử đã thực hiện | [Đợt mới nhất](reports/INCREMENT_2026-11-01.md), [web](reports/web-validation.json), [mobile](reports/mobile-validation.json) |
+| Kiểm thử đã thực hiện | [Nghiệm thu MVP 02/11](reports/COURSEWORK_ACCEPTANCE_2026-11-02.md), [kết quả máy đọc](reports/COURSEWORK_ACCEPTANCE_2026-11-02.json) |
 | Nguồn gốc và phạm vi hai môn | [Nguồn gốc](PROVENANCE.md), [phạm vi](docs/COURSE_SCOPE.md) |
 
 ## Trạng thái
 
-Đã có web nghiệp vụ và client Android dùng chung API; chưa production hoặc nghiệm thu toàn bộ. Kết quả mới nhất: [tệp Android và kiểm chứng 01/11](reports/INCREMENT_2026-11-01.md). Backend 152 tests chọn lọc (58 PostgreSQL) được chạy 01/11; mobile 98 suites/852 tests được chạy 01/11. Đọc STATUS/TODO để phân biệt đã triển khai và đã kiểm chứng.
+Đã chốt mốc phần mềm MVP giờ hành chính: backend chạy/build bằng JDK 21, toàn bộ 407 tests đạt; web 8 tests; mobile 98 suites/852 tests và TypeScript đạt. OPPO đã kiểm tra đủ bốn lượt QR và kích hoạt/reset trong môi trường thử riêng. Clone sạch cùng máy chạy được với DB mới. Chưa production; chuẩn bị báo cáo/slide và môn Triển khai phần mềm tiếp tục theo STATUS/TODO.
 
 ## Hai repository phục vụ đồ án
 

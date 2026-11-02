@@ -4,7 +4,7 @@ Lấy đúng nhánh feat/authorization-foundation cho đến khi PR được mer
 
 ## Chuẩn bị
 
-- Git, JDK 21 trở lên (backend target Java 21), Node 24.
+- Git, khuyến nghị JDK 21 (đã kiểm chứng Temurin 21.0.13+9), Node 24. Backend target Java 21; launcher chấp nhận mới hơn nhưng không thay bằng chứng JDK 21.
 - PostgreSQL đang chạy local; biết tài khoản/password quản trị để tạo một database thử riêng. Có psql.exe trong PATH hoặc cung cấp PgBinPath.
 - Internet cho Maven Wrapper tải Maven/dependencies ở lượt đầu. Backend có mvnw.cmd và cấu hình Wrapper. Android thêm Android Studio/SDK, ANDROID_HOME và USB debugging được chính người dùng cho phép.
 
@@ -44,3 +44,5 @@ Bản localDemo debug-signed, chỉ cho loopback/emulator HTTP và tắt dev sup
 Windows đường dẫn dài: ưu tiên clone vào đường dẫn ngắn. Nếu dùng ổ subst cho native build, đặt WORKSPHERE_JS_ROOT là đường dẫn mobile gốc cho Metro; không đổi root Gradle sang ổ khác. Xem docs/MOBILE_RUNNING.md. Hai script không tự cài JDK/PostgreSQL/SDK và không tự đổi thiết lập bảo mật máy.
 
 Kiểm chứng 30/10: clone sạch cùng máy, Maven Wrapper và database/cổng riêng chạy được; login/logout, thư reset đúng origin, reuse/Stop/restart đạt. Có dùng cache dependencies; chưa kiểm chứng máy thứ hai hoàn toàn mới.
+
+Kiểm chứng cuối 02/11: commit `1d51b0793427d839bf6cfbe7bb942bc794929fb9`, clone local sạch cùng máy, JDK 21/Maven Wrapper/cache Maven; database mới và cổng riêng. Build/chạy, login/logout, mail đúng origin, reuse/Stop/restart đạt. Không chép database/credentials của checkout gốc, không tự sinh lịch/lương. Chưa kiểm trên máy thứ hai; thành viên cần tự thực hiện trước ngày nộp.
