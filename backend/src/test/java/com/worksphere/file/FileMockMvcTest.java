@@ -122,6 +122,7 @@ public class FileMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -158,15 +159,15 @@ public class FileMockMvcTest {
             jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                     adminUserId, adminRoleId);
         }
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         uploaderUserId = UUID.randomUUID();
         insertUser(uploaderUserId, "uploader_file", "uploader_file@test.com", passwordEncoder.encode("Password123!"));
-        uploaderToken = jwtService.generateAccessToken(uploaderUserId, UUID.randomUUID());
+        uploaderToken = authorizationAccessToken(uploaderUserId);
 
         otherUserId = UUID.randomUUID();
         insertUser(otherUserId, "other_file", "other_file@test.com", passwordEncoder.encode("Password123!"));
-        otherToken = jwtService.generateAccessToken(otherUserId, UUID.randomUUID());
+        otherToken = authorizationAccessToken(otherUserId);
     }
 
     private void insertUser(UUID id, String username, String email, String passwordHash) {
@@ -530,5 +531,15 @@ public class FileMockMvcTest {
         Map<?, ?> resp = objectMapper.readValue(result.getResponse().getContentAsString(), Map.class);
         Map<?, ?> data = (Map<?, ?>) resp.get("data");
         return UUID.fromString(data.get("id").toString());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

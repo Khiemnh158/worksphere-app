@@ -32,15 +32,18 @@ public class MilestoneApplicationService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final MilestoneRepository milestoneRepository;
+    private final ProjectAccessPolicy accessPolicy;
 
     public MilestoneApplicationService(
             ProjectRepository projectRepository,
             ProjectMemberRepository projectMemberRepository,
-            MilestoneRepository milestoneRepository
+            MilestoneRepository milestoneRepository,
+            ProjectAccessPolicy accessPolicy
     ) {
         this.projectRepository = projectRepository;
         this.projectMemberRepository = projectMemberRepository;
         this.milestoneRepository = milestoneRepository;
+        this.accessPolicy = accessPolicy;
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +56,7 @@ public class MilestoneApplicationService {
         Project project = projectRepository.findActiveById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
 
-        verifyProjectReadAccess(project.getId(), principal);
+        accessPolicy.requireRead(project.getId(), principal != null ? principal.userId() : null);
 
         return milestoneRepository.findAllByProjectIdOrderByDueDateAsc(project.getId())
                 .stream()
@@ -63,8 +66,10 @@ public class MilestoneApplicationService {
 
     @Transactional
     public MilestoneResponse createMilestone(UUID projectId, CreateMilestoneRequest request, UUID currentUserId) {
-        Project project = projectRepository.findActiveById(projectId)
+        Project project = projectRepository.findActiveByIdForUpdate(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
+
+        accessPolicy.requireManage(projectId, currentUserId, "PROJECT_UPDATE");
 
         if (project.getStatus() == ProjectStatus.COMPLETED || project.getStatus() == ProjectStatus.CANCELLED) {
             throw new BusinessRuleException("PROJECT_NOT_ACTIVE", "Không thể tạo milestone cho dự án đã hoàn thành hoặc bị huỷ");
@@ -84,38 +89,4 @@ public class MilestoneApplicationService {
         return MilestoneResponse.from(saved);
     }
 
-    private void verifyProjectReadAccess(UUID projectId, WorkSphereUserPrincipal principal) {
-        if (principal == null) {
-            throw new AccessDeniedException("Yêu cầu xác thực");
-        }
-        if (hasSystemAdminRole(principal)) {
-            return;
-        }
-        boolean isMember = projectMemberRepository.existsByProjectIdAndUserIdAndActiveTrue(projectId, principal.userId());
-        if (!isMember) {
-            throw new AccessDeniedException("Bạn không có quyền truy cập dự án này");
-        }
-    }
-
-    private boolean hasSystemAdminRole(WorkSphereUserPrincipal principal) {
-        if (principal == null) {
-            return false;
-        }
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getAuthorities() != null) {
-            boolean hasAdminAuthority = auth.getAuthorities().stream()
-                    .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()) || "ADMIN".equals(a.getAuthority()));
-            if (hasAdminAuthority) {
-                return true;
-            }
-        }
-        if (principal.user() != null && principal.user().getRoles() != null) {
-            try {
-                return principal.user().getRoles().stream()
-                        .anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getCode()));
-            } catch (Exception ignored) {
-            }
-        }
-        return false;
-    }
 }

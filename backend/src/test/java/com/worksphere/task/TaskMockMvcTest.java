@@ -171,6 +171,7 @@ public class TaskMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -217,7 +218,7 @@ public class TaskMockMvcTest {
                             + "SELECT ?, id, now() FROM permissions ON CONFLICT DO NOTHING",
                     adminRoleId);
         }
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         pmUserId = UUID.randomUUID();
         insertUser(pmUserId, "pm_task", "pm_task@test.com", passwordEncoder.encode("Password123!"));
@@ -233,7 +234,7 @@ public class TaskMockMvcTest {
                             + "ON CONFLICT DO NOTHING",
                     pmRoleId);
         }
-        pmToken = jwtService.generateAccessToken(pmUserId, UUID.randomUUID());
+        pmToken = authorizationAccessToken(pmUserId);
 
         employeeUserId = UUID.randomUUID();
         insertUser(employeeUserId, "emp_task", "emp_task@test.com", passwordEncoder.encode("Password123!"));
@@ -247,7 +248,7 @@ public class TaskMockMvcTest {
                             + "ON CONFLICT DO NOTHING",
                     empRoleId);
         }
-        employeeToken = jwtService.generateAccessToken(employeeUserId, UUID.randomUUID());
+        employeeToken = authorizationAccessToken(employeeUserId);
 
         otherEmployeeUserId = UUID.randomUUID();
         insertUser(otherEmployeeUserId, "emp_other", "emp_other@test.com", passwordEncoder.encode("Password123!"));
@@ -255,7 +256,7 @@ public class TaskMockMvcTest {
             jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                     otherEmployeeUserId, empRoleId);
         }
-        otherEmployeeToken = jwtService.generateAccessToken(otherEmployeeUserId, UUID.randomUUID());
+        otherEmployeeToken = authorizationAccessToken(otherEmployeeUserId);
 
         // Create Project
         projectId = UUID.randomUUID();
@@ -577,7 +578,7 @@ public class TaskMockMvcTest {
                         .header("Authorization", "Bearer " + employeeToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(selfApproveReq)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code", is("FORBIDDEN")));
 
         // 5. IN_REVIEW -> COMPLETED by PM
@@ -726,7 +727,7 @@ public class TaskMockMvcTest {
                         .header("Authorization", "Bearer " + otherEmployeeToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editReq)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code", is("FORBIDDEN")));
 
         // 3. Author edits comment
@@ -1085,13 +1086,13 @@ public class TaskMockMvcTest {
                         .header("Authorization", "Bearer " + pmToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pmEditReq)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code", is("FORBIDDEN")));
 
         // 2. PM (non-admin) tries to delete employee's comment -> 422 FORBIDDEN
         mockMvc.perform(delete("/api/v1/tasks/" + task.getId() + "/comments/" + commentId)
                         .header("Authorization", "Bearer " + pmToken))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code", is("FORBIDDEN")));
 
         // 3. System Admin updates employee's comment -> 200 OK
@@ -1198,5 +1199,15 @@ public class TaskMockMvcTest {
                 Integer.class, task.getId()
         );
         assertThat(historyCount).isEqualTo(0);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

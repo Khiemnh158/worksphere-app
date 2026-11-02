@@ -1,5 +1,6 @@
 import { secureStorage } from '../../shared/storage/secureStorage';
 import { accessTokenStore } from '../../shared/storage/accessTokenStore';
+import { NativeModules } from 'react-native';
 
 /**
  * Global session credential coordinator.
@@ -31,6 +32,12 @@ export function getSessionCredentialGeneration(): number {
  */
 export function invalidateSessionCredentials(): number {
   credentialGeneration += 1;
+  // Best effort private-cache teardown. Pending native operations also verify their epoch.
+  try {
+    NativeModules.WorkplaceFiles?.resetAttachmentCache?.();
+  } catch {
+    /* Credentials still invalidate if cleanup fails. */
+  }
   return credentialGeneration;
 }
 
@@ -46,11 +53,13 @@ export function hasActiveAccessToken(): boolean {
  * Enqueues an asynchronous credential transaction into the FIFO queue.
  * Ensures that if `operation` throws, future operations still execute.
  */
-function enqueueCredentialTransaction<T>(operation: () => Promise<T>): Promise<T> {
+function enqueueCredentialTransaction<T>(
+  operation: () => Promise<T>,
+): Promise<T> {
   const result = credentialQueue.then(operation, operation);
   credentialQueue = result.then(
     () => undefined,
-    () => undefined
+    () => undefined,
   );
   return result;
 }
@@ -64,7 +73,7 @@ function enqueueCredentialTransaction<T>(operation: () => Promise<T>): Promise<T
 export async function commitLoginCredentials(
   expectedGeneration: number,
   refreshToken: string,
-  accessToken: string
+  accessToken: string,
 ): Promise<void> {
   return enqueueCredentialTransaction(async () => {
     if (credentialGeneration !== expectedGeneration) {
@@ -100,7 +109,7 @@ export async function commitLoginCredentials(
 export async function commitRefreshedCredentials(
   expectedGeneration: number,
   refreshToken: string,
-  accessToken: string
+  accessToken: string,
 ): Promise<void> {
   return enqueueCredentialTransaction(async () => {
     if (credentialGeneration !== expectedGeneration) {
@@ -135,9 +144,14 @@ export async function commitRefreshedCredentials(
  * If expectedGeneration is provided, clear only proceeds if generation still matches.
  * If expectedGeneration is omitted, clear proceeds unconditionally as part of explicit teardown.
  */
-export async function clearSessionCredentials(expectedGeneration?: number): Promise<void> {
+export async function clearSessionCredentials(
+  expectedGeneration?: number,
+): Promise<void> {
   return enqueueCredentialTransaction(async () => {
-    if (expectedGeneration !== undefined && credentialGeneration !== expectedGeneration) {
+    if (
+      expectedGeneration !== undefined &&
+      credentialGeneration !== expectedGeneration
+    ) {
       return;
     }
 
@@ -156,9 +170,14 @@ export async function clearSessionCredentials(expectedGeneration?: number): Prom
  * Does NOT clear the Keychain refresh token, preserving persistent session for bootstrap.
  * Verifies generation if expectedGeneration is provided.
  */
-export async function clearAccessTokenForBootstrap(expectedGeneration?: number): Promise<void> {
+export async function clearAccessTokenForBootstrap(
+  expectedGeneration?: number,
+): Promise<void> {
   return enqueueCredentialTransaction(async () => {
-    if (expectedGeneration !== undefined && credentialGeneration !== expectedGeneration) {
+    if (
+      expectedGeneration !== undefined &&
+      credentialGeneration !== expectedGeneration
+    ) {
       return;
     }
 

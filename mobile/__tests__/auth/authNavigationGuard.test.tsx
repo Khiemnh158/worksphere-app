@@ -7,8 +7,16 @@ import type { AuthContextValue } from '../../src/app/auth/authTypes';
 import { ThemeProvider } from '../../src/app/providers/ThemeProvider';
 import { theme } from '../../src/shared/theme';
 
-jest.mock('react-native-safe-area-context', () =>
-  require('react-native-safe-area-context/jest/mock').default
+jest.mock('../../src/features/workspace/WorkspaceNavigator', () => ({
+  WorkspaceNavigator: () => {
+    const { View } = require('react-native');
+    return <View testID="workspace-root" />;
+  },
+}));
+
+jest.mock(
+  'react-native-safe-area-context',
+  () => require('react-native-safe-area-context/jest/mock').default,
 );
 
 jest.mock('react-native-screens', () => {
@@ -21,7 +29,7 @@ jest.mock('react-native-screens', () => {
 
 describe('RootNavigator Authentication Guard', () => {
   const createMockAuthContext = (
-    sessionState: 'INITIALIZING' | 'UNAUTHENTICATED' | 'AUTHENTICATED'
+    sessionState: 'INITIALIZING' | 'UNAUTHENTICATED' | 'AUTHENTICATED',
   ): AuthContextValue => ({
     sessionState,
     operationState: 'idle',
@@ -46,7 +54,7 @@ describe('RootNavigator Authentication Guard', () => {
   });
 
   async function renderGuardedNavigator(
-    sessionState: 'INITIALIZING' | 'UNAUTHENTICATED' | 'AUTHENTICATED'
+    sessionState: 'INITIALIZING' | 'UNAUTHENTICATED' | 'AUTHENTICATED',
   ) {
     const authContext = createMockAuthContext(sessionState);
     return await render(
@@ -56,31 +64,37 @@ describe('RootNavigator Authentication Guard', () => {
             <RootNavigator />
           </NavigationContainer>
         </AuthContext.Provider>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   }
 
   test('when INITIALIZING: renders loading indicator and does NOT mount Auth or Main stacks', async () => {
-    const { getByTestId, queryByTestId } = await renderGuardedNavigator('INITIALIZING');
+    const { getByTestId, queryByTestId } = await renderGuardedNavigator(
+      'INITIALIZING',
+    );
 
     expect(getByTestId('root-initializing-state')).toBeTruthy();
     expect(getByTestId('root-initializing-indicator')).toBeTruthy();
     expect(queryByTestId('screen-login')).toBeNull();
-    expect(queryByTestId('screen-dashboard')).toBeNull();
+    expect(queryByTestId('workspace-root')).toBeNull();
   });
 
   test('when UNAUTHENTICATED: renders Auth stack (LoginScreen) and strictly prevents Main stack access', async () => {
-    const { getByTestId, queryByTestId } = await renderGuardedNavigator('UNAUTHENTICATED');
+    const { getByTestId, queryByTestId } = await renderGuardedNavigator(
+      'UNAUTHENTICATED',
+    );
 
     expect(getByTestId('screen-login')).toBeTruthy();
-    expect(queryByTestId('screen-dashboard')).toBeNull();
+    expect(queryByTestId('workspace-root')).toBeNull();
     expect(queryByTestId('root-initializing-state')).toBeNull();
   });
 
   test('when AUTHENTICATED: renders Main stack (Dashboard) and unmounts Auth stack', async () => {
-    const { getByTestId, queryByTestId } = await renderGuardedNavigator('AUTHENTICATED');
+    const { getByTestId, queryByTestId } = await renderGuardedNavigator(
+      'AUTHENTICATED',
+    );
 
-    expect(getByTestId('screen-dashboard')).toBeTruthy();
+    expect(getByTestId('workspace-root')).toBeTruthy();
     expect(queryByTestId('screen-login')).toBeNull();
     expect(queryByTestId('root-initializing-state')).toBeNull();
   });

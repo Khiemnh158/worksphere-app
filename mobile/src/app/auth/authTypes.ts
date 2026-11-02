@@ -5,7 +5,11 @@ export type { AuthUser };
 
 export type SessionState = 'INITIALIZING' | 'UNAUTHENTICATED' | 'AUTHENTICATED';
 
-export type AuthOperationState = 'idle' | 'authenticating' | 'signingOut' | 'error';
+export type AuthOperationState =
+  | 'idle'
+  | 'authenticating'
+  | 'signingOut'
+  | 'error';
 
 export interface AuthState {
   sessionState: SessionState;
@@ -20,7 +24,10 @@ export type AuthAction =
   | { type: 'INITIALIZATION_COMPLETED_UNAUTHENTICATED' }
   | { type: 'BOOTSTRAP_STARTED' }
   | { type: 'BOOTSTRAP_SUCCEEDED'; payload: { user: AuthUser } }
-  | { type: 'BOOTSTRAP_RECOVERABLE_FAILED'; payload: { error: AuthPresentationError } }
+  | {
+      type: 'BOOTSTRAP_RECOVERABLE_FAILED';
+      payload: { error: AuthPresentationError };
+    }
   | { type: 'BOOTSTRAP_TERMINAL_FAILED' }
   | { type: 'LOGIN_STARTED' }
   | { type: 'LOGIN_SUCCEEDED'; payload: { user: AuthUser } }
@@ -37,7 +44,11 @@ export interface AuthContextValue {
   initialized: boolean;
   lastAuthError: AuthPresentationError | null;
   canRetryBootstrap?: boolean;
-  login: (loginInput: string, passwordInput: string) => Promise<boolean>;
+  login: (
+    loginInput: string,
+    passwordInput: string,
+    mfaCode?: string,
+  ) => Promise<boolean>;
   logout: () => Promise<void>;
   logoutLocal: () => Promise<void>;
   logoutAll?: () => Promise<void>;

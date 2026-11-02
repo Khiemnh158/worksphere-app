@@ -7,7 +7,6 @@ import com.worksphere.identity.api.request.LoginRequest;
 import com.worksphere.identity.api.request.LogoutRequest;
 import com.worksphere.identity.api.request.RefreshTokenRequest;
 import com.worksphere.identity.api.request.ResetPasswordRequest;
-import com.worksphere.identity.domain.PasswordResetToken;
 import com.worksphere.identity.infrastructure.persistence.LoginSessionRepository;
 import com.worksphere.identity.infrastructure.persistence.PasswordResetTokenRepository;
 import com.worksphere.identity.infrastructure.persistence.RefreshTokenRepository;
@@ -42,10 +41,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HexFormat;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -122,6 +117,7 @@ public class AuthMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -134,6 +130,9 @@ public class AuthMockMvcTest {
                 .apply(springSecurity())
                 .build();
 
+        jdbcTemplate.update("DELETE FROM account_recovery_tokens");
+        jdbcTemplate.update("DELETE FROM mail_outbox");
+        jdbcTemplate.update("DELETE FROM workplace_events");
         loginSessionRepository.deleteAll();
         refreshTokenRepository.deleteAll();
         passwordResetTokenRepository.deleteAll();
@@ -252,7 +251,7 @@ public class AuthMockMvcTest {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"))
                 .andExpect(jsonPath("$.message").value("Thông tin đăng nhập không chính xác"));
@@ -266,7 +265,7 @@ public class AuthMockMvcTest {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("ACCOUNT_PENDING"))
                 .andExpect(jsonPath("$.message").value("Tài khoản chưa được kích hoạt"));
@@ -280,7 +279,7 @@ public class AuthMockMvcTest {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("ACCOUNT_LOCKED"))
                 .andExpect(jsonPath("$.message").value("Tài khoản đã bị khóa"));
@@ -294,7 +293,7 @@ public class AuthMockMvcTest {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("ACCOUNT_DISABLED"))
                 .andExpect(jsonPath("$.message").value("Tài khoản đã bị vô hiệu hóa"));
@@ -334,7 +333,7 @@ public class AuthMockMvcTest {
     @Order(11)
     void protectedEndpoint_shouldSucceed_whenValidTokenProvided() throws Exception {
         UUID sessionId = UUID.randomUUID();
-        String validToken = jwtService.generateAccessToken(activeUserId, sessionId);
+        String validToken = authorizationAccessToken(activeUserId);
 
         mockMvc.perform(get("/api/v1/me")
                         .header("Authorization", "Bearer " + validToken))
@@ -385,7 +384,7 @@ public class AuthMockMvcTest {
         mockMvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshReq)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("REFRESH_TOKEN_REVOKED"));
     }
 
@@ -421,7 +420,7 @@ public class AuthMockMvcTest {
         mockMvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshReq)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("REFRESH_TOKEN_REVOKED"));
     }
 
@@ -452,24 +451,30 @@ public class AuthMockMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.code").value("RESET_TOKEN_INVALID"));
+                .andExpect(jsonPath("$.code").value("RECOVERY_INVALID"));
     }
 
     @Test
     @Order(16)
     void resetPassword_shouldSucceed_whenTokenIsValid() throws Exception {
-        String rawToken = UUID.randomUUID().toString().replace("-", "");
-        String tokenHash = hashToken(rawToken);
-
-        PasswordResetToken prt = PasswordResetToken.create(
-                UUID.randomUUID(),
-                activeUserId,
-                tokenHash,
-                Instant.now().plus(15, ChronoUnit.MINUTES),
-                "127.0.0.1",
-                "TestAgent"
-        );
-        passwordResetTokenRepository.save(prt);
+        // Follow the current email-verified recovery path, not the retired password_reset_tokens table.
+        jdbcTemplate.update("UPDATE users SET email_verified_at=now() WHERE id=?", activeUserId);
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new LoginRequest("activeuser", "Password123!", "Reset test"))))
+                .andExpect(status().isOk()).andReturn();
+        JsonNode oldTokens = objectMapper.readTree(login.getResponse().getContentAsString()).path("data");
+        mockMvc.perform(post("/api/v1/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ForgotPasswordRequest("active@test.com"))))
+                .andExpect(status().isOk());
+        String encryptedMail = jdbcTemplate.queryForObject(
+                "SELECT encrypted_body FROM mail_outbox WHERE recipient=? AND subject=? ORDER BY created_at DESC LIMIT 1",
+                String.class, "active@test.com", "WorkSphere · Đặt lại mật khẩu");
+        var token = java.util.regex.Pattern.compile("/#reset/([A-Za-z0-9_-]{43})")
+                .matcher(recoveryService.decrypt(encryptedMail));
+        assertThat(token.find()).isTrue();
+        String rawToken = token.group(1);
 
         ResetPasswordRequest req = new ResetPasswordRequest(rawToken, "BrandNewPassword123!", "BrandNewPassword123!");
         mockMvc.perform(post("/api/v1/auth/reset-password")
@@ -479,21 +484,33 @@ public class AuthMockMvcTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("Mật khẩu đã được đặt lại thành công"));
 
+        String passwordHash = jdbcTemplate.queryForObject("SELECT password_hash FROM users WHERE id=?", String.class, activeUserId);
+        assertThat(passwordEncoder.matches("BrandNewPassword123!", passwordHash)).isTrue();
+        assertThat(passwordEncoder.matches("Password123!", passwordHash)).isFalse();
+        mockMvc.perform(get("/api/v1/me").header("Authorization", "Bearer " + oldTokens.path("accessToken").asText()))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new RefreshTokenRequest(oldTokens.path("refreshToken").asText()))))
+                .andExpect(status().isUnauthorized());
+
         // Verify that trying to reuse the used reset token fails
         mockMvc.perform(post("/api/v1/auth/reset-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.code").value("RESET_TOKEN_INVALID"));
+                .andExpect(jsonPath("$.code").value("RECOVERY_INVALID"));
     }
 
-    private String hashToken(String rawToken) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hash);
-        } catch (Exception e) {
-            throw new RuntimeException("SHA-256 not available", e);
-        }
+    @Autowired
+    private com.worksphere.identity.application.RecoveryService recoveryService;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

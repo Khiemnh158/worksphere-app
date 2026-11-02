@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-01",
+  "scope": "Android first client on shared web backend; not complete mobile release",
+  "typecheck": {
+    "exitCode": 0
+  },
+  "jest": {
+    "suitesPassed": 98,
+    "suitesTotal": 98,
+    "testsPassed": 852,
+    "testsTotal": 852,
+    "skipped": 0,
+    "seconds": 49.081,
+    "notes": "Inherited act warnings remain"
+  },
+  "lintChangedSource": {
+    "errors": 0,
+    "warnings": 32,
+    "date": "2026-10-30"
+  },
+  "android": {
+    "target": "debug x86_64",
+    "build": "SUCCESS",
+    "seconds": 18,
+    "tasks": 191,
+    "requiresMetro": true,
+    "emulator": "Small_Phone",
+    "install": "PASS",
+    "coldStartSessionRestored": true,
+    "cameraOpened": true,
+    "physicalQrInOut": "NOT_VERIFIED"
+  },
+  "manualScenarios": [
+    "Employee session, own department directory and assigned work",
+    "Lan to Hai handover retains progress 65%",
+    "Android work comment visible on web after reload",
+    "Native Android QR camera opens; full real-camera rotating QR IN/OUT not verified"
+  ],
+  "backendEvidence": "web-validation.json",
+  "remaining": [
+    "Physical QR IN/OUT and camera/network edge cases",
+    "Large files/cloud providers/additional viewer acceptance",
+    "Physical OS-link acceptance; verified HTTPS App Links and iOS",
+    "Push/realtime/offline",
+    "ARM release signing and iOS",
+    "User acceptance"
+  ],
+  "androidPhysical": {
+    "target": "debug arm64-v8a",
+    "model": "OPPO CPH2603",
+    "android": "16",
+    "build": "SUCCESS",
+    "buildSeconds": 225,
+    "tasks": 191,
+    "install": "PASS",
+    "launchCommand": "SUCCESS",
+    "requiresMetro": true,
+    "connection": "USB adb reverse 18120/8081",
+    "physicalQrInOut": "IN_VERIFIED_OUT_PENDING",
+    "apkSha256": "22df4ec3cb77afd874836dbcff6de54d3ea7299c708bc33a02d1fa5e62c80d40",
+    "inEvidence": {
+      "result": "IN persisted after a physical camera scan in local test environment",
+      "out": "NOT_VERIFIED",
+      "details": "Identifying activity details retained locally, not published"
+    }
+  },
+  "bundledLocal": {
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "build": "SUCCESS",
+    "metroRequired": false,
+    "backendRequired": true,
+    "environment": "loopback local, debug signed",
+    "emulatorLoginAndAttendance": "PASS",
+    "physicalNewBuildOut": "NOT_VERIFIED",
+    "buildSeconds": 59,
+    "tasks": 151,
+    "profileBasics": "IMPLEMENTED; two regression tests pass; physical UI not verified",
+    "securityScreenReadOnly": "VERIFIED on emulator; no MFA or password changes made",
+    "physicalInstallAndUserLaunch": "PASS; pagination APK installed; user confirms existing history on OPPO. File open/save confirmation is from the earlier attachment APK.",
+    "physicalRecoveryLink": "PENDING"
+  },
+  "lintLatestIncrement": {
+    "files": 3,
+    "errors": 0,
+    "warnings": 4,
+    "scope": "Punch pagination increment; attachment lint evidence remains in dated report"
+  },
+  "recoveryLinks": {
+    "implementation": "Android custom scheme with strict parser and session guard",
+    "webFixtureButton": "VERIFIED",
+    "automaticCredentialSubmission": false,
+    "physicalFormAcceptance": "PENDING"
+  },
+  "dayOffLabel": {
+    "weeklyOffAndHolidayRegression": "PASS",
+    "webActualUi": "VERIFIED",
+    "physicalUpdatedLabel": "PENDING_USER_ACCEPTANCE"
+  },
+  "fileWorkflows": {
+    "implemented": "Android single file per work command/support creation/comment, authenticated opening and Save As",
+    "emulatorPickerAndWorkUpload": "PASS_NATIVE_UI_AND_API_BYTES_MATCH",
+    "progress": "RETAINED_65",
+    "emulatorOpen": "VERIFIED_IMAGE_VIEWER",
+    "emulatorSaveAs": "BYTES_MATCH",
+    "emulatorSaveCancellation": "PASS_NO_FALSE_SUCCESS",
+    "wrongPurpose": "REJECTED_415",
+    "outsideWorkDepartment": "REJECTED_403",
+    "outsideSupportScope": "REJECTED_403",
+    "oppoOpen": "USER_CONFIRMED",
+    "oppoSave": "USER_CONFIRMED",
+    "sessionBoundary": "UNIT_TESTED_AND_NATIVE_EPOCH_GUARDS",
+    "logoutCachePurge": "PASS_EMULATOR_NATIVE_CACHE_ONE_FILE_TO_EMPTY_AND_LOGIN_SCREEN",
+    "fixtureCleanup": "ONE_OWNED_HASH_MATCHING_UNLINKED_FILE_SOFT_DELETED"
+  },
+  "punchHistory": {
+    "implementation": "20 per page, scoped API, chosen month resets to first page",
+    "tests": "PASS_PAGE_SWITCH_RETRY_AND_LATE_OLD_MONTH_DISCARDED",
+    "nativeUi": "USER_CONFIRMED_EXISTING_IN_AND_STATION_ON_OPPO"
+  }
+}

@@ -4,7 +4,9 @@
  * Canonical Source: backend validation constraints on Identity DTOs.
  */
 
-export type FieldErrors<TField extends string> = Partial<Record<TField, string>>;
+export type FieldErrors<TField extends string> = Partial<
+  Record<TField, string>
+>;
 
 const BASIC_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -40,7 +42,9 @@ export function normalizeFullName(fullName: string): string {
  * Normalizes phone number input.
  * Strips surrounding whitespace, returns null if empty string.
  */
-export function normalizePhoneNumber(phoneNumber?: string | null): string | null {
+export function normalizePhoneNumber(
+  phoneNumber?: string | null,
+): string | null {
   if (!phoneNumber) {
     return null;
   }
@@ -67,7 +71,9 @@ export interface LoginFormData {
  * - login: required after trim, max 255 chars
  * - password: required, 8-128 chars (never trimmed)
  */
-export function validateLogin(data: LoginFormData): FieldErrors<'login' | 'password'> {
+export function validateLogin(
+  data: LoginFormData,
+): FieldErrors<'login' | 'password'> {
   const errors: FieldErrors<'login' | 'password'> = {};
 
   const loginTrimmed = data.login ? data.login.trim() : '';
@@ -96,7 +102,9 @@ export interface ForgotPasswordFormData {
  * - email: required after trim, basic email format, max 255 chars
  * - Does NOT perform user enumeration checks.
  */
-export function validateForgotPassword(data: ForgotPasswordFormData): FieldErrors<'email'> {
+export function validateForgotPassword(
+  data: ForgotPasswordFormData,
+): FieldErrors<'email'> {
   const errors: FieldErrors<'email'> = {};
 
   const emailTrimmed = data.email ? data.email.trim() : '';
@@ -111,6 +119,15 @@ export function validateForgotPassword(data: ForgotPasswordFormData): FieldError
   return errors;
 }
 
+function utf8Bytes(value: string): number {
+  let bytes = 0;
+  for (const char of value) {
+    const point = char.codePointAt(0) ?? 0;
+    bytes += point <= 0x7f ? 1 : point <= 0x7ff ? 2 : point <= 0xffff ? 3 : 4;
+  }
+  return bytes;
+}
+
 export interface ResetPasswordFormData {
   resetToken?: string;
   newPassword?: string;
@@ -120,13 +137,14 @@ export interface ResetPasswordFormData {
 /**
  * Validates Reset Password form data.
  * - resetToken: required (token itself is never logged or included in error strings)
- * - newPassword: required, 8-128 chars
+ * - newPassword: required, at least 12 characters and at most 72 UTF-8 bytes
  * - confirmPassword: required, must match newPassword
  */
 export function validateResetPassword(
-  data: ResetPasswordFormData
+  data: ResetPasswordFormData,
 ): FieldErrors<'resetToken' | 'newPassword' | 'confirmPassword'> {
-  const errors: FieldErrors<'resetToken' | 'newPassword' | 'confirmPassword'> = {};
+  const errors: FieldErrors<'resetToken' | 'newPassword' | 'confirmPassword'> =
+    {};
 
   const tokenTrimmed = data.resetToken ? data.resetToken.trim() : '';
   if (!tokenTrimmed) {
@@ -136,8 +154,9 @@ export function validateResetPassword(
   const newPassword = data.newPassword ?? '';
   if (!newPassword) {
     errors.newPassword = 'Vui lòng nhập mật khẩu mới';
-  } else if (newPassword.length < 8 || newPassword.length > 128) {
-    errors.newPassword = 'Mật khẩu phải có từ 8 đến 128 ký tự';
+  } else if (newPassword.length < 12 || utf8Bytes(newPassword) > 72) {
+    errors.newPassword =
+      'Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8';
   }
 
   const confirmPassword = data.confirmPassword ?? '';
@@ -159,13 +178,15 @@ export interface ChangePasswordFormData {
 /**
  * Validates Change Password form data.
  * - currentPassword: required
- * - newPassword: required, 8-128 chars, must differ from currentPassword
+ * - newPassword: required, at least 12 characters and at most 72 UTF-8 bytes, must differ from currentPassword
  * - confirmPassword: required, must match newPassword
  */
 export function validateChangePassword(
-  data: ChangePasswordFormData
+  data: ChangePasswordFormData,
 ): FieldErrors<'currentPassword' | 'newPassword' | 'confirmPassword'> {
-  const errors: FieldErrors<'currentPassword' | 'newPassword' | 'confirmPassword'> = {};
+  const errors: FieldErrors<
+    'currentPassword' | 'newPassword' | 'confirmPassword'
+  > = {};
 
   const currentPassword = data.currentPassword ?? '';
   if (!currentPassword) {
@@ -175,8 +196,9 @@ export function validateChangePassword(
   const newPassword = data.newPassword ?? '';
   if (!newPassword) {
     errors.newPassword = 'Vui lòng nhập mật khẩu mới';
-  } else if (newPassword.length < 8 || newPassword.length > 128) {
-    errors.newPassword = 'Mật khẩu phải có từ 8 đến 128 ký tự';
+  } else if (newPassword.length < 12 || utf8Bytes(newPassword) > 72) {
+    errors.newPassword =
+      'Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8';
   } else if (currentPassword && newPassword === currentPassword) {
     errors.newPassword = 'Mật khẩu mới không được trùng mật khẩu hiện tại';
   }
@@ -202,7 +224,7 @@ export interface UpdateProfileFormData {
  * - phoneNumber: optional, max 20 chars if provided
  */
 export function validateUpdateProfile(
-  data: UpdateProfileFormData
+  data: UpdateProfileFormData,
 ): FieldErrors<'fullName' | 'phoneNumber'> {
   const errors: FieldErrors<'fullName' | 'phoneNumber'> = {};
 

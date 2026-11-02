@@ -14,7 +14,7 @@ import com.facebook.react.uimanager.ViewManager
 class EnvironmentConfigPackage : ReactPackage {
 
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        return listOf(EnvironmentConfigModule(reactContext))
+        return listOf(EnvironmentConfigModule(reactContext), WorkplaceDeviceModule(reactContext), WorkplaceFilesModule(reactContext))
     }
 
     override fun createViewManagers(

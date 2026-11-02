@@ -18,7 +18,9 @@ describe('Auth Form Validators and Normalizers', () => {
     });
 
     it('normalizeEmail trims whitespace and converts to lowercase', () => {
-      expect(normalizeEmail('  User.Name@Domain.COM  ')).toBe('user.name@domain.com');
+      expect(normalizeEmail('  User.Name@Domain.COM  ')).toBe(
+        'user.name@domain.com',
+      );
       expect(normalizeEmail('TEST@EXAMPLE.VN')).toBe('test@example.vn');
     });
 
@@ -43,20 +45,31 @@ describe('Auth Form Validators and Normalizers', () => {
     });
 
     it('returns error when login is only whitespace', () => {
-      const errors = validateLogin({ login: '   ', password: 'validPassword123' });
+      const errors = validateLogin({
+        login: '   ',
+        password: 'validPassword123',
+      });
       expect(errors.login).toBe('Vui lòng nhập tên đăng nhập hoặc email');
       expect(errors.password).toBeUndefined();
     });
 
     it('returns error when login exceeds 255 characters', () => {
       const longLogin = 'a'.repeat(256);
-      const errors = validateLogin({ login: longLogin, password: 'validPassword123' });
-      expect(errors.login).toBe('Tên đăng nhập hoặc email không được vượt quá 255 ký tự');
+      const errors = validateLogin({
+        login: longLogin,
+        password: 'validPassword123',
+      });
+      expect(errors.login).toBe(
+        'Tên đăng nhập hoặc email không được vượt quá 255 ký tự',
+      );
     });
 
     it('accepts login with exactly 255 characters', () => {
       const maxLogin = 'a'.repeat(255);
-      const errors = validateLogin({ login: maxLogin, password: 'validPassword123' });
+      const errors = validateLogin({
+        login: maxLogin,
+        password: 'validPassword123',
+      });
       expect(errors.login).toBeUndefined();
     });
 
@@ -74,14 +87,21 @@ describe('Auth Form Validators and Normalizers', () => {
     it('accepts boundary passwords (8 and 128 characters)', () => {
       const pass8 = '12345678';
       const pass128 = 'p'.repeat(128);
-      expect(validateLogin({ login: 'user1', password: pass8 }).password).toBeUndefined();
-      expect(validateLogin({ login: 'user1', password: pass128 }).password).toBeUndefined();
+      expect(
+        validateLogin({ login: 'user1', password: pass8 }).password,
+      ).toBeUndefined();
+      expect(
+        validateLogin({ login: 'user1', password: pass128 }).password,
+      ).toBeUndefined();
     });
 
     it('preserves password spaces without trimming', () => {
       // 6 chars + 2 surrounding spaces = 8 chars
       const passWithSpaces = ' 123456 ';
-      const errors = validateLogin({ login: 'user1', password: passWithSpaces });
+      const errors = validateLogin({
+        login: 'user1',
+        password: passWithSpaces,
+      });
       expect(errors.password).toBeUndefined();
     });
   });
@@ -89,23 +109,37 @@ describe('Auth Form Validators and Normalizers', () => {
   describe('validateForgotPassword', () => {
     it('returns error when email is empty or whitespace', () => {
       expect(validateForgotPassword({}).email).toBe('Vui lòng nhập email');
-      expect(validateForgotPassword({ email: '   ' }).email).toBe('Vui lòng nhập email');
+      expect(validateForgotPassword({ email: '   ' }).email).toBe(
+        'Vui lòng nhập email',
+      );
     });
 
     it('returns error for invalid email formats', () => {
-      expect(validateForgotPassword({ email: 'invalid-email' }).email).toBe('Email không đúng định dạng');
-      expect(validateForgotPassword({ email: 'user@' }).email).toBe('Email không đúng định dạng');
-      expect(validateForgotPassword({ email: '@domain.com' }).email).toBe('Email không đúng định dạng');
-      expect(validateForgotPassword({ email: 'user@domain' }).email).toBe('Email không đúng định dạng');
+      expect(validateForgotPassword({ email: 'invalid-email' }).email).toBe(
+        'Email không đúng định dạng',
+      );
+      expect(validateForgotPassword({ email: 'user@' }).email).toBe(
+        'Email không đúng định dạng',
+      );
+      expect(validateForgotPassword({ email: '@domain.com' }).email).toBe(
+        'Email không đúng định dạng',
+      );
+      expect(validateForgotPassword({ email: 'user@domain' }).email).toBe(
+        'Email không đúng định dạng',
+      );
     });
 
     it('returns error when email exceeds 255 characters', () => {
       const longEmail = 'a'.repeat(245) + '@domain.com'; // > 255 chars
-      expect(validateForgotPassword({ email: longEmail }).email).toBe('Email không được vượt quá 255 ký tự');
+      expect(validateForgotPassword({ email: longEmail }).email).toBe(
+        'Email không được vượt quá 255 ký tự',
+      );
     });
 
     it('accepts a valid email address', () => {
-      const errors = validateForgotPassword({ email: 'employee@worksphere.local' });
+      const errors = validateForgotPassword({
+        email: 'employee@worksphere.local',
+      });
       expect(errors.email).toBeUndefined();
     });
   });
@@ -124,14 +158,18 @@ describe('Auth Form Validators and Normalizers', () => {
         newPassword: 'short',
         confirmPassword: 'short',
       });
-      expect(shortErr.newPassword).toBe('Mật khẩu phải có từ 8 đến 128 ký tự');
+      expect(shortErr.newPassword).toBe(
+        'Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8',
+      );
 
       const longErr = validateResetPassword({
         resetToken: 'token123',
         newPassword: 'x'.repeat(129),
         confirmPassword: 'x'.repeat(129),
       });
-      expect(longErr.newPassword).toBe('Mật khẩu phải có từ 8 đến 128 ký tự');
+      expect(longErr.newPassword).toBe(
+        'Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8',
+      );
     });
 
     it('returns error when confirmPassword does not match newPassword', () => {
@@ -178,7 +216,9 @@ describe('Auth Form Validators and Normalizers', () => {
         newPassword: 'currentPassword123',
         confirmPassword: 'currentPassword123',
       });
-      expect(errors.newPassword).toBe('Mật khẩu mới không được trùng mật khẩu hiện tại');
+      expect(errors.newPassword).toBe(
+        'Mật khẩu mới không được trùng mật khẩu hiện tại',
+      );
     });
 
     it('rejects confirmation mismatch', () => {
@@ -202,27 +242,47 @@ describe('Auth Form Validators and Normalizers', () => {
 
   describe('validateUpdateProfile', () => {
     it('requires fullName', () => {
-      expect(validateUpdateProfile({}).fullName).toBe('Vui lòng nhập họ và tên');
-      expect(validateUpdateProfile({ fullName: '   ' }).fullName).toBe('Vui lòng nhập họ và tên');
+      expect(validateUpdateProfile({}).fullName).toBe(
+        'Vui lòng nhập họ và tên',
+      );
+      expect(validateUpdateProfile({ fullName: '   ' }).fullName).toBe(
+        'Vui lòng nhập họ và tên',
+      );
     });
 
     it('enforces fullName max 150 characters', () => {
       const longName = 'A'.repeat(151);
       expect(validateUpdateProfile({ fullName: longName }).fullName).toBe(
-        'Họ và tên không được vượt quá 150 ký tự'
+        'Họ và tên không được vượt quá 150 ký tự',
       );
-      expect(validateUpdateProfile({ fullName: 'A'.repeat(150) }).fullName).toBeUndefined();
+      expect(
+        validateUpdateProfile({ fullName: 'A'.repeat(150) }).fullName,
+      ).toBeUndefined();
     });
 
     it('allows optional phoneNumber but enforces max 20 characters', () => {
-      expect(validateUpdateProfile({ fullName: 'Nguyen Van A', phoneNumber: null }).phoneNumber).toBeUndefined();
-      expect(validateUpdateProfile({ fullName: 'Nguyen Van A', phoneNumber: '' }).phoneNumber).toBeUndefined();
-      expect(validateUpdateProfile({ fullName: 'Nguyen Van A', phoneNumber: '0901234567' }).phoneNumber).toBeUndefined();
+      expect(
+        validateUpdateProfile({ fullName: 'Nguyen Van A', phoneNumber: null })
+          .phoneNumber,
+      ).toBeUndefined();
+      expect(
+        validateUpdateProfile({ fullName: 'Nguyen Van A', phoneNumber: '' })
+          .phoneNumber,
+      ).toBeUndefined();
+      expect(
+        validateUpdateProfile({
+          fullName: 'Nguyen Van A',
+          phoneNumber: '0901234567',
+        }).phoneNumber,
+      ).toBeUndefined();
 
       const longPhone = '1'.repeat(21);
-      expect(validateUpdateProfile({ fullName: 'Nguyen Van A', phoneNumber: longPhone }).phoneNumber).toBe(
-        'Số điện thoại không được vượt quá 20 ký tự'
-      );
+      expect(
+        validateUpdateProfile({
+          fullName: 'Nguyen Van A',
+          phoneNumber: longPhone,
+        }).phoneNumber,
+      ).toBe('Số điện thoại không được vượt quá 20 ký tự');
     });
   });
 });

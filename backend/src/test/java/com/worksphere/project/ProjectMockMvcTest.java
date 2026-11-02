@@ -124,6 +124,7 @@ public class ProjectMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -167,7 +168,7 @@ public class ProjectMockMvcTest {
                     "SELECT ?, id, now() FROM permissions ON CONFLICT DO NOTHING",
                     adminRoleId);
         }
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         // Create PM user (has PROJECT_MANAGER role with PROJECT_READ, PROJECT_CREATE, PROJECT_UPDATE, PROJECT_MEMBER_MANAGE)
         pmUserId = UUID.randomUUID();
@@ -184,7 +185,7 @@ public class ProjectMockMvcTest {
                     "ON CONFLICT DO NOTHING",
                     pmRoleId);
         }
-        pmToken = jwtService.generateAccessToken(pmUserId, UUID.randomUUID());
+        pmToken = authorizationAccessToken(pmUserId);
 
         // Create regular Employee user (has PROJECT_READ per V015)
         employeeUserId = UUID.randomUUID();
@@ -196,12 +197,12 @@ public class ProjectMockMvcTest {
                     "INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                     employeeUserId, empRoleId);
         }
-        employeeToken = jwtService.generateAccessToken(employeeUserId, UUID.randomUUID());
+        employeeToken = authorizationAccessToken(employeeUserId);
 
         // Create unprivileged user with no roles/permissions
         UUID unprivilegedUserId = UUID.randomUUID();
         insertUser(unprivilegedUserId, "no_perm_user", "noperm@test.com", passwordEncoder.encode("Password123!"));
-        unprivilegedToken = jwtService.generateAccessToken(unprivilegedUserId, UUID.randomUUID());
+        unprivilegedToken = authorizationAccessToken(unprivilegedUserId);
     }
 
     private void insertUser(UUID id, String username, String email, String passwordHash) {
@@ -331,6 +332,8 @@ public class ProjectMockMvcTest {
                 LocalDate.now().plusMonths(2),
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         UpdateProjectRequest req = new UpdateProjectRequest(
                 "Tên mới",
@@ -366,6 +369,8 @@ public class ProjectMockMvcTest {
                 null,
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         UpdateProjectRequest req = new UpdateProjectRequest(
                 "Tên sửa",
@@ -399,6 +404,8 @@ public class ProjectMockMvcTest {
                 null,
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         // DRAFT -> ACTIVE
         ChangeProjectStatusRequest req = new ChangeProjectStatusRequest(
@@ -435,6 +442,8 @@ public class ProjectMockMvcTest {
                 null,
                 pmUserId
         ));
+        projectMemberRepository.saveAndFlush(ProjectMember.create(
+                UUID.randomUUID(), project.getId(), pmUserId, ProjectRole.PROJECT_MANAGER, pmUserId));
 
         // DRAFT -> COMPLETED is invalid per 06_API_CONTRACT.md section 11.5
         ChangeProjectStatusRequest req = new ChangeProjectStatusRequest(
@@ -654,5 +663,15 @@ public class ProjectMockMvcTest {
                         .content(objectMapper.writeValueAsString(sameReq)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.projectRole").value("PROJECT_MANAGER"));
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

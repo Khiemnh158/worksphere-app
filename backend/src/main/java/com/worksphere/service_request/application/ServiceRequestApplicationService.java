@@ -42,25 +42,11 @@ import com.worksphere.shared.exception.BusinessRuleException;
 import com.worksphere.shared.exception.ResourceNotFoundException;
 import com.worksphere.shared.response.PagedData;
 import com.worksphere.shared.security.WorkSphereUserPrincipal;
+
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import java.sql.SQLException;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -71,14 +57,39 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
- * Application service for ServiceRequest operations.
- * Per 02_USER_ROLES_AND_WORKFLOWS.md and 06_API_CONTRACT.md section 13.
+ * Application service for ServiceRequest operations. Per 02_USER_ROLES_AND_WORKFLOWS.md and
+ * 06_API_CONTRACT.md section 13.
  */
 @Service
 public class ServiceRequestApplicationService {
 
-    private static final Logger log = LoggerFactory.getLogger(ServiceRequestApplicationService.class);
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.organization.application.DepartmentRouting routing;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.workplace.RequestOperations operations;
+
+    private final ServiceRequestAccessPolicy accessPolicy;
+
+    private static final Logger log =
+            LoggerFactory.getLogger(ServiceRequestApplicationService.class);
     private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final ServiceRequestRepository requestRepository;
@@ -93,7 +104,8 @@ public class ServiceRequestApplicationService {
     private final AssetRepository assetRepository;
     private final AssetAssignmentRepository assetAssignmentRepository;
     private final Clock clock;
-    private final com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher;
+    private final com.worksphere.notification.application.NotificationEventDispatcher
+            eventDispatcher;
 
     public ServiceRequestApplicationService(
             ServiceRequestRepository requestRepository,
@@ -108,8 +120,8 @@ public class ServiceRequestApplicationService {
             AssetRepository assetRepository,
             AssetAssignmentRepository assetAssignmentRepository,
             Clock clock,
-            com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher
-    ) {
+            com.worksphere.notification.application.NotificationEventDispatcher eventDispatcher,
+            ServiceRequestAccessPolicy accessPolicy) {
         this.requestRepository = requestRepository;
         this.categoryRepository = categoryRepository;
         this.assignmentRepository = assignmentRepository;
@@ -123,16 +135,28 @@ public class ServiceRequestApplicationService {
         this.assetAssignmentRepository = assetAssignmentRepository;
         this.clock = clock;
         this.eventDispatcher = eventDispatcher;
+        this.accessPolicy = accessPolicy;
     }
 
     @Transactional
-    public CreateServiceRequestResponse createRequest(CreateServiceRequestRequest request, WorkSphereUserPrincipal principal) {
-        ServiceCategory category = categoryRepository.findByIdAndDeletedFalse(request.categoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_CATEGORY_NOT_FOUND", "Không tìm thấy danh mục dịch vụ"));
+    public CreateServiceRequestResponse createRequest(
+            CreateServiceRequestRequest request, WorkSphereUserPrincipal principal) {
+        ServiceCategory category =
+                categoryRepository
+                        .findByIdAndDeletedFalse(request.categoryId())
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_CATEGORY_NOT_FOUND",
+                                                "Không tìm thấy danh mục dịch vụ"));
 
         if (!category.isActive()) {
-            throw new BusinessRuleException("SERVICE_CATEGORY_NOT_FOUND", "Danh mục dịch vụ đang dừng hoạt động");
+            throw new BusinessRuleException(
+                    "SERVICE_CATEGORY_NOT_FOUND", "Danh mục dịch vụ đang dừng hoạt động");
         }
+
+        UUID receiving = category.getReceivingDepartmentId();
+        routing.requireReceiving(receiving);
 
         int currentYear = LocalDate.ofInstant(clock.instant(), BUSINESS_ZONE).getYear();
         requestRepository.acquireRequestNumberLock(currentYear);
@@ -147,35 +171,39 @@ public class ServiceRequestApplicationService {
             validateAssetForRequest(request.assetId(), principal);
         }
 
-        ServicePriority priority = request.priority() != null ? request.priority() : category.getDefaultPriority();
-        ServiceRequest sr = ServiceRequest.create(
-                requestId,
-                requestNumber,
-                category.getId(),
-                principal.userId(),
-                request.assetId(),
-                request.title().trim(),
-                request.description().trim(),
-                priority,
-                principal.userId(),
-                clock.instant()
-        );
+        ServicePriority priority =
+                request.priority() != null ? request.priority() : category.getDefaultPriority();
+        ServiceRequest sr =
+                ServiceRequest.create(
+                        requestId,
+                        requestNumber,
+                        category.getId(),
+                        principal.userId(),
+                        request.assetId(),
+                        request.title().trim(),
+                        request.description().trim(),
+                        priority,
+                        principal.userId(),
+                        clock.instant());
 
+        sr.routeTo(receiving);
         ServiceRequest saved = requestRepository.save(sr);
+        routing.notifyManager(receiving, "Yêu cầu mới: " + sr.getTitle(), sr.getId());
         attachFiles(saved.getId(), request.attachmentFileIds());
 
-        ServiceStatusHistory initialHistory = ServiceStatusHistory.create(
-                UUID.randomUUID(),
-                requestId,
-                null,
-                ServiceStatus.OPEN,
-                "Yêu cầu dịch vụ được tạo",
-                principal.userId(),
-                clock.instant()
-        );
+        ServiceStatusHistory initialHistory =
+                ServiceStatusHistory.create(
+                        UUID.randomUUID(),
+                        requestId,
+                        null,
+                        ServiceStatus.OPEN,
+                        "Yêu cầu dịch vụ được tạo",
+                        principal.userId(),
+                        clock.instant());
         historyRepository.save(initialHistory);
 
-        return new CreateServiceRequestResponse(saved.getId(), saved.getRequestNumber(), saved.getStatus());
+        return new CreateServiceRequestResponse(
+                saved.getId(), saved.getRequestNumber(), saved.getStatus());
     }
 
     @Transactional(readOnly = true)
@@ -190,71 +218,77 @@ public class ServiceRequestApplicationService {
             Instant createdFrom,
             Instant createdTo,
             String search,
-            Pageable pageable
-    ) {
-        Specification<ServiceRequest> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.isFalse(root.get("deleted")));
+            Pageable pageable) {
+        Specification<ServiceRequest> spec =
+                (root, query, cb) -> {
+                    List<Predicate> predicates = new ArrayList<>();
+                    predicates.add(cb.isFalse(root.get("deleted")));
 
-            if (!hasSystemAdminRole(principal)) {
-                UUID callerId = principal.userId();
-                Subquery<Integer> sub = query.subquery(Integer.class);
-                Root<ServiceAssignment> sa = sub.from(ServiceAssignment.class);
-                sub.select(cb.literal(1))
-                        .where(
-                                cb.equal(sa.get("requestId"), root.get("id")),
-                                cb.equal(sa.get("assigneeId"), callerId),
-                                cb.isTrue(sa.get("active"))
-                        );
-                predicates.add(cb.or(
-                        cb.equal(root.get("requesterId"), callerId),
-                        cb.exists(sub)
-                ));
-            }
+                    {
+                        UUID callerId = principal.userId();
+                        Subquery<Integer> sub = query.subquery(Integer.class);
+                        Root<ServiceAssignment> sa = sub.from(ServiceAssignment.class);
+                        sub.select(cb.literal(1))
+                                .where(
+                                        cb.equal(sa.get("requestId"), root.get("id")),
+                                        cb.equal(sa.get("assigneeId"), callerId),
+                                        cb.isTrue(sa.get("active")));
+                        predicates.add(
+                                cb.or(
+                                        cb.equal(root.get("requesterId"), callerId),
+                                        cb.exists(sub),
+                                        root.get("receivingDepartmentId")
+                                                .in(
+                                                        routing.managed(callerId).isEmpty()
+                                                                ? java.util.List.of(new UUID(0, 0))
+                                                                : routing.managed(callerId)),
+                                        hasSystemAdminRole(principal)
+                                                ? cb.isNull(root.get("receivingDepartmentId"))
+                                                : cb.disjunction()));
+                    }
 
-            if (categoryId != null) {
-                predicates.add(cb.equal(root.get("categoryId"), categoryId));
-            }
-            if (requesterId != null) {
-                predicates.add(cb.equal(root.get("requesterId"), requesterId));
-            }
-            if (assigneeId != null) {
-                Subquery<Integer> sub = query.subquery(Integer.class);
-                Root<ServiceAssignment> sa = sub.from(ServiceAssignment.class);
-                sub.select(cb.literal(1))
-                        .where(
-                                cb.equal(sa.get("requestId"), root.get("id")),
-                                cb.equal(sa.get("assigneeId"), assigneeId),
-                                cb.isTrue(sa.get("active"))
-                        );
-                predicates.add(cb.exists(sub));
-            }
-            if (assetId != null) {
-                predicates.add(cb.equal(root.get("assetId"), assetId));
-            }
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
-            }
-            if (priority != null) {
-                predicates.add(cb.equal(root.get("priority"), priority));
-            }
-            if (createdFrom != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), createdFrom));
-            }
-            if (createdTo != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), createdTo));
-            }
-            if (search != null && !search.isBlank()) {
-                String pattern = "%" + search.trim().toLowerCase() + "%";
-                predicates.add(cb.or(
-                        cb.like(cb.lower(root.get("requestNumber")), pattern),
-                        cb.like(cb.lower(root.get("title")), pattern),
-                        cb.like(cb.lower(root.get("description")), pattern)
-                ));
-            }
+                    if (categoryId != null) {
+                        predicates.add(cb.equal(root.get("categoryId"), categoryId));
+                    }
+                    if (requesterId != null) {
+                        predicates.add(cb.equal(root.get("requesterId"), requesterId));
+                    }
+                    if (assigneeId != null) {
+                        Subquery<Integer> sub = query.subquery(Integer.class);
+                        Root<ServiceAssignment> sa = sub.from(ServiceAssignment.class);
+                        sub.select(cb.literal(1))
+                                .where(
+                                        cb.equal(sa.get("requestId"), root.get("id")),
+                                        cb.equal(sa.get("assigneeId"), assigneeId),
+                                        cb.isTrue(sa.get("active")));
+                        predicates.add(cb.exists(sub));
+                    }
+                    if (assetId != null) {
+                        predicates.add(cb.equal(root.get("assetId"), assetId));
+                    }
+                    if (status != null) {
+                        predicates.add(cb.equal(root.get("status"), status));
+                    }
+                    if (priority != null) {
+                        predicates.add(cb.equal(root.get("priority"), priority));
+                    }
+                    if (createdFrom != null) {
+                        predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), createdFrom));
+                    }
+                    if (createdTo != null) {
+                        predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), createdTo));
+                    }
+                    if (search != null && !search.isBlank()) {
+                        String pattern = "%" + search.trim().toLowerCase() + "%";
+                        predicates.add(
+                                cb.or(
+                                        cb.like(cb.lower(root.get("requestNumber")), pattern),
+                                        cb.like(cb.lower(root.get("title")), pattern),
+                                        cb.like(cb.lower(root.get("description")), pattern)));
+                    }
 
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+                    return cb.and(predicates.toArray(new Predicate[0]));
+                };
 
         Page<ServiceRequest> page = requestRepository.findAll(spec, pageable);
 
@@ -262,135 +296,199 @@ public class ServiceRequestApplicationService {
             return PagedData.from(page, Collections.emptyList());
         }
 
-        Set<UUID> categoryIds = page.getContent().stream()
-                .map(ServiceRequest::getCategoryId)
-                .collect(Collectors.toSet());
-        Map<UUID, ServiceCategory> categoryMap = categoryRepository.findAllById(categoryIds).stream()
-                .collect(Collectors.toMap(ServiceCategory::getId, Function.identity()));
+        Set<UUID> categoryIds =
+                page.getContent().stream()
+                        .map(ServiceRequest::getCategoryId)
+                        .collect(Collectors.toSet());
+        Map<UUID, ServiceCategory> categoryMap =
+                categoryRepository.findAllById(categoryIds).stream()
+                        .collect(Collectors.toMap(ServiceCategory::getId, Function.identity()));
 
-        Set<UUID> requestIds = page.getContent().stream()
-                .map(ServiceRequest::getId)
-                .collect(Collectors.toSet());
-        List<ServiceAssignment> activeAssignments = assignmentRepository.findAllByRequestIdInAndActiveTrue(requestIds);
-        Map<UUID, ServiceAssignment> assignmentMap = activeAssignments.stream()
-                .collect(Collectors.toMap(ServiceAssignment::getRequestId, Function.identity(), (a, b) -> a));
+        Set<UUID> requestIds =
+                page.getContent().stream().map(ServiceRequest::getId).collect(Collectors.toSet());
+        List<ServiceAssignment> activeAssignments =
+                assignmentRepository.findAllByRequestIdInAndActiveTrue(requestIds);
+        Map<UUID, ServiceAssignment> assignmentMap =
+                activeAssignments.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        ServiceAssignment::getRequestId,
+                                        Function.identity(),
+                                        (a, b) -> a));
 
         Set<UUID> userIds = new HashSet<>();
         page.getContent().forEach(sr -> userIds.add(sr.getRequesterId()));
         activeAssignments.forEach(sa -> userIds.add(sa.getAssigneeId()));
-        Map<UUID, User> userMap = userRepository.findAllById(userIds).stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
+        Map<UUID, User> userMap =
+                userRepository.findAllById(userIds).stream()
+                        .collect(Collectors.toMap(User::getId, Function.identity()));
 
-        List<ServiceRequestSummaryResponse> items = page.getContent().stream().map(sr -> {
-            ServiceCategory cat = categoryMap.get(sr.getCategoryId());
-            User reqUser = userMap.get(sr.getRequesterId());
-            ServiceAssignment sa = assignmentMap.get(sr.getId());
-            User assignUser = sa != null ? userMap.get(sa.getAssigneeId()) : null;
+        List<ServiceRequestSummaryResponse> items =
+                page.getContent().stream()
+                        .map(
+                                sr -> {
+                                    ServiceCategory cat = categoryMap.get(sr.getCategoryId());
+                                    User reqUser = userMap.get(sr.getRequesterId());
+                                    ServiceAssignment sa = assignmentMap.get(sr.getId());
+                                    User assignUser =
+                                            sa != null ? userMap.get(sa.getAssigneeId()) : null;
 
-            return new ServiceRequestSummaryResponse(
-                    sr.getId(),
-                    sr.getRequestNumber(),
-                    sr.getCategoryId(),
-                    cat != null ? cat.getName() : null,
-                    sr.getRequesterId(),
-                    reqUser != null ? reqUser.getFullName() : null,
-                    sa != null ? sa.getAssigneeId() : null,
-                    assignUser != null ? assignUser.getFullName() : null,
-                    sr.getTitle(),
-                    sr.getPriority(),
-                    sr.getStatus(),
-                    sr.getCreatedAt(),
-                    sr.getUpdatedAt()
-            );
-        }).toList();
+                                    return new ServiceRequestSummaryResponse(
+                                            sr.getId(),
+                                            sr.getRequestNumber(),
+                                            sr.getCategoryId(),
+                                            cat != null ? cat.getName() : null,
+                                            sr.getRequesterId(),
+                                            reqUser != null ? reqUser.getFullName() : null,
+                                            sa != null ? sa.getAssigneeId() : null,
+                                            assignUser != null ? assignUser.getFullName() : null,
+                                            sr.getTitle(),
+                                            sr.getPriority(),
+                                            sr.getStatus(),
+                                            sr.getCreatedAt(),
+                                            sr.getUpdatedAt());
+                                })
+                        .toList();
 
         return PagedData.from(page, items);
     }
 
     @Transactional(readOnly = true)
-    public ServiceRequestDetailResponse getRequestDetail(UUID requestId, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdAndDeletedFalse(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public ServiceRequestDetailResponse getRequestDetail(
+            UUID requestId, WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdAndDeletedFalse(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
         verifyRequestAccess(sr, principal);
 
         ServiceCategory category = categoryRepository.findById(sr.getCategoryId()).orElse(null);
         User requester = userRepository.findById(sr.getRequesterId()).orElse(null);
-        Optional<ServiceAssignment> activeAssignmentOpt = assignmentRepository.findByRequestIdAndActiveTrue(requestId);
-        User assignee = activeAssignmentOpt.flatMap(sa -> userRepository.findById(sa.getAssigneeId())).orElse(null);
+        Optional<ServiceAssignment> activeAssignmentOpt =
+                assignmentRepository.findByRequestIdAndActiveTrue(requestId);
+        User assignee =
+                activeAssignmentOpt
+                        .flatMap(sa -> userRepository.findById(sa.getAssigneeId()))
+                        .orElse(null);
 
-        List<ServiceAttachment> attachments = attachmentRepository.findAllByRequestIdOrderByCreatedAtAsc(requestId);
+        List<ServiceAttachment> attachments =
+                attachmentRepository.findAllByRequestIdOrderByCreatedAtAsc(requestId);
         List<ServiceAttachmentResponse> attachmentResponses = buildAttachmentResponses(attachments);
 
-        boolean includeInternal = hasSystemAdminRole(principal)
-                || (activeAssignmentOpt.isPresent() && activeAssignmentOpt.get().getAssigneeId().equals(principal.userId()));
+        boolean includeInternal =
+                routing.manages(sr.getReceivingDepartmentId(), principal.userId())
+                        || (sr.getReceivingDepartmentId() == null && hasSystemAdminRole(principal))
+                        || (activeAssignmentOpt.isPresent()
+                                && activeAssignmentOpt
+                                        .get()
+                                        .getAssigneeId()
+                                        .equals(principal.userId()));
 
-        List<ServiceComment> comments = includeInternal
-                ? commentRepository.findAllByRequestIdAndDeletedFalseOrderByCreatedAtAsc(requestId)
-                : commentRepository.findAllByRequestIdAndInternalFalseAndDeletedFalseOrderByCreatedAtAsc(requestId);
+        List<ServiceComment> comments =
+                includeInternal
+                        ? commentRepository.findAllByRequestIdAndDeletedFalseOrderByCreatedAtAsc(
+                                requestId)
+                        : commentRepository
+                                .findAllByRequestIdAndInternalFalseAndDeletedFalseOrderByCreatedAtAsc(
+                                        requestId);
 
-        Set<UUID> commentAuthorIds = comments.stream().map(ServiceComment::getAuthorId).collect(Collectors.toSet());
-        Map<UUID, User> authorMap = userRepository.findAllById(commentAuthorIds).stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
+        Set<UUID> commentAuthorIds =
+                comments.stream().map(ServiceComment::getAuthorId).collect(Collectors.toSet());
+        Map<UUID, User> authorMap =
+                userRepository.findAllById(commentAuthorIds).stream()
+                        .collect(Collectors.toMap(User::getId, Function.identity()));
 
-        List<ServiceCommentResponse> commentResponses = comments.stream().map(c -> {
-            User author = authorMap.get(c.getAuthorId());
-            return new ServiceCommentResponse(
-                    c.getId(),
-                    c.getRequestId(),
-                    c.getAuthorId(),
-                    author != null ? author.getFullName() : null,
-                    c.getContent(),
-                    c.isInternal(),
-                    c.isEdited(),
-                    c.getEditedAt(),
-                    c.getCreatedAt(),
-                    c.getUpdatedAt()
-            );
-        }).toList();
+        List<ServiceCommentResponse> commentResponses =
+                comments.stream()
+                        .map(
+                                c -> {
+                                    User author = authorMap.get(c.getAuthorId());
+                                    return new ServiceCommentResponse(
+                                            c.getId(),
+                                            c.getRequestId(),
+                                            c.getAuthorId(),
+                                            author != null ? author.getFullName() : null,
+                                            c.getContent(),
+                                            c.isInternal(),
+                                            c.isEdited(),
+                                            c.getEditedAt(),
+                                            c.getCreatedAt(),
+                                            c.getUpdatedAt());
+                                })
+                        .toList();
 
-        List<ServiceStatusHistory> histories = historyRepository.findAllByRequestIdOrderByChangedAtAsc(requestId);
-        Set<UUID> historyUserIds = histories.stream().map(ServiceStatusHistory::getChangedBy).collect(Collectors.toSet());
-        Map<UUID, User> historyUserMap = userRepository.findAllById(historyUserIds).stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
+        List<ServiceStatusHistory> histories =
+                historyRepository.findAllByRequestIdOrderByChangedAtAsc(requestId);
+        Set<UUID> historyUserIds =
+                histories.stream()
+                        .map(ServiceStatusHistory::getChangedBy)
+                        .collect(Collectors.toSet());
+        Map<UUID, User> historyUserMap =
+                userRepository.findAllById(historyUserIds).stream()
+                        .collect(Collectors.toMap(User::getId, Function.identity()));
 
-        List<ServiceStatusHistoryResponse> historyResponses = histories.stream().map(h -> {
-            User user = historyUserMap.get(h.getChangedBy());
-            return new ServiceStatusHistoryResponse(
-                    h.getId(),
-                    h.getRequestId(),
-                    h.getFromStatus(),
-                    h.getToStatus(),
-                    h.getComment(),
-                    h.getChangedBy(),
-                    user != null ? user.getFullName() : null,
-                    h.getChangedAt()
-            );
-        }).toList();
+        List<ServiceStatusHistoryResponse> historyResponses =
+                histories.stream()
+                        .map(
+                                h -> {
+                                    User user = historyUserMap.get(h.getChangedBy());
+                                    return new ServiceStatusHistoryResponse(
+                                            h.getId(),
+                                            h.getRequestId(),
+                                            h.getFromStatus(),
+                                            h.getToStatus(),
+                                            h.getComment(),
+                                            h.getChangedBy(),
+                                            user != null ? user.getFullName() : null,
+                                            h.getChangedAt());
+                                })
+                        .toList();
 
-        ServiceRatingResponse ratingResponse = ratingRepository.findByRequestId(requestId)
-                .map(r -> {
-                    User rater = userRepository.findById(r.getRatedBy()).orElse(null);
-                    return new ServiceRatingResponse(
-                            r.getId(),
-                            r.getRequestId(),
-                            r.getRatedBy(),
-                            rater != null ? rater.getFullName() : null,
-                            r.getScore(),
-                            r.getComment(),
-                            r.getCreatedAt()
-                    );
-                }).orElse(null);
+        ServiceRatingResponse ratingResponse =
+                ratingRepository
+                        .findByRequestId(requestId)
+                        .map(
+                                r -> {
+                                    User rater =
+                                            userRepository.findById(r.getRatedBy()).orElse(null);
+                                    return new ServiceRatingResponse(
+                                            r.getId(),
+                                            r.getRequestId(),
+                                            r.getRatedBy(),
+                                            rater != null ? rater.getFullName() : null,
+                                            r.getScore(),
+                                            r.getComment(),
+                                            r.getCreatedAt());
+                                })
+                        .orElse(null);
 
-        Set<String> allowedActions = computeAllowedActions(sr, principal, activeAssignmentOpt.isPresent());
+        Set<String> allowedActions =
+                computeAllowedActions(sr, principal, activeAssignmentOpt.isPresent());
 
         return new ServiceRequestDetailResponse(
                 sr.getId(),
+                sr.getReceivingDepartmentId(),
                 sr.getRequestNumber(),
-                category != null ? new ServiceRequestDetailResponse.CategoryBrief(category.getId(), category.getCode(), category.getName()) : null,
-                requester != null ? new ServiceRequestDetailResponse.UserBrief(requester.getId(), requester.getFullName(), requester.getEmail()) : null,
+                category != null
+                        ? new ServiceRequestDetailResponse.CategoryBrief(
+                                category.getId(), category.getCode(), category.getName())
+                        : null,
+                requester != null
+                        ? new ServiceRequestDetailResponse.UserBrief(
+                                requester.getId(), requester.getFullName(), requester.getEmail())
+                        : null,
                 (activeAssignmentOpt.isPresent() && assignee != null)
-                        ? new ServiceRequestDetailResponse.AssigneeBrief(activeAssignmentOpt.get().getId(), assignee.getId(), assignee.getFullName(), assignee.getEmail(), activeAssignmentOpt.get().getAssignedAt())
+                        ? new ServiceRequestDetailResponse.AssigneeBrief(
+                                activeAssignmentOpt.get().getId(),
+                                assignee.getId(),
+                                assignee.getFullName(),
+                                assignee.getEmail(),
+                                activeAssignmentOpt.get().getAssignedAt())
                         : null,
                 null,
                 sr.getTitle(),
@@ -405,39 +503,69 @@ public class ServiceRequestApplicationService {
                 historyResponses,
                 ratingResponse,
                 allowedActions,
+                operations.meta(sr.getId()),
                 sr.getCreatedAt(),
                 sr.getUpdatedAt(),
-                sr.getVersion()
-        );
+                sr.getVersion());
     }
 
     @Transactional
-    public ServiceRequestDetailResponse updateRequest(UUID requestId, UpdateServiceRequestRequest request, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdAndDeletedFalse(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public ServiceRequestDetailResponse updateRequest(
+            UUID requestId,
+            UpdateServiceRequestRequest request,
+            WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdAndDeletedFalse(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
         if (!sr.getRequesterId().equals(principal.userId())) {
             throw new AccessDeniedException("Chỉ người tạo mới có quyền cập nhật nội dung yêu cầu");
         }
 
         if (sr.getStatus() != ServiceStatus.OPEN) {
-            throw new BusinessRuleException("INVALID_REQUEST_STATE", "Chỉ có thể cập nhật yêu cầu khi ở trạng thái OPEN");
+            throw new BusinessRuleException(
+                    "INVALID_REQUEST_STATE", "Chỉ có thể cập nhật yêu cầu khi ở trạng thái OPEN");
         }
 
         if (!sr.getVersion().equals(request.version())) {
-            throw new BusinessRuleException("OPTIMISTIC_LOCK_CONFLICT", "Dữ liệu yêu cầu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.");
+            throw new BusinessRuleException(
+                    "OPTIMISTIC_LOCK_CONFLICT",
+                    "Dữ liệu yêu cầu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.");
         }
 
         UUID categoryId = sr.getCategoryId();
         if (request.categoryId() != null && !request.categoryId().equals(sr.getCategoryId())) {
-            ServiceCategory cat = categoryRepository.findByIdAndDeletedFalse(request.categoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("SERVICE_CATEGORY_NOT_FOUND", "Không tìm thấy danh mục dịch vụ"));
+            ServiceCategory cat =
+                    categoryRepository
+                            .findByIdAndDeletedFalse(request.categoryId())
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "SERVICE_CATEGORY_NOT_FOUND",
+                                                    "Không tìm thấy danh mục dịch vụ"));
             if (!cat.isActive()) {
-                throw new BusinessRuleException("SERVICE_CATEGORY_NOT_FOUND", "Danh mục dịch vụ đang dừng hoạt động");
+                throw new BusinessRuleException(
+                        "SERVICE_CATEGORY_NOT_FOUND", "Danh mục dịch vụ đang dừng hoạt động");
             }
             categoryId = cat.getId();
         }
 
+        if (request.assetId() != null) {
+            validateAssetForRequest(request.assetId(), principal);
+        }
+
+        if (!categoryId.equals(sr.getCategoryId())) {
+            UUID nextDepartment = routing.route(categoryId);
+            routing.requireReceiving(nextDepartment);
+            sr.routeTo(nextDepartment);
+            routing.notifyManager(
+                    nextDepartment, "Yêu cầu chuyển đến: " + sr.getTitle(), sr.getId());
+        }
         sr.updateContent(
                 request.title().trim(),
                 request.description().trim(),
@@ -445,27 +573,67 @@ public class ServiceRequestApplicationService {
                 categoryId,
                 request.assetId(),
                 principal.userId(),
-                clock.instant()
-        );
+                clock.instant());
 
         requestRepository.save(sr);
         return getRequestDetail(requestId, principal);
     }
 
     @Transactional
-    public void assignRequest(UUID requestId, AssignServiceRequestRequest request, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdForUpdate(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public void assignRequest(
+            UUID requestId,
+            AssignServiceRequestRequest request,
+            WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdForUpdate(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
-        User assignee = userRepository.findById(request.assigneeId())
-                .orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", "Không tìm thấy người xử lý"));
-
-        if (assignee.getStatus() != com.worksphere.identity.domain.UserStatus.ACTIVE || assignee.isDeleted()) {
-            throw new BusinessRuleException("USER_INACTIVE", "Người xử lý đang không ở trạng thái hoạt động");
+        if (sr.getReceivingDepartmentId() != null) {
+            routing.requireManager(sr.getReceivingDepartmentId(), principal);
+            if (request.version() == null || !request.version().equals(sr.getVersion())) {
+                throw new BusinessRuleException(
+                        "OPTIMISTIC_LOCK_CONFLICT",
+                        "Yêu cầu đã thay đổi. Tải lại trước khi phân công.");
+            }
+            routing.requireAssignee(sr.getReceivingDepartmentId(), request.assigneeId());
+        } else if (!hasSystemAdminRole(principal)) {
+            throw new AccessDeniedException("Yêu cầu cũ chưa định tuyến cần quản trị viên xử lý");
         }
 
-        Optional<ServiceAssignment> activeAssignmentOpt = assignmentRepository.findByRequestIdAndActiveTrue(requestId);
-        if (activeAssignmentOpt.isPresent() && activeAssignmentOpt.get().getAssigneeId().equals(request.assigneeId())) {
+        if (sr.getStatus() == ServiceStatus.CLOSED
+                || sr.getStatus() == ServiceStatus.CANCELLED
+                || sr.getStatus() == ServiceStatus.REJECTED) {
+            throw new BusinessRuleException(
+                    "INVALID_REQUEST_STATE", "Không thể phân công yêu cầu đã kết thúc");
+        }
+        if (sr.getRequesterId().equals(request.assigneeId())) {
+            throw new BusinessRuleException(
+                    "INVALID_REQUEST_STATE", "Người gửi không được tự xử lý yêu cầu của mình");
+        }
+
+        User assignee =
+                userRepository
+                        .findById(request.assigneeId())
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "USER_NOT_FOUND", "Không tìm thấy người xử lý"));
+
+        if (assignee.getStatus() != com.worksphere.identity.domain.UserStatus.ACTIVE
+                || assignee.isDeleted()) {
+            throw new BusinessRuleException(
+                    "USER_INACTIVE", "Người xử lý đang không ở trạng thái hoạt động");
+        }
+
+        Optional<ServiceAssignment> activeAssignmentOpt =
+                assignmentRepository.findByRequestIdAndActiveTrue(requestId);
+        if (activeAssignmentOpt.isPresent()
+                && activeAssignmentOpt.get().getAssigneeId().equals(request.assigneeId())) {
             return;
         }
 
@@ -475,17 +643,26 @@ public class ServiceRequestApplicationService {
             assignmentRepository.saveAndFlush(old);
         }
 
-        ServiceAssignment newAssignment = ServiceAssignment.create(
-                UUID.randomUUID(),
-                requestId,
-                request.assigneeId(),
-                principal.userId(),
-                clock.instant()
-        );
+        ServiceAssignment newAssignment =
+                ServiceAssignment.create(
+                        UUID.randomUUID(),
+                        requestId,
+                        request.assigneeId(),
+                        principal.userId(),
+                        clock.instant());
 
         try {
             assignmentRepository.saveAndFlush(newAssignment);
-            eventDispatcher.onServiceRequestAssigned(requestId, newAssignment.getId(), request.assigneeId(), principal.userId(), sr.getTitle());
+            if (sr.getReceivingDepartmentId() != null && activeAssignmentOpt.isPresent()) {
+                operations.registerHandover(
+                        newAssignment.getId(), activeAssignmentOpt.get().getAssigneeId());
+            }
+            eventDispatcher.onServiceRequestAssigned(
+                    requestId,
+                    newAssignment.getId(),
+                    request.assigneeId(),
+                    principal.userId(),
+                    sr.getTitle());
         } catch (DataIntegrityViolationException ex) {
             handleAssignmentConflict(ex);
         }
@@ -494,204 +671,308 @@ public class ServiceRequestApplicationService {
             sr.transitionStatus(ServiceStatus.ASSIGNED, principal.userId(), clock.instant());
             requestRepository.save(sr);
 
-            ServiceStatusHistory history = ServiceStatusHistory.create(
-                    UUID.randomUUID(),
-                    requestId,
-                    ServiceStatus.OPEN,
-                    ServiceStatus.ASSIGNED,
-                    "Phân công người xử lý: " + assignee.getFullName(),
-                    principal.userId(),
-                    clock.instant()
-            );
+            ServiceStatusHistory history =
+                    ServiceStatusHistory.create(
+                            UUID.randomUUID(),
+                            requestId,
+                            ServiceStatus.OPEN,
+                            ServiceStatus.ASSIGNED,
+                            "Phân công người xử lý: " + assignee.getFullName(),
+                            principal.userId(),
+                            clock.instant());
             historyRepository.save(history);
         }
+        sr.touch(principal.userId(), clock.instant());
+        requestRepository.saveAndFlush(sr);
     }
 
     @Transactional
-    public void updateStatus(UUID requestId, UpdateServiceRequestStatusRequest request, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdAndDeletedFalse(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public void updateStatus(
+            UUID requestId,
+            UpdateServiceRequestStatusRequest request,
+            WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdAndDeletedFalse(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
-        boolean isAdmin = hasSystemAdminRole(principal);
-        boolean isActiveAssignee = assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(requestId, principal.userId());
+        boolean isAdmin = hasSystemAdminRole(principal) && sr.getReceivingDepartmentId() == null;
+        boolean isActiveAssignee =
+                assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(
+                        requestId, principal.userId());
 
-        if (!isAdmin && !isActiveAssignee) {
+        boolean isRequester = sr.getRequesterId().equals(principal.userId());
+        if (isActiveAssignee) operations.requireReviewed(requestId, principal.userId());
+        if (!isAdmin && !isActiveAssignee && !isRequester) {
             throw new AccessDeniedException("Bạn không có quyền cập nhật trạng thái yêu cầu này");
         }
 
         if (sr.getStatus() == ServiceStatus.CLOSED) {
-            throw new BusinessRuleException("SERVICE_ALREADY_CLOSED", "Yêu cầu đã đóng, không thể thay đổi trạng thái");
+            throw new BusinessRuleException(
+                    "SERVICE_ALREADY_CLOSED", "Yêu cầu đã đóng, không thể thay đổi trạng thái");
         }
 
         if (sr.getStatus() == ServiceStatus.CANCELLED) {
-            throw new BusinessRuleException("SERVICE_ALREADY_CANCELLED", "Yêu cầu đã huỷ, không thể thay đổi trạng thái");
+            throw new BusinessRuleException(
+                    "SERVICE_ALREADY_CANCELLED", "Yêu cầu đã huỷ, không thể thay đổi trạng thái");
         }
 
         if (!sr.getStatus().canTransitionTo(request.status())) {
             throw new BusinessRuleException(
                     "SERVICE_STATUS_TRANSITION_INVALID",
-                    "Chuyển đổi trạng thái không hợp lệ từ " + sr.getStatus() + " sang " + request.status()
-            );
+                    "Chuyển đổi trạng thái không hợp lệ từ "
+                            + sr.getStatus()
+                            + " sang "
+                            + request.status());
+        }
+
+        if (!accessPolicy.canTransition(
+                sr.getStatus(), request.status(), isRequester, isActiveAssignee, isAdmin)) {
+            throw new AccessDeniedException(
+                    "Bạn không có quyền thực hiện bước này trong quy trình hỗ trợ");
         }
 
         if (request.status() == ServiceStatus.RESOLVED) {
             if (request.comment() == null || request.comment().trim().isEmpty()) {
-                throw new BusinessRuleException("SERVICE_RESOLUTION_REQUIRED", "Cần cập nhật giải pháp xử lý khi hoàn tất yêu cầu");
+                throw new BusinessRuleException(
+                        "SERVICE_RESOLUTION_REQUIRED",
+                        "Cần cập nhật giải pháp xử lý khi hoàn tất yêu cầu");
             }
         }
 
         if (request.status() == ServiceStatus.ASSIGNED) {
-            boolean hasAssignee = assignmentRepository.findByRequestIdAndActiveTrue(requestId).isPresent();
+            boolean hasAssignee =
+                    assignmentRepository.findByRequestIdAndActiveTrue(requestId).isPresent();
             if (!hasAssignee) {
-                throw new BusinessRuleException("SERVICE_ASSIGNEE_REQUIRED", "Yêu cầu cần có người xử lý trước khi chuyển sang trạng thái ASSIGNED");
+                throw new BusinessRuleException(
+                        "SERVICE_ASSIGNEE_REQUIRED",
+                        "Yêu cầu cần có người xử lý trước khi chuyển sang trạng thái ASSIGNED");
             }
         }
 
         if (!sr.getVersion().equals(request.version())) {
-            throw new BusinessRuleException("OPTIMISTIC_LOCK_CONFLICT", "Dữ liệu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.");
+            throw new BusinessRuleException(
+                    "OPTIMISTIC_LOCK_CONFLICT",
+                    "Dữ liệu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.");
         }
 
         ServiceStatus oldStatus = sr.getStatus();
+        if (request.status() == ServiceStatus.CLOSED || request.status() == ServiceStatus.CANCELLED)
+            operations.terminal(requestId);
         sr.transitionStatus(request.status(), principal.userId(), clock.instant());
         requestRepository.save(sr);
 
-        ServiceStatusHistory history = ServiceStatusHistory.create(
-                UUID.randomUUID(),
-                requestId,
-                oldStatus,
-                request.status(),
-                request.comment() != null ? request.comment().trim() : null,
-                principal.userId(),
-                clock.instant()
-        );
+        ServiceStatusHistory history =
+                ServiceStatusHistory.create(
+                        UUID.randomUUID(),
+                        requestId,
+                        oldStatus,
+                        request.status(),
+                        request.comment() != null ? request.comment().trim() : null,
+                        principal.userId(),
+                        clock.instant());
         historyRepository.save(history);
-        eventDispatcher.onServiceRequestStatusChanged(requestId, history.getId(), request.status(), principal.userId(), sr.getTitle(), sr.getRequesterId());
+        eventDispatcher.onServiceRequestStatusChanged(
+                requestId,
+                history.getId(),
+                request.status(),
+                principal.userId(),
+                sr.getTitle(),
+                sr.getRequesterId());
     }
 
     @Transactional
-    public ServiceRequestDetailResponse rejectResolution(UUID requestId, RejectResolutionRequest request, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdAndDeletedFalse(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public ServiceRequestDetailResponse rejectResolution(
+            UUID requestId, RejectResolutionRequest request, WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdAndDeletedFalse(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
         if (!sr.getRequesterId().equals(principal.userId())) {
             throw new BusinessRuleException(
                     "SERVICE_RESOLUTION_REJECTION_FORBIDDEN",
-                    "Chỉ người tạo yêu cầu mới có quyền từ chối kết quả xử lý"
-            );
+                    "Chỉ người tạo yêu cầu mới có quyền từ chối kết quả xử lý");
         }
 
         if (sr.getStatus() == ServiceStatus.CLOSED) {
-            throw new BusinessRuleException("SERVICE_ALREADY_CLOSED", "Yêu cầu đã đóng, không thể từ chối kết quả");
+            throw new BusinessRuleException(
+                    "SERVICE_ALREADY_CLOSED", "Yêu cầu đã đóng, không thể từ chối kết quả");
         }
 
         if (sr.getStatus() == ServiceStatus.CANCELLED) {
-            throw new BusinessRuleException("SERVICE_ALREADY_CANCELLED", "Yêu cầu đã huỷ, không thể từ chối kết quả");
+            throw new BusinessRuleException(
+                    "SERVICE_ALREADY_CANCELLED", "Yêu cầu đã huỷ, không thể từ chối kết quả");
         }
 
         if (sr.getStatus() != ServiceStatus.RESOLVED) {
-            throw new BusinessRuleException("SERVICE_NOT_RESOLVED", "Yêu cầu chưa ở trạng thái RESOLVED");
+            throw new BusinessRuleException(
+                    "SERVICE_NOT_RESOLVED", "Yêu cầu chưa ở trạng thái RESOLVED");
         }
 
         if (request.reason() == null || request.reason().trim().isEmpty()) {
-            throw new BusinessRuleException("VALIDATION_ERROR", "Lý do từ chối không được để trống");
+            throw new BusinessRuleException(
+                    "VALIDATION_ERROR", "Lý do từ chối không được để trống");
         }
 
         if (!sr.getVersion().equals(request.version())) {
-            throw new BusinessRuleException("OPTIMISTIC_LOCK_CONFLICT", "Dữ liệu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.");
+            throw new BusinessRuleException(
+                    "OPTIMISTIC_LOCK_CONFLICT",
+                    "Dữ liệu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.");
         }
 
         sr.transitionStatus(ServiceStatus.IN_PROGRESS, principal.userId(), clock.instant());
         requestRepository.save(sr);
 
-        ServiceStatusHistory history = ServiceStatusHistory.create(
-                UUID.randomUUID(),
-                requestId,
-                ServiceStatus.RESOLVED,
-                ServiceStatus.IN_PROGRESS,
-                request.reason().trim(),
-                principal.userId(),
-                clock.instant()
-        );
+        ServiceStatusHistory history =
+                ServiceStatusHistory.create(
+                        UUID.randomUUID(),
+                        requestId,
+                        ServiceStatus.RESOLVED,
+                        ServiceStatus.IN_PROGRESS,
+                        request.reason().trim(),
+                        principal.userId(),
+                        clock.instant());
         historyRepository.save(history);
 
-        // Side effect notification deferred per canonical and prompt instruction
-        log.info("NOTIFICATION_SIDE_EFFECT_DEFERRED: Service Request {} resolution rejected by {}", requestId, principal.userId());
+        assignmentRepository
+                .findByRequestIdAndActiveTrue(requestId)
+                .ifPresent(
+                        a ->
+                                routing.notice(
+                                        a.getAssigneeId(),
+                                        "Cần xử lý lại: " + sr.getTitle(),
+                                        "REQUEST",
+                                        requestId));
 
         return getRequestDetail(requestId, principal);
     }
 
     @Transactional(readOnly = true)
-    public PagedData<ServiceCommentResponse> getComments(UUID requestId, Pageable pageable, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdAndDeletedFalse(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public PagedData<ServiceCommentResponse> getComments(
+            UUID requestId, Pageable pageable, WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdAndDeletedFalse(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
         verifyRequestAccess(sr, principal);
 
-        boolean includeInternal = hasSystemAdminRole(principal)
-                || assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(requestId, principal.userId());
+        boolean includeInternal =
+                routing.manages(sr.getReceivingDepartmentId(), principal.userId())
+                        || (sr.getReceivingDepartmentId() == null && hasSystemAdminRole(principal))
+                        || assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(
+                                requestId, principal.userId());
 
-        Page<ServiceComment> commentPage = includeInternal
-                ? commentRepository.findAllByRequestIdAndDeletedFalse(requestId, pageable)
-                : commentRepository.findAllByRequestIdAndInternalFalseAndDeletedFalse(requestId, pageable);
+        Page<ServiceComment> commentPage =
+                includeInternal
+                        ? commentRepository.findAllByRequestIdAndDeletedFalse(requestId, pageable)
+                        : commentRepository.findAllByRequestIdAndInternalFalseAndDeletedFalse(
+                                requestId, pageable);
 
         if (commentPage.isEmpty()) {
             return PagedData.from(commentPage, Collections.emptyList());
         }
 
-        Set<UUID> authorIds = commentPage.getContent().stream().map(ServiceComment::getAuthorId).collect(Collectors.toSet());
-        Map<UUID, User> authorMap = userRepository.findAllById(authorIds).stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
+        Set<UUID> authorIds =
+                commentPage.getContent().stream()
+                        .map(ServiceComment::getAuthorId)
+                        .collect(Collectors.toSet());
+        Map<UUID, User> authorMap =
+                userRepository.findAllById(authorIds).stream()
+                        .collect(Collectors.toMap(User::getId, Function.identity()));
 
-        List<ServiceCommentResponse> responses = commentPage.getContent().stream().map(c -> {
-            User author = authorMap.get(c.getAuthorId());
-            return new ServiceCommentResponse(
-                    c.getId(),
-                    c.getRequestId(),
-                    c.getAuthorId(),
-                    author != null ? author.getFullName() : null,
-                    c.getContent(),
-                    c.isInternal(),
-                    c.isEdited(),
-                    c.getEditedAt(),
-                    c.getCreatedAt(),
-                    c.getUpdatedAt()
-            );
-        }).toList();
+        List<ServiceCommentResponse> responses =
+                commentPage.getContent().stream()
+                        .map(
+                                c -> {
+                                    User author = authorMap.get(c.getAuthorId());
+                                    return new ServiceCommentResponse(
+                                            c.getId(),
+                                            c.getRequestId(),
+                                            c.getAuthorId(),
+                                            author != null ? author.getFullName() : null,
+                                            c.getContent(),
+                                            c.isInternal(),
+                                            c.isEdited(),
+                                            c.getEditedAt(),
+                                            c.getCreatedAt(),
+                                            c.getUpdatedAt());
+                                })
+                        .toList();
 
         return PagedData.from(commentPage, responses);
     }
 
     @Transactional
-    public ServiceCommentResponse createComment(UUID requestId, CreateServiceCommentRequest request, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdAndDeletedFalse(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public ServiceCommentResponse createComment(
+            UUID requestId,
+            CreateServiceCommentRequest request,
+            WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdAndDeletedFalse(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
         verifyRequestAccess(sr, principal);
 
         boolean isInternal = Boolean.TRUE.equals(request.isInternal());
-        boolean canCreateInternal = hasSystemAdminRole(principal)
-                || assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(requestId, principal.userId());
+        if (sr.getRequesterId().equals(principal.userId()))
+            routing.notifyManager(
+                    sr.getReceivingDepartmentId(),
+                    "Người gửi đã bổ sung: " + sr.getTitle(),
+                    sr.getId());
+        boolean canCreateInternal =
+                routing.manages(sr.getReceivingDepartmentId(), principal.userId())
+                        || (sr.getReceivingDepartmentId() == null && hasSystemAdminRole(principal))
+                        || assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(
+                                requestId, principal.userId());
 
         if (isInternal && !canCreateInternal) {
             throw new AccessDeniedException("Người tạo yêu cầu không có quyền tạo ghi chú nội bộ");
         }
 
+        if (isInternal
+                && request.attachmentFileIds() != null
+                && !request.attachmentFileIds().isEmpty())
+            throw new BusinessRuleException(
+                    "VALIDATION_ERROR",
+                    "Chưa hỗ trợ tệp riêng tư theo ghi chú nội bộ; không đính kèm để tránh lộ tệp"
+                            + " cho người gửi");
         validateAttachmentFiles(request.attachmentFileIds(), principal);
         attachFiles(requestId, request.attachmentFileIds());
 
-        ServiceComment comment = ServiceComment.create(
-                UUID.randomUUID(),
-                requestId,
-                principal.userId(),
-                request.content().trim(),
-                isInternal,
-                clock.instant()
-        );
+        ServiceComment comment =
+                ServiceComment.create(
+                        UUID.randomUUID(),
+                        requestId,
+                        principal.userId(),
+                        request.content().trim(),
+                        isInternal,
+                        clock.instant());
         ServiceComment saved = commentRepository.save(comment);
 
-        UUID activeAssigneeId = assignmentRepository.findByRequestIdAndActiveTrue(requestId)
-                .map(ServiceAssignment::getAssigneeId)
-                .orElse(null);
+        UUID activeAssigneeId =
+                assignmentRepository
+                        .findByRequestIdAndActiveTrue(requestId)
+                        .map(ServiceAssignment::getAssigneeId)
+                        .orElse(null);
         eventDispatcher.onServiceRequestCommentAdded(
                 requestId,
                 saved.getId(),
@@ -699,8 +980,7 @@ public class ServiceRequestApplicationService {
                 sr.getTitle(),
                 sr.getRequesterId(),
                 saved.isInternal(),
-                activeAssigneeId
-        );
+                activeAssigneeId);
 
         User author = userRepository.findById(principal.userId()).orElse(null);
         return new ServiceCommentResponse(
@@ -713,38 +993,47 @@ public class ServiceRequestApplicationService {
                 saved.isEdited(),
                 saved.getEditedAt(),
                 saved.getCreatedAt(),
-                saved.getUpdatedAt()
-        );
+                saved.getUpdatedAt());
     }
 
     @Transactional
-    public ServiceRatingResponse rateRequest(UUID requestId, CreateServiceRatingRequest request, WorkSphereUserPrincipal principal) {
-        ServiceRequest sr = requestRepository.findByIdAndDeletedFalse(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("SERVICE_REQUEST_NOT_FOUND", "Không tìm thấy yêu cầu dịch vụ"));
+    public ServiceRatingResponse rateRequest(
+            UUID requestId, CreateServiceRatingRequest request, WorkSphereUserPrincipal principal) {
+        ServiceRequest sr =
+                requestRepository
+                        .findByIdAndDeletedFalse(requestId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "SERVICE_REQUEST_NOT_FOUND",
+                                                "Không tìm thấy yêu cầu dịch vụ"));
 
         if (!sr.getRequesterId().equals(principal.userId())) {
             throw new BusinessRuleException(
                     "SERVICE_RATING_FORBIDDEN",
-                    "Chỉ người tạo yêu cầu mới có quyền đánh giá chất lượng dịch vụ"
-            );
+                    "Chỉ người tạo yêu cầu mới có quyền đánh giá chất lượng dịch vụ");
         }
 
         if (sr.getStatus() != ServiceStatus.CLOSED) {
-            throw new BusinessRuleException("SERVICE_NOT_CLOSED", "Chỉ có thể đánh giá yêu cầu dịch vụ khi đã ở trạng thái CLOSED");
+            throw new BusinessRuleException(
+                    "SERVICE_NOT_CLOSED",
+                    "Chỉ có thể đánh giá yêu cầu dịch vụ khi đã ở trạng thái CLOSED");
         }
 
         if (ratingRepository.existsByRequestId(requestId)) {
-            throw new BusinessRuleException("SERVICE_RATING_ALREADY_EXISTS", "Yêu cầu dịch vụ này đã được đánh giá trước đó");
+            throw new BusinessRuleException(
+                    "SERVICE_RATING_ALREADY_EXISTS",
+                    "Yêu cầu dịch vụ này đã được đánh giá trước đó");
         }
 
-        ServiceRating rating = ServiceRating.create(
-                UUID.randomUUID(),
-                requestId,
-                principal.userId(),
-                request.score(),
-                request.comment() != null ? request.comment().trim() : null,
-                clock.instant()
-        );
+        ServiceRating rating =
+                ServiceRating.create(
+                        UUID.randomUUID(),
+                        requestId,
+                        principal.userId(),
+                        request.score(),
+                        request.comment() != null ? request.comment().trim() : null,
+                        clock.instant());
 
         try {
             ratingRepository.saveAndFlush(rating);
@@ -760,8 +1049,7 @@ public class ServiceRequestApplicationService {
                 rater != null ? rater.getFullName() : null,
                 rating.getScore(),
                 rating.getComment(),
-                rating.getCreatedAt()
-        );
+                rating.getCreatedAt());
     }
 
     private void validateAttachmentFiles(List<UUID> fileIds, WorkSphereUserPrincipal principal) {
@@ -771,29 +1059,41 @@ public class ServiceRequestApplicationService {
 
         Set<UUID> uniqueFileIds = new HashSet<>(fileIds);
         if (uniqueFileIds.size() != fileIds.size()) {
-            throw new BusinessRuleException("VALIDATION_ERROR", "Danh sách tệp đính kèm chứa mã tệp trùng lặp");
+            throw new BusinessRuleException(
+                    "VALIDATION_ERROR", "Danh sách tệp đính kèm chứa mã tệp trùng lặp");
         }
 
         boolean isAdmin = hasSystemAdminRole(principal);
 
         for (UUID fileId : fileIds) {
-            StoredFile file = storedFileRepository.findById(fileId)
-                    .orElseThrow(() -> new ResourceNotFoundException("FILE_NOT_FOUND", "Tệp đính kèm không tồn tại: " + fileId));
+            StoredFile file =
+                    storedFileRepository
+                            .findById(fileId)
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "FILE_NOT_FOUND",
+                                                    "Tệp đính kèm không tồn tại: " + fileId));
 
             if (file.getStatus() != StoredFileStatus.ACTIVE) {
-                throw new BusinessRuleException("FILE_NOT_FOUND", "Tệp đính kèm không còn hoạt động hoặc đã bị xoá");
+                throw new BusinessRuleException(
+                        "FILE_NOT_FOUND", "Tệp đính kèm không còn hoạt động hoặc đã bị xoá");
             }
 
             if (!file.getStoragePath().startsWith("SERVICE_ATTACHMENT/")) {
-                throw new BusinessRuleException("FILE_TYPE_NOT_ALLOWED", "Mục đích sử dụng của tệp không phải là SERVICE_ATTACHMENT");
+                throw new BusinessRuleException(
+                        "FILE_TYPE_NOT_ALLOWED",
+                        "Mục đích sử dụng của tệp không phải là SERVICE_ATTACHMENT");
             }
 
             if (!isAdmin && !file.getUploadedBy().equals(principal.userId())) {
-                throw new BusinessRuleException("FILE_ACCESS_DENIED", "Bạn chỉ có thể đính kèm tệp do chính mình tải lên");
+                throw new BusinessRuleException(
+                        "FILE_ACCESS_DENIED", "Bạn chỉ có thể đính kèm tệp do chính mình tải lên");
             }
 
             if (attachmentRepository.existsByFileId(fileId)) {
-                throw new BusinessRuleException("VALIDATION_ERROR", "Tệp đã được đính kèm vào một yêu cầu dịch vụ khác");
+                throw new BusinessRuleException(
+                        "VALIDATION_ERROR", "Tệp đã được đính kèm vào một yêu cầu dịch vụ khác");
             }
         }
     }
@@ -804,18 +1104,19 @@ public class ServiceRequestApplicationService {
         }
         for (UUID fileId : fileIds) {
             StoredFile file = storedFileRepository.findById(fileId).orElseThrow();
-            ServiceAttachment attachment = ServiceAttachment.create(
-                    UUID.randomUUID(),
-                    requestId,
-                    fileId,
-                    file.getUploadedBy(),
-                    clock.instant()
-            );
+            ServiceAttachment attachment =
+                    ServiceAttachment.create(
+                            UUID.randomUUID(),
+                            requestId,
+                            fileId,
+                            file.getUploadedBy(),
+                            clock.instant());
             attachmentRepository.save(attachment);
         }
     }
 
-    private List<ServiceAttachmentResponse> buildAttachmentResponses(List<ServiceAttachment> attachments) {
+    private List<ServiceAttachmentResponse> buildAttachmentResponses(
+            List<ServiceAttachment> attachments) {
         if (attachments == null || attachments.isEmpty()) {
             return Collections.emptyList();
         }
@@ -824,22 +1125,23 @@ public class ServiceRequestApplicationService {
         for (ServiceAttachment att : attachments) {
             StoredFile file = storedFileRepository.findById(att.getFileId()).orElse(null);
             if (file != null && file.getStatus() == StoredFileStatus.ACTIVE) {
-                responses.add(new ServiceAttachmentResponse(
-                        file.getId(),
-                        file.getOriginalName(),
-                        file.getMimeType(),
-                        file.getSizeBytes(),
-                        "/api/v1/files/" + file.getId() + "/download",
-                        att.getUploadedBy(),
-                        att.getCreatedAt()
-                ));
+                responses.add(
+                        new ServiceAttachmentResponse(
+                                file.getId(),
+                                file.getOriginalName(),
+                                file.getMimeType(),
+                                file.getSizeBytes(),
+                                "/api/v1/files/" + file.getId() + "/download",
+                                att.getUploadedBy(),
+                                att.getCreatedAt()));
             }
         }
         return responses;
     }
 
     private void verifyRequestAccess(ServiceRequest request, WorkSphereUserPrincipal principal) {
-        if (hasSystemAdminRole(principal)) {
+        if ((request.getReceivingDepartmentId() == null && hasSystemAdminRole(principal))
+                || routing.manages(request.getReceivingDepartmentId(), principal.userId())) {
             return;
         }
 
@@ -847,9 +1149,9 @@ public class ServiceRequestApplicationService {
             return;
         }
 
-        boolean isAssignee = assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(
-                request.getId(), principal.userId()
-        );
+        boolean isAssignee =
+                assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(
+                        request.getId(), principal.userId());
         if (isAssignee) {
             return;
         }
@@ -857,25 +1159,57 @@ public class ServiceRequestApplicationService {
         throw new AccessDeniedException("Bạn không có quyền truy cập yêu cầu dịch vụ này");
     }
 
-    private Set<String> computeAllowedActions(ServiceRequest request, WorkSphereUserPrincipal principal, boolean hasActiveAssignee) {
+    private Set<String> computeAllowedActions(
+            ServiceRequest request, WorkSphereUserPrincipal principal, boolean hasActiveAssignee) {
         Set<String> actions = new HashSet<>();
-        boolean isAdmin = hasSystemAdminRole(principal);
+        boolean isAdmin =
+                hasSystemAdminRole(principal) && request.getReceivingDepartmentId() == null;
+        boolean coordinator =
+                routing.manages(request.getReceivingDepartmentId(), principal.userId());
         boolean isRequester = request.getRequesterId().equals(principal.userId());
-        boolean isActiveAssignee = assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(
-                request.getId(), principal.userId()
-        );
+        boolean isActiveAssignee =
+                assignmentRepository.existsByRequestIdAndAssigneeIdAndActiveTrue(
+                        request.getId(), principal.userId());
 
-        if (isAdmin) {
+        if ((isAdmin || coordinator)
+                && request.getStatus() != ServiceStatus.CLOSED
+                && request.getStatus() != ServiceStatus.CANCELLED
+                && request.getStatus() != ServiceStatus.REJECTED) {
             actions.add("ASSIGN");
         }
 
+        if (coordinator
+                && (request.getStatus() == ServiceStatus.OPEN
+                        || (request.getStatus() == ServiceStatus.WAITING_FOR_USER
+                                && !hasActiveAssignee))) {
+            actions.add("TRANSFER");
+            actions.add("DECLINE");
+            actions.add(
+                    request.getStatus() == ServiceStatus.OPEN
+                            ? "DISPATCH_INFO"
+                            : "DISPATCH_RESUME");
+        }
         if (isRequester) {
             if (request.getStatus() == ServiceStatus.OPEN) {
                 actions.add("UPDATE");
-                actions.add("CANCEL");
+                if (accessPolicy.canTransition(
+                        request.getStatus(),
+                        ServiceStatus.CANCELLED,
+                        isRequester,
+                        isActiveAssignee,
+                        isAdmin)) {
+                    actions.add("CANCEL");
+                }
             } else if (request.getStatus() == ServiceStatus.RESOLVED) {
                 actions.add("REJECT_RESOLUTION");
-                actions.add("CONFIRM");
+                if (accessPolicy.canTransition(
+                        request.getStatus(),
+                        ServiceStatus.CLOSED,
+                        isRequester,
+                        isActiveAssignee,
+                        isAdmin)) {
+                    actions.add("CONFIRM");
+                }
             } else if (request.getStatus() == ServiceStatus.CLOSED) {
                 if (!ratingRepository.existsByRequestId(request.getId())) {
                     actions.add("RATE");
@@ -895,10 +1229,11 @@ public class ServiceRequestApplicationService {
             }
         }
 
-        if (isAdmin || isRequester || isActiveAssignee) {
+        if (isAdmin || coordinator || isRequester || isActiveAssignee) {
             actions.add("COMMENT");
         }
 
+        operations.addActions(request, principal, actions, isActiveAssignee);
         return actions;
     }
 
@@ -911,8 +1246,8 @@ public class ServiceRequestApplicationService {
                         && sqlEx.getMessage().contains("uk_service_assignments_one_active")) {
                     throw new BusinessRuleException(
                             "SERVICE_ASSIGNMENT_CONFLICT",
-                            "Yêu cầu dịch vụ đang được phân công đồng thời hoặc trạng thái phân công đã thay đổi. Vui lòng tải lại dữ liệu và thử lại."
-                    );
+                            "Yêu cầu dịch vụ đang được phân công đồng thời hoặc trạng thái phân"
+                                    + " công đã thay đổi. Vui lòng tải lại dữ liệu và thử lại.");
                 }
             }
             cause = cause.getCause();
@@ -927,11 +1262,11 @@ public class ServiceRequestApplicationService {
                 if ("23505".equals(sqlEx.getSQLState())
                         && sqlEx.getMessage() != null
                         && (sqlEx.getMessage().contains("service_ratings_request_id_key")
-                                || (sqlEx.getMessage().contains("service_ratings") && sqlEx.getMessage().contains("request_id")))) {
+                                || (sqlEx.getMessage().contains("service_ratings")
+                                        && sqlEx.getMessage().contains("request_id")))) {
                     throw new BusinessRuleException(
                             "SERVICE_RATING_ALREADY_EXISTS",
-                            "Yêu cầu dịch vụ này đã được đánh giá trước đó"
-                    );
+                            "Yêu cầu dịch vụ này đã được đánh giá trước đó");
                 }
             }
             cause = cause.getCause();
@@ -942,18 +1277,20 @@ public class ServiceRequestApplicationService {
     private void validateAssetForRequest(UUID assetId, WorkSphereUserPrincipal principal) {
         if (!assetRepository.existsById(assetId)
                 || !assetRepository.findByIdAndDeletedFalse(assetId).isPresent()) {
-            throw new ResourceNotFoundException("ASSET_NOT_FOUND", "Không tìm thấy tài sản liên kết");
+            throw new ResourceNotFoundException(
+                    "ASSET_NOT_FOUND", "Không tìm thấy tài sản liên kết");
         }
 
         if (hasSystemAdminRole(principal)) {
             return;
         }
 
-        boolean isAssignedToCaller = assetAssignmentRepository.existsByAssetIdAndAssignedToAndStatus(
-                assetId, principal.userId(), AssetAssignmentStatus.ACTIVE
-        );
+        boolean isAssignedToCaller =
+                assetAssignmentRepository.existsByAssetIdAndAssignedToAndStatus(
+                        assetId, principal.userId(), AssetAssignmentStatus.ACTIVE);
         if (!isAssignedToCaller) {
-            throw new BusinessRuleException("ASSET_ACCESS_DENIED",
+            throw new BusinessRuleException(
+                    "ASSET_ACCESS_DENIED",
                     "Bạn chỉ được gắn tài sản đang được cấp phát cho chính mình");
         }
     }

@@ -1,7 +1,15 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { render } from '@testing-library/react-native';
-import { theme, colors, spacing, radii, typography, shadows, minTouchTarget } from '../src/shared/theme';
+import {
+  theme,
+  colors,
+  spacing,
+  radii,
+  typography,
+  shadows,
+  minTouchTarget,
+} from '../src/shared/theme';
 import { ThemeProvider, useAppTheme } from '../src/app/providers/ThemeProvider';
 
 describe('Design Tokens Verification', () => {
@@ -93,7 +101,10 @@ describe('ThemeProvider and useAppTheme Hook', () => {
   function ThemeConsumer() {
     const appTheme = useAppTheme();
     return (
-      <View testID="theme-consumer" style={{ backgroundColor: appTheme.colors.background }}>
+      <View
+        testID="theme-consumer"
+        style={{ backgroundColor: appTheme.colors.background }}
+      >
         <Text testID="primary-color">{appTheme.colors.primary}</Text>
         <Text testID="bg-color">{appTheme.colors.background}</Text>
       </View>
@@ -109,18 +120,18 @@ describe('ThemeProvider and useAppTheme Hook', () => {
     const { getByTestId } = await render(
       <ThemeProvider>
         <ThemeConsumer />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
-    expect(getByTestId('primary-color')).toHaveTextContent('#1E3A8A');
-    expect(getByTestId('bg-color')).toHaveTextContent('#F8FAFC');
+    expect(getByTestId('primary-color')).toHaveTextContent('#d8eda9');
+    expect(getByTestId('bg-color')).toHaveTextContent('#101411');
   });
 
   test('useAppTheme outside provider throws descriptive error', async () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(render(<BadConsumer />)).rejects.toThrow(
-      'useAppTheme must be used within a ThemeProvider'
+      'useAppTheme must be used within a ThemeProvider',
     );
 
     spy.mockRestore();

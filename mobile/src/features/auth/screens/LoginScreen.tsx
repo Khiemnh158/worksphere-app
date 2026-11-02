@@ -24,7 +24,11 @@ export function LoginScreen() {
 
   const [loginInput, setLoginInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<{ login?: string; password?: string }>({});
+  const [mfaCode, setMfaCode] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<{
+    login?: string;
+    password?: string;
+  }>({});
 
   const isAuthenticating = operationState === 'authenticating';
 
@@ -80,7 +84,9 @@ export function LoginScreen() {
     // Login identifier is trimmed.
     // Password input is strictly UNTRIMMED to preserve password character invariants.
     const normalizedIdentifier = normalizeLogin(loginInput);
-    await login(normalizedIdentifier, passwordInput);
+    if (mfaCode.trim())
+      await login(normalizedIdentifier, passwordInput, mfaCode.trim());
+    else await login(normalizedIdentifier, passwordInput);
   };
 
   return (
@@ -90,10 +96,23 @@ export function LoginScreen() {
       testID="screen-login"
     >
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { padding: theme.spacing.lg }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { padding: theme.spacing.lg },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.headerContainer}>
+          <Text
+            style={{
+              color: theme.colors.primary,
+              fontSize: 28,
+              fontWeight: '800',
+              marginBottom: 30,
+            }}
+          >
+            w· worksphere
+          </Text>
           <Text
             style={[
               theme.typography.heading1,
@@ -107,10 +126,13 @@ export function LoginScreen() {
             style={[
               theme.typography.body,
               styles.headerSubtitle,
-              { color: theme.colors.textSecondary, marginTop: theme.spacing.xs },
+              {
+                color: theme.colors.textSecondary,
+                marginTop: theme.spacing.xs,
+              },
             ]}
           >
-            SCR-AUTH-02: Hệ thống quản lý công việc và dự án WorkSphere
+            Công việc rõ ràng. Phối hợp nhịp nhàng.
           </Text>
         </View>
 
@@ -185,6 +207,24 @@ export function LoginScreen() {
             containerStyle={{ marginBottom: theme.spacing.xs }}
           />
 
+          <AppTextInput
+            label="Mã hai bước / mã dự phòng (nếu đã bật)"
+            value={mfaCode}
+            onChangeText={setMfaCode}
+            autoCapitalize="none"
+            autoCorrect={false}
+            disabled={isAuthenticating}
+            testID="input-mfa"
+            containerStyle={{ marginTop: 16, marginBottom: 16 }}
+          />
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('ActivateAccount')}
+          >
+            <Text style={{ color: theme.colors.primary, marginBottom: 14 }}>
+              Kích hoạt tài khoản được cấp →
+            </Text>
+          </Pressable>
           <View style={styles.forgotPasswordContainer}>
             <Pressable
               accessibilityRole="button"
@@ -206,7 +246,9 @@ export function LoginScreen() {
             </Pressable>
           </View>
 
-          <View style={[styles.submitContainer, { marginTop: theme.spacing.lg }]}>
+          <View
+            style={[styles.submitContainer, { marginTop: theme.spacing.lg }]}
+          >
             <AppButton
               title="Đăng nhập"
               onPress={handleSubmit}

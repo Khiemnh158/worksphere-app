@@ -87,6 +87,7 @@ public class UserDirectoryMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -114,21 +115,21 @@ public class UserDirectoryMockMvcTest {
         insertUserWithDetails(adminUserId, "admin_user", "admin@worksphere.com", "Admin Manager",
                 passwordEncoder.encode("Password123!"), "ACTIVE", engineeringDept.getId(), false, "0901111111");
         assignRole(adminUserId, "ADMIN");
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         // 2. Project Manager
         pmUserId = UUID.randomUUID();
         insertUserWithDetails(pmUserId, "pm_user", "pm@worksphere.com", "Project Manager One",
                 passwordEncoder.encode("Password123!"), "ACTIVE", engineeringDept.getId(), false, "0902222222");
         assignRole(pmUserId, "PROJECT_MANAGER");
-        pmToken = jwtService.generateAccessToken(pmUserId, UUID.randomUUID());
+        pmToken = authorizationAccessToken(pmUserId);
 
         // 3. Regular Employee
         employeeUserId = UUID.randomUUID();
         insertUserWithDetails(employeeUserId, "emp_user", "emp@worksphere.com", "Ordinary Employee",
                 passwordEncoder.encode("Password123!"), "ACTIVE", hrDept.getId(), false, "0903333333");
         assignRole(employeeUserId, "EMPLOYEE");
-        employeeToken = jwtService.generateAccessToken(employeeUserId, UUID.randomUUID());
+        employeeToken = authorizationAccessToken(employeeUserId);
     }
 
     private void insertUserWithDetails(UUID id, String username, String email, String fullName,
@@ -397,5 +398,15 @@ public class UserDirectoryMockMvcTest {
                         .param("size", "101"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("BAD_REQUEST"));
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

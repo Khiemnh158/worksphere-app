@@ -703,7 +703,9 @@ public class TaskApplicationService {
             if (isAdmin || isPM || isTL || isAssignee) {
                 actions.add("UPDATE_PROGRESS");
             }
-            actions.add("UPDATE_STATUS");
+            if (isAdmin || isPM || isTL || isAssignee) {
+                actions.add("UPDATE_STATUS");
+            }
 
             if (isAdmin || isPM || isTL) {
                 actions.add("ASSIGN");

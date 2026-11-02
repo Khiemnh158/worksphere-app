@@ -1,40 +1,33 @@
-# WorkSphere App - Kỹ năng lập trình nâng cao
+# WorkSphere — Kỹ năng lập trình nâng cao
 
-Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh nghiệp. Đây là **nguồn ứng dụng chuẩn** của ba học phần.
+Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ cho doanh nghiệp vừa và nhỏ. Backend là nguồn nghiệp vụ duy nhất; web và Android dùng chung API/PostgreSQL.
 
-**Trạng thái 29/10/2026: import baseline đã chạy local + hai bản vá khởi động/xác thực. Chưa hoàn thiện nghiệp vụ, chưa xây lại UI, chưa đạt production-ready.**
+**Bắt đầu tại [Hướng dẫn dự án và giao việc](docs/PROJECT_GUIDE.md).** Tài liệu này chỉ đường để chạy, hiểu nghiệp vụ, chia việc và chuẩn bị báo cáo/slide.
 
-| Học phần | Repository | Phạm vi |
-| --- | --- | --- |
-| Kỹ năng lập trình nâng cao | [worksphere-app](https://github.com/Khiemnh158/worksphere-app) | Backend, web dự kiến, mobile kế thừa, hợp đồng API, nghiệp vụ, tests |
-| An toàn thông tin | [worksphere-security](https://github.com/Khiemnh158/worksphere-security) | Mô hình đe dọa, test quyền/session, scan, báo cáo trước/sau |
-| Triển khai phần mềm | [worksphere-deployment](https://github.com/Khiemnh158/worksphere-deployment) | Jenkins, Docker Compose, Sonar, Prom/Graf, vận hành và minh chứng |
+| Bạn cần | Đọc |
+|---|---|
+| Chạy bản clone và Android | [Hướng dẫn chạy](docs/FRESH_CLONE_RUNNING.md) |
+| Biết đã làm và còn thiếu | [Hiện trạng](STATUS.md), [TODO](TODO.md) |
+| Quyền và luồng nghiệp vụ | [Luồng nền](docs/WEB_WORKFLOWS.md), [bổ sung hiện hành](docs/WEB_PHASE2_CONTRACT.md), [QR/công/OT](docs/ATTENDANCE_POLICY.md) |
+| Kiểm thử đã thực hiện | [Nghiệm thu MVP 02/11](reports/COURSEWORK_ACCEPTANCE_2026-11-02.md), [kết quả máy đọc](reports/COURSEWORK_ACCEPTANCE_2026-11-02.json) |
+| Nguồn gốc và phạm vi hai môn | [Nguồn gốc](PROVENANCE.md), [phạm vi](docs/COURSE_SCOPE.md) |
 
-## Đọc trước khi bắt đầu
+## Trạng thái
 
-1. [Hiện trạng thật](STATUS.md) và [nguồn gốc](PROVENANCE.md).
-2. [Phạm vi môn và sản phẩm](docs/COURSE_SCOPE.md).
-3. [Kế hoạch UI và nghiệp vụ](docs/PRODUCT_PLAN.md).
-4. [Backlog ưu tiên](TODO.md), [kế hoạch cho một người chính](docs/SOLO_PLAN.md).
-5. [Cách chạy](docs/RUNNING.md), [báo cáo audit PDF](docs/audit/WorkSphere-audit-2026-10-29.pdf).
+Đã chốt mốc phần mềm MVP giờ hành chính: backend chạy/build bằng JDK 21, toàn bộ 407 tests đạt; web 8 tests; mobile 98 suites/852 tests và TypeScript đạt. OPPO đã kiểm tra đủ bốn lượt QR và kích hoạt/reset trong môi trường thử riêng. Clone sạch cùng máy chạy được với DB mới. Chưa production; chuẩn bị báo cáo/slide và môn Triển khai phần mềm tiếp tục theo STATUS/TODO.
 
-## Có sẵn
+## Hai repository phục vụ đồ án
 
-- `backend/`: Spring Boot modular monolith, PostgreSQL, Flyway V001-V017; identity, organization, project, task, service_request, asset, file, notification.
-- `mobile/`: React Native/TypeScript; auth, dashboard, project/task; ServiceRequest mới có foundation/API, UI chưa trọn luồng.
-- `design/`: thiết kế/prototype kế thừa, **không phải web frontend đang vận hành**.
-- `docs/legacy/`, `reports/legacy/`: tài liệu lịch sử của source bốn môn cũ, giữ để truy vết.
-- Hai bản vá local F01/F02 được đưa vào snapshot này; xem PROVENANCE.
+| Học phần | Nguồn chuẩn |
+|---|---|
+| Kỹ năng lập trình nâng cao | [worksphere-app](https://github.com/Khiemnh158/worksphere-app) — ứng dụng, API và tests |
+| Triển khai phần mềm | [worksphere-deployment](https://github.com/Khiemnh158/worksphere-deployment) — triển khai, vận hành và bằng chứng |
 
-## Chưa có, không coi là đã làm
+Repo triển khai ghim commit của app; business logic giữ tại worksphere-app. Ngày 02/11/2026, người dùng xác nhận An toàn thông tin thi trắc nghiệm nên bỏ chuyên đề/repo riêng. Các bảo vệ và kiểm thử bảo mật trong ứng dụng vẫn được giữ. Môn Phát triển ứng dụng di động của nhóm khác không thuộc hai môn nộp này.
 
-- Web app mới và thiết kế UI mới; hàng đợi hỗ trợ theo team; quyền trạng thái requester đúng đầy đủ.
-- Sửa triệt để logout/refresh race, phạm vi project và các phát hiện còn mở.
-- Pipeline CI/CD hoàn chỉnh, Dockerfile/Compose, Sonar, Prometheus/Grafana và bản release mobile.
-- Audit writer/onboarding email đầy đủ.
+## Bố cục source
 
-Source cũ có GitHub workflow skeleton; bản lưu nằm ở `docs/legacy/UPSTREAM_ci.yml.disabled`. Không kích hoạt pipeline cũ để tạo trạng thái xanh gây hiểu nhầm khi backend chưa được build/test trong CI.
-
-## Quy tắc phiên bản
-
-Mọi sửa business logic ở repo này. Hai repo học phần khác dùng `target.json`/`versions.env` ghim **commit của app**, không copy backend thành ba bản. Đây là snapshot import mới; commit upstream vẫn được ghi đầy đủ, không nhận mã kế thừa là phần nhóm tự viết.
+- backend/: Spring Boot, mục tiêu Java 21, PostgreSQL/Flyway V001–V027.
+- web/: cổng web đang dùng; mobile/: React Native/TypeScript và Android.
+- scripts/: khởi động local; docs/: hợp đồng/hướng dẫn; reports/: kết quả kiểm chứng.
+- design/, docs/legacy/, reports/legacy/: nguồn kế thừa, không phải giao diện hoặc yêu cầu hiện hành. Đọc [quy tắc tài liệu](docs/DOCUMENTATION.md) trước khi dùng cho báo cáo.

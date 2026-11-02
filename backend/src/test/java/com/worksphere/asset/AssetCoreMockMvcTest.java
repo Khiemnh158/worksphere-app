@@ -102,6 +102,7 @@ public class AssetCoreMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -130,20 +131,20 @@ public class AssetCoreMockMvcTest {
         UUID adminRoleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE code = 'ADMIN'", UUID.class);
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 adminUserId, adminRoleId);
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         employee1Id = UUID.randomUUID();
         insertUser(employee1Id, "emp1_user", "emp1@worksphere.com");
         UUID empRoleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE code = 'EMPLOYEE'", UUID.class);
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 employee1Id, empRoleId);
-        employee1Token = jwtService.generateAccessToken(employee1Id, UUID.randomUUID());
+        employee1Token = authorizationAccessToken(employee1Id);
 
         employee2Id = UUID.randomUUID();
         insertUser(employee2Id, "emp2_user", "emp2@worksphere.com");
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 employee2Id, empRoleId);
-        employee2Token = jwtService.generateAccessToken(employee2Id, UUID.randomUUID());
+        employee2Token = authorizationAccessToken(employee2Id);
 
         activeCategory = AssetCategory.create(
                 UUID.randomUUID(), "LAPTOP", "Laptop", "Laptop Category", true, Instant.now()
@@ -521,5 +522,15 @@ public class AssetCoreMockMvcTest {
         });
         assertThat(adminSrNums).containsExactlyInAnyOrder("SR-REQ-01", "SR-REQ-02", "SR-REQ-03");
         assertThat(adminSrIds).containsExactlyInAnyOrder(sr1Id, sr2Id, sr3Id);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

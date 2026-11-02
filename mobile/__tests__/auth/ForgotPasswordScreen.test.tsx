@@ -5,8 +5,9 @@ import { ThemeProvider } from '../../src/app/providers/ThemeProvider';
 import { theme } from '../../src/shared/theme';
 import { authApi } from '../../src/features/auth/api/authApi';
 
-jest.mock('react-native-safe-area-context', () =>
-  require('react-native-safe-area-context/jest/mock').default
+jest.mock(
+  'react-native-safe-area-context',
+  () => require('react-native-safe-area-context/jest/mock').default,
 );
 
 const mockNavigate = jest.fn();
@@ -32,7 +33,7 @@ describe('ForgotPasswordScreen Component (SCR-AUTH-03)', () => {
     return await render(
       <ThemeProvider theme={theme}>
         <ForgotPasswordScreen />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   }
 
@@ -44,7 +45,7 @@ describe('ForgotPasswordScreen Component (SCR-AUTH-03)', () => {
     const { getByTestId, getByText } = await renderForgotPasswordScreen();
 
     expect(getByTestId('screen-forgot-password')).toBeTruthy();
-    expect(getByText('SCR-AUTH-03')).toBeTruthy();
+    expect(getByText('KHÔI PHỤC TRUY CẬP')).toBeTruthy();
     expect(getByText('Quên mật khẩu')).toBeTruthy();
     expect(getByTestId('input-email')).toBeTruthy();
     expect(getByTestId('btn-submit-forgot-password')).toBeTruthy();
@@ -108,7 +109,10 @@ describe('ForgotPasswordScreen Component (SCR-AUTH-03)', () => {
     const { getByTestId } = await renderForgotPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-email'), '  User.Test@Example.Com  ');
+      fireEvent.changeText(
+        getByTestId('input-email'),
+        '  User.Test@Example.Com  ',
+      );
     });
 
     await act(async () => {
@@ -137,19 +141,25 @@ describe('ForgotPasswordScreen Component (SCR-AUTH-03)', () => {
 
     await waitFor(() => {
       expect(getByTestId('forgot-password-success-view')).toBeTruthy();
-      expect(getByText('Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi.')).toBeTruthy();
+      expect(
+        getByText('Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi.'),
+      ).toBeTruthy();
     });
   });
 
   test('anti-enumeration invariant: existing and non-existing email results in identical user feedback', async () => {
-    const expectedSafeMessage = 'Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi.';
+    const expectedSafeMessage =
+      'Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi.';
 
     // Scenario A: Conceptual existing user returns success
     (authApi.forgotPassword as jest.Mock).mockResolvedValue(undefined);
     const viewA = await renderForgotPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(viewA.getByTestId('input-email'), 'existing@example.com');
+      fireEvent.changeText(
+        viewA.getByTestId('input-email'),
+        'existing@example.com',
+      );
     });
 
     await act(async () => {
@@ -170,7 +180,10 @@ describe('ForgotPasswordScreen Component (SCR-AUTH-03)', () => {
     const viewB = await renderForgotPasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(viewB.getByTestId('input-email'), 'nonexistent@example.com');
+      fireEvent.changeText(
+        viewB.getByTestId('input-email'),
+        'nonexistent@example.com',
+      );
     });
 
     await act(async () => {
@@ -216,7 +229,8 @@ describe('ForgotPasswordScreen Component (SCR-AUTH-03)', () => {
   test('displays retryable network error message with traceId', async () => {
     (authApi.forgotPassword as jest.Mock).mockRejectedValue({
       kind: 'NETWORK_ERROR',
-      message: 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.',
+      message:
+        'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.',
       traceId: 'tr-net-err-01',
     });
 
@@ -232,7 +246,11 @@ describe('ForgotPasswordScreen Component (SCR-AUTH-03)', () => {
 
     await waitFor(() => {
       expect(getByTestId('forgot-password-global-error')).toBeTruthy();
-      expect(getByText('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.')).toBeTruthy();
+      expect(
+        getByText(
+          'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.',
+        ),
+      ).toBeTruthy();
       expect(getByText('Mã tham chiếu: tr-net-err-01')).toBeTruthy();
     });
   });

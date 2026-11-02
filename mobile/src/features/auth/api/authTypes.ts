@@ -12,6 +12,7 @@ export interface LoginRequest {
   login: string;
   password: string;
   deviceName?: string;
+  mfaCode?: string;
 }
 
 /**
@@ -192,10 +193,18 @@ export function isAuthUser(val: unknown): val is AuthUser {
   ) {
     return false;
   }
-  if (obj.department !== null && obj.department !== undefined && !isAuthDepartment(obj.department)) {
+  if (
+    obj.department !== null &&
+    obj.department !== undefined &&
+    !isAuthDepartment(obj.department)
+  ) {
     return false;
   }
-  if (obj.avatarUrl !== null && obj.avatarUrl !== undefined && typeof obj.avatarUrl !== 'string') {
+  if (
+    obj.avatarUrl !== null &&
+    obj.avatarUrl !== undefined &&
+    typeof obj.avatarUrl !== 'string'
+  ) {
     return false;
   }
   return true;

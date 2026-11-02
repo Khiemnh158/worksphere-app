@@ -28,6 +28,52 @@ describe('Environment Configuration', () => {
     expect(config.requestTimeoutMs).toBe(15000);
   });
 
+  test('a native bundled local build works without Metro development mode only on loopback', () => {
+    (globalThis as any).__DEV__ = false;
+    jest.spyOn(nativeEnv, 'getNativeEnvironmentConstants').mockReturnValue({
+      BUNDLED_LOCAL: true,
+      API_BASE_URL: 'http://127.0.0.1:18120/api/v1',
+    });
+    expect(getEnvironmentConfig()).toEqual(
+      expect.objectContaining({
+        apiBaseUrl: 'http://127.0.0.1:18120/api/v1',
+        isProduction: false,
+      }),
+    );
+  });
+
+  test.each([
+    'http://192.0.2.5:18120',
+    'http://127.0.0.1.attacker.invalid',
+    'https://api.example.invalid',
+    'http://127.0.0.1@attacker.invalid',
+  ])('bundled local refuses remote or deceptive URL %s', url => {
+    (globalThis as any).__DEV__ = false;
+    jest
+      .spyOn(nativeEnv, 'getNativeEnvironmentConstants')
+      .mockReturnValue({ BUNDLED_LOCAL: true, API_BASE_URL: url });
+    expect(() => getEnvironmentConfig()).toThrow('loopback');
+  });
+
+  test('a normal release cannot opt into local HTTP without the native build flag', () => {
+    (globalThis as any).__DEV__ = false;
+    jest
+      .spyOn(nativeEnv, 'getNativeEnvironmentConstants')
+      .mockReturnValue({
+        BUNDLED_LOCAL: false,
+        API_BASE_URL: 'http://127.0.0.1:18120',
+      });
+    expect(() => getEnvironmentConfig()).toThrow('HTTPS');
+  });
+
+  test('a bundled local build must carry an explicit native API URL', () => {
+    (globalThis as any).__DEV__ = false;
+    jest
+      .spyOn(nativeEnv, 'getNativeEnvironmentConstants')
+      .mockReturnValue({ BUNDLED_LOCAL: true });
+    expect(() => getEnvironmentConfig()).toThrow('loopback');
+  });
+
   test('resolves explicit native debug override when provided in development', () => {
     (globalThis as any).__DEV__ = true;
     jest.spyOn(nativeEnv, 'getNativeEnvironmentConstants').mockReturnValue({
@@ -57,7 +103,7 @@ describe('Environment Configuration', () => {
     });
 
     expect(() => getEnvironmentConfig()).toThrow(
-      /Security violation: Production API Base URL must use HTTPS/
+      /Security violation: Production API Base URL must use HTTPS/,
     );
   });
 
@@ -66,28 +112,42 @@ describe('Environment Configuration', () => {
     jest.spyOn(nativeEnv, 'getNativeEnvironmentConstants').mockReturnValue({});
 
     expect(() => getEnvironmentConfig()).toThrow(
-      /Production Environment Configuration missing/
+      /Production Environment Configuration missing/,
     );
   });
 
   test('normalizes trailing slashes and ensures single /api/v1 suffix', () => {
-    expect(normalizeApiBaseUrl('http://localhost:8080/')).toBe('http://localhost:8080/api/v1');
-    expect(normalizeApiBaseUrl('http://localhost:8080/api/v1/')).toBe('http://localhost:8080/api/v1');
-    expect(normalizeApiBaseUrl('http://localhost:8080///')).toBe('http://localhost:8080/api/v1');
-    expect(normalizeApiBaseUrl('http://localhost:8080///api/v1///')).toBe('http://localhost:8080/api/v1');
-    expect(normalizeApiBaseUrl('https://api.worksphere.vn/api/v1', true)).toBe('https://api.worksphere.vn/api/v1');
+    expect(normalizeApiBaseUrl('http://localhost:8080/')).toBe(
+      'http://localhost:8080/api/v1',
+    );
+    expect(normalizeApiBaseUrl('http://localhost:8080/api/v1/')).toBe(
+      'http://localhost:8080/api/v1',
+    );
+    expect(normalizeApiBaseUrl('http://localhost:8080///')).toBe(
+      'http://localhost:8080/api/v1',
+    );
+    expect(normalizeApiBaseUrl('http://localhost:8080///api/v1///')).toBe(
+      'http://localhost:8080/api/v1',
+    );
+    expect(normalizeApiBaseUrl('https://api.worksphere.vn/api/v1', true)).toBe(
+      'https://api.worksphere.vn/api/v1',
+    );
   });
 
   test('rejects malformed URLs without valid protocol', () => {
-    expect(() => normalizeApiBaseUrl('localhost:8080')).toThrow(/Malformed API Base URL/);
-    expect(() => normalizeApiBaseUrl('ftp://example.com')).toThrow(/Malformed API Base URL/);
+    expect(() => normalizeApiBaseUrl('localhost:8080')).toThrow(
+      /Malformed API Base URL/,
+    );
+    expect(() => normalizeApiBaseUrl('ftp://example.com')).toThrow(
+      /Malformed API Base URL/,
+    );
     expect(() => normalizeApiBaseUrl('')).toThrow(/non-empty string/);
   });
 
   test('strictly rejects HTTP protocol in production normalization', () => {
-    expect(() => normalizeApiBaseUrl('http://insecure.worksphere.vn', true)).toThrow(
-      /Security violation: Production API Base URL must use HTTPS/
-    );
+    expect(() =>
+      normalizeApiBaseUrl('http://insecure.worksphere.vn', true),
+    ).toThrow(/Security violation: Production API Base URL must use HTTPS/);
   });
 
   test('supports runtime injection for tests and restores state on reset', () => {
@@ -98,7 +158,9 @@ describe('Environment Configuration', () => {
     });
 
     const active = getEnvironmentConfig();
-    expect(active.apiBaseUrl).toBe('https://test-server.worksphere.internal/api/v1');
+    expect(active.apiBaseUrl).toBe(
+      'https://test-server.worksphere.internal/api/v1',
+    );
     expect(active.isProduction).toBe(true);
     expect(active.requestTimeoutMs).toBe(5000);
 
@@ -121,7 +183,7 @@ describe('Environment Configuration', () => {
         requestTimeoutMs: 15000,
       });
     }).toThrow(
-      /Security violation: Cannot downgrade environment configuration to non-production at runtime/
+      /Security violation: Cannot downgrade environment configuration to non-production at runtime/,
     );
   });
 
@@ -132,13 +194,16 @@ describe('Environment Configuration', () => {
       requestTimeoutMs: 8000,
     });
 
-    const requestInterceptor = (apiClient.interceptors.request as any).handlers[0].fulfilled;
+    const requestInterceptor = (apiClient.interceptors.request as any)
+      .handlers[0].fulfilled;
     const config = {
       headers: new axios.AxiosHeaders(),
     } as InternalAxiosRequestConfig;
 
     const result = await requestInterceptor(config);
-    expect(result.baseURL).toBe('https://custom-target.worksphere.internal/api/v1');
+    expect(result.baseURL).toBe(
+      'https://custom-target.worksphere.internal/api/v1',
+    );
     expect(result.timeout).toBe(8000);
   });
 });

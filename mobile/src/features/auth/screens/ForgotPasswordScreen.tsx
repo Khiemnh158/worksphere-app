@@ -27,7 +27,9 @@ export function ForgotPasswordScreen() {
 
   const [email, setEmail] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<'email'>>({});
-  const [globalError, setGlobalError] = useState<AuthPresentationError | null>(null);
+  const [globalError, setGlobalError] = useState<AuthPresentationError | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -81,38 +83,79 @@ export function ForgotPasswordScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { padding: theme.spacing.lg }]}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { padding: theme.spacing.lg },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
           {/* Canonical Screen ID badge */}
-          <View style={[styles.badge, { backgroundColor: theme.colors.primaryContainer, borderRadius: theme.radii.small }]}>
-            <Text style={[theme.typography.caption, { color: theme.colors.onPrimaryContainer }]}>
-              SCR-AUTH-03
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: theme.colors.primaryContainer,
+                borderRadius: theme.radii.small,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                theme.typography.caption,
+                { color: theme.colors.onPrimaryContainer },
+              ]}
+            >
+              KHÔI PHỤC TRUY CẬP
             </Text>
           </View>
 
-          <Text style={[theme.typography.heading1, { color: theme.colors.textPrimary, marginTop: theme.spacing.sm }]}>
+          <Text
+            style={[
+              theme.typography.heading1,
+              { color: theme.colors.textPrimary, marginTop: theme.spacing.sm },
+            ]}
+          >
             Quên mật khẩu
           </Text>
 
           {submitted ? (
-            <View style={styles.successSection} testID="forgot-password-success-view">
+            <View
+              style={styles.successSection}
+              testID="forgot-password-success-view"
+            >
               <View
                 style={[
                   styles.successBanner,
-                  { backgroundColor: theme.colors.successContainer, borderRadius: theme.radii.medium },
+                  {
+                    backgroundColor: theme.colors.successContainer,
+                    borderRadius: theme.radii.medium,
+                  },
                 ]}
                 accessible={true}
                 accessibilityRole="alert"
                 testID="forgot-password-success-banner"
               >
-                <Text style={[theme.typography.bodyMedium, { color: theme.colors.success }]}>
+                <Text
+                  style={[
+                    theme.typography.bodyMedium,
+                    { color: theme.colors.success },
+                  ]}
+                >
                   Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi.
                 </Text>
               </View>
 
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginBottom: theme.spacing.xl }]}>
-                Vui lòng kiểm tra hộp thư đến (và thư mục rác) để nhận hướng dẫn và mã xác thực đặt lại mật khẩu.
+              <Text
+                style={[
+                  theme.typography.body,
+                  {
+                    color: theme.colors.textSecondary,
+                    marginBottom: theme.spacing.xl,
+                  },
+                ]}
+              >
+                Vui lòng kiểm tra hộp thư đến (và thư mục rác) để nhận hướng dẫn
+                và mã xác thực đặt lại mật khẩu.
               </Text>
 
               <AppButton
@@ -134,25 +177,48 @@ export function ForgotPasswordScreen() {
             </View>
           ) : (
             <View style={styles.formSection}>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginBottom: theme.spacing.xl }]}>
-                Nhập địa chỉ email liên kết với tài khoản của bạn để nhận hướng dẫn khôi phục mật khẩu.
+              <Text
+                style={[
+                  theme.typography.body,
+                  {
+                    color: theme.colors.textSecondary,
+                    marginBottom: theme.spacing.xl,
+                  },
+                ]}
+              >
+                Nhập địa chỉ email liên kết với tài khoản của bạn để nhận hướng
+                dẫn khôi phục mật khẩu.
               </Text>
 
               {globalError ? (
                 <View
                   style={[
                     styles.errorBanner,
-                    { backgroundColor: theme.colors.errorContainer, borderRadius: theme.radii.medium },
+                    {
+                      backgroundColor: theme.colors.errorContainer,
+                      borderRadius: theme.radii.medium,
+                    },
                   ]}
                   accessible={true}
                   accessibilityRole="alert"
                   testID="forgot-password-global-error"
                 >
-                  <Text style={[theme.typography.bodyMedium, { color: theme.colors.error }]}>
+                  <Text
+                    style={[
+                      theme.typography.bodyMedium,
+                      { color: theme.colors.error },
+                    ]}
+                  >
                     {globalError.message}
                   </Text>
                   {globalError.traceId ? (
-                    <Text style={[theme.typography.caption, styles.traceIdText, { color: theme.colors.error }]}>
+                    <Text
+                      style={[
+                        theme.typography.caption,
+                        styles.traceIdText,
+                        { color: theme.colors.error },
+                      ]}
+                    >
                       Mã tham chiếu: {globalError.traceId}
                     </Text>
                   ) : null}

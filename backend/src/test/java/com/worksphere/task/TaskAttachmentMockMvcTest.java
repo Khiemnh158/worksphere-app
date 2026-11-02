@@ -148,6 +148,7 @@ public class TaskAttachmentMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -186,17 +187,17 @@ public class TaskAttachmentMockMvcTest {
         projectManagerId = UUID.randomUUID();
         insertUser(projectManagerId, "pm_attach", "pm_attach@test.com");
         assignRole(projectManagerId, "PROJECT_MANAGER");
-        pmToken = jwtService.generateAccessToken(projectManagerId, UUID.randomUUID());
+        pmToken = authorizationAccessToken(projectManagerId);
 
         projectMemberId = UUID.randomUUID();
         insertUser(projectMemberId, "member_attach", "member_attach@test.com");
         assignRole(projectMemberId, "EMPLOYEE");
-        memberToken = jwtService.generateAccessToken(projectMemberId, UUID.randomUUID());
+        memberToken = authorizationAccessToken(projectMemberId);
 
         nonMemberId = UUID.randomUUID();
         insertUser(nonMemberId, "nonmember_attach", "nonmember_attach@test.com");
         assignRole(nonMemberId, "EMPLOYEE");
-        nonMemberToken = jwtService.generateAccessToken(nonMemberId, UUID.randomUUID());
+        nonMemberToken = authorizationAccessToken(nonMemberId);
 
         // Project
         projectId = UUID.randomUUID();
@@ -403,5 +404,15 @@ public class TaskAttachmentMockMvcTest {
         Map<?, ?> resp = objectMapper.readValue(result.getResponse().getContentAsString(), Map.class);
         Map<?, ?> data = (Map<?, ?>) resp.get("data");
         return UUID.fromString(data.get("id").toString());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }
