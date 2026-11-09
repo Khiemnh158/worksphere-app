@@ -12,6 +12,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ import java.util.*;
 
 /** Opt-in sample company in a dedicated practice database. No production bootstrap. */
 @Component
-@Profile("dev")
+@Profile({"dev", "deployment-demo"})
 @ConditionalOnProperty(name = "worksphere.web-demo.enabled", havingValue = "true")
 public class WebDemoProvisioner implements ApplicationRunner {
     private final UserRepository users;
@@ -33,6 +34,7 @@ public class WebDemoProvisioner implements ApplicationRunner {
     private final PasswordEncoder encoder;
     private final JdbcTemplate db;
     private final String password, url;
+    private final boolean deploymentDemo;
 
     public WebDemoProvisioner(
             UserRepository users,
@@ -43,7 +45,8 @@ public class WebDemoProvisioner implements ApplicationRunner {
             PasswordEncoder encoder,
             JdbcTemplate db,
             @Value("${WORKSPHERE_WEB_DEMO_PASSWORD:}") String password,
-            @Value("${spring.datasource.url}") String url) {
+            @Value("${spring.datasource.url}") String url,
+            Environment environment) {
         this.users = users;
         this.roles = roles;
         this.userRoles = userRoles;
@@ -53,18 +56,29 @@ public class WebDemoProvisioner implements ApplicationRunner {
         this.db = db;
         this.password = password;
         this.url = url;
+        this.deploymentDemo = environment.matchesProfiles("deployment-demo");
     }
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (!url.matches(
+        if (deploymentDemo) {
+            if (!url.equals("jdbc:postgresql://postgres:5432/worksphere_deployment")
+                    || password.length() < 12) {
+                throw new IllegalStateException(
+                        "Deployment demo requires the dedicated Compose database and external"
+                                + " password (12+ chars)");
+            }
+            // Serialize the empty database check and the seed in one transaction.
+            db.execute("SELECT pg_advisory_xact_lock(573108291)");
+            if (users.existsByUsernameAndDeletedFalse("admin.web")) return;
+        } else if (!url.matches(
                         "jdbc:postgresql://(?:localhost|127\\.0\\.0\\.1):[0-9]+/worksphere_web[a-zA-Z0-9_]*")
                 || password.length() < 12)
             throw new IllegalStateException(
                     "Web demo requires dedicated local worksphere_web database and external"
                             + " password (12+ chars)");
-        if (users.existsByUsernameAndDeletedFalse("admin.web")) {
+        if (!deploymentDemo && users.existsByUsernameAndDeletedFalse("admin.web")) {
             provisionLeadership();
             return;
         }

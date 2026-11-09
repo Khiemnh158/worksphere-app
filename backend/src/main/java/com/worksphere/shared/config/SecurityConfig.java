@@ -6,6 +6,7 @@ import com.worksphere.shared.security.WorkSphereAuthEntryPoint;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,7 +40,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http, @Value("${management.server.port:-1}") int managementPort)
+            throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -64,7 +67,12 @@ public class SecurityConfig {
                                                 HttpMethod.POST, "/api/v1/auth/reset-password")
                                         .permitAll()
                                         // Actuator health
-                                        .requestMatchers("/actuator/health")
+                                        .requestMatchers("/actuator/health", "/actuator/health/readiness")
+                                        .permitAll()
+                                        .requestMatchers(request ->
+                                                request.getLocalPort() == managementPort
+                                                        && "GET".equals(request.getMethod())
+                                                        && "/actuator/prometheus".equals(request.getRequestURI()))
                                         .permitAll()
                                         // Swagger UI
                                         .requestMatchers(

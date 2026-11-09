@@ -1807,12 +1807,11 @@ class WorkplacePostgresTest {
 
     @Test
     void qrStationRequiresSpecialistAndRejectsExpiredReplayAndClosedStation() throws Exception {
-        attendanceClock(
-                LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"))
-                        .atTime(10, 0)
-                        .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
-                        .toInstant()
-                        .toString());
+        ZoneId officeZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDate today = LocalDate.now(officeZone);
+        Instant punchTime = today.atTime(10, 0).atZone(officeZone).toInstant();
+        OffsetDateTime validUntil = punchTime.plusSeconds(30).atOffset(ZoneOffset.UTC);
+        attendanceClock(punchTime.toString());
         db.update(
                 "INSERT INTO staff_capabilities(user_id,capability) VALUES (?,'TIME_REVIEW')",
                 hr.getId());
@@ -1826,7 +1825,6 @@ class WorkplacePostgresTest {
         var qr = call("POST", "/workplace/attendance/stations/" + station + "/challenge", h, null);
         status(qr, 200);
         assertThat(data(qr).path("image").asText()).startsWith("data:image/svg+xml;base64,");
-        LocalDate today = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         db.update(
                 "INSERT INTO"
                     + " work_calendar(work_date,day_kind,normal_minutes,shift_start,shift_end,break_minutes,configured_by)"
@@ -1839,11 +1837,12 @@ class WorkplacePostgresTest {
         db.update(
                 "INSERT INTO"
                         + " attendance_qr_challenges(id,station_id,token_hash,issued_by,expires_at)"
-                        + " VALUES (?,?,?,?,now()+interval '30 seconds')",
+                        + " VALUES (?,?,?,?,?)",
                 challenge,
                 station,
                 recoveryService.hash(token),
-                hr.getId());
+                hr.getId(),
+                validUntil);
         status(
                 call(
                         "POST",
@@ -1859,8 +1858,8 @@ class WorkplacePostgresTest {
                         Map.of("token", token, "type", "IN")),
                 422);
         db.update(
-                "UPDATE attendance_qr_challenges SET expires_at='2000-01-01T00:00:00Z' WHERE"
-                        + " id=?",
+                "UPDATE attendance_qr_challenges SET expires_at=? WHERE id=?",
+                punchTime.minusSeconds(1).atOffset(ZoneOffset.UTC),
                 challenge);
         status(
                 call(
@@ -1870,8 +1869,8 @@ class WorkplacePostgresTest {
                         Map.of("token", token, "type", "IN")),
                 422);
         db.update(
-                "UPDATE attendance_qr_challenges SET expires_at=now()+interval '30 seconds' WHERE"
-                        + " id=?",
+                "UPDATE attendance_qr_challenges SET expires_at=? WHERE id=?",
+                validUntil,
                 challenge);
         db.update("UPDATE attendance_stations SET is_active=false WHERE id=?", station);
         status(
