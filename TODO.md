@@ -38,4 +38,4 @@ Các ô bỏ trống đều CHƯA LÀM, không phải kết quả đã hoàn th�
 - [ ] Release signing F27, dependency reachability/vá tương thích F28.
 - [ ] Full asset UI, SLA và ticket-task link sau khi phần bắt buộc đủ.
 
-Chi tiết F01-F34: docs/audit/findings.json và PDF. Hạ tầng ở repo deployment; test an toàn chuyên đề ở security; mọi fix business code vẫn ở app.
+Xem [dữ liệu rà soát F01–F34](docs/audit/findings.json). Hạ tầng ở repo deployment. Các bản sửa nghiệp vụ nằm ở repo app.

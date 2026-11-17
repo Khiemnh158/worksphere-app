@@ -18,7 +18,7 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh 
 2. [Phạm vi môn và sản phẩm](docs/COURSE_SCOPE.md).
 3. [Kế hoạch UI và nghiệp vụ](docs/PRODUCT_PLAN.md).
 4. [Backlog ưu tiên](TODO.md), [kế hoạch cho một người chính](docs/SOLO_PLAN.md).
-5. [Cách chạy](docs/RUNNING.md), [báo cáo audit PDF](docs/audit/WorkSphere-audit-2026-10-29.pdf).
+5. [Cách chạy](docs/RUNNING.md), [dữ liệu rà soát baseline](docs/audit/findings.json).
 
 ## Có sẵn
 
