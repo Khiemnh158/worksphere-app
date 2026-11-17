@@ -1,5 +1,7 @@
 # WorkSphere App - Kỹ năng lập trình nâng cao
 
+[Báo cáo đồ án WorkSphere Word và PDF](reports/COURSEWORK_REPORT.md) · [Mã nguồn đầy đủ web, Android và backend](https://github.com/Khiemnh158/worksphere-app/tree/4273f1ed907eb49ae0023ab1cacff7c25de8a691)
+
 Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ doanh nghiệp. Đây là **nguồn ứng dụng chuẩn** của ba học phần.
 
 **Trạng thái 29/10/2026: import baseline đã chạy local + hai bản vá khởi động/xác thực. Chưa hoàn thiện nghiệp vụ, chưa xây lại UI, chưa đạt production-ready.**
