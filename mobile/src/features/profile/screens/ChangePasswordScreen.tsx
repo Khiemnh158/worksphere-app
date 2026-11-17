@@ -15,7 +15,10 @@ import {
   validateChangePassword,
   FieldErrors,
 } from '../../auth/validation/authValidation';
-import { mapAuthError, AuthPresentationError } from '../../auth/errors/authErrorMapper';
+import {
+  mapAuthError,
+  AuthPresentationError,
+} from '../../auth/errors/authErrorMapper';
 import { PasswordInput } from '../../../shared/components/PasswordInput';
 import { AppButton } from '../../../shared/components/AppButton';
 import type { ProfileNavigationProp } from '../../../app/navigation/types';
@@ -28,8 +31,12 @@ export function ChangePasswordScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors<'currentPassword' | 'newPassword' | 'confirmPassword'>>({});
-  const [globalError, setGlobalError] = useState<AuthPresentationError | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<
+    FieldErrors<'currentPassword' | 'newPassword' | 'confirmPassword'>
+  >({});
+  const [globalError, setGlobalError] = useState<AuthPresentationError | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -99,29 +106,63 @@ export function ChangePasswordScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { padding: theme.spacing.lg }]}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { padding: theme.spacing.lg },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={[theme.typography.heading2, { color: theme.colors.textPrimary, marginBottom: theme.spacing.xs }]}>
+          <Text
+            style={[
+              theme.typography.heading2,
+              {
+                color: theme.colors.textPrimary,
+                marginBottom: theme.spacing.xs,
+              },
+            ]}
+          >
             Đổi mật khẩu
           </Text>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginBottom: theme.spacing.xl }]}>
-            Mật khẩu mới phải có từ 8 đến 128 ký tự và khác mật khẩu hiện tại
+          <Text
+            style={[
+              theme.typography.body,
+              {
+                color: theme.colors.textSecondary,
+                marginBottom: theme.spacing.xl,
+              },
+            ]}
+          >
+            Mật khẩu mới có ít nhất 12 ký tự, tối đa 72 byte và khác mật khẩu
+            hiện tại
           </Text>
 
           {globalError ? (
             <View
               style={[
                 styles.errorBanner,
-                { backgroundColor: theme.colors.errorContainer, borderRadius: theme.radii.medium },
+                {
+                  backgroundColor: theme.colors.errorContainer,
+                  borderRadius: theme.radii.medium,
+                },
               ]}
               testID="change-password-global-error"
             >
-              <Text style={[theme.typography.bodyMedium, { color: theme.colors.error }]}>
+              <Text
+                style={[
+                  theme.typography.bodyMedium,
+                  { color: theme.colors.error },
+                ]}
+              >
                 {globalError.message}
               </Text>
               {globalError.traceId ? (
-                <Text style={[theme.typography.caption, styles.traceIdText, { color: theme.colors.error }]}>
+                <Text
+                  style={[
+                    theme.typography.caption,
+                    styles.traceIdText,
+                    { color: theme.colors.error },
+                  ]}
+                >
                   Mã tham chiếu: {globalError.traceId}
                 </Text>
               ) : null}
@@ -132,11 +173,19 @@ export function ChangePasswordScreen() {
             <View
               style={[
                 styles.successBanner,
-                { backgroundColor: theme.colors.successContainer, borderRadius: theme.radii.medium },
+                {
+                  backgroundColor: theme.colors.successContainer,
+                  borderRadius: theme.radii.medium,
+                },
               ]}
               testID="change-password-success-message"
             >
-              <Text style={[theme.typography.bodyMedium, { color: theme.colors.success }]}>
+              <Text
+                style={[
+                  theme.typography.bodyMedium,
+                  { color: theme.colors.success },
+                ]}
+              >
                 {successMessage}
               </Text>
             </View>
@@ -161,7 +210,7 @@ export function ChangePasswordScreen() {
             onChangeText={setNewPassword}
             error={fieldErrors.newPassword}
             required
-            placeholder="Nhập mật khẩu mới (8-128 ký tự)"
+            placeholder="Mật khẩu mới (ít nhất 12 ký tự)"
             accessibilityLabel="Mật khẩu mới"
             testID="input-new-password"
             disabled={submitting}

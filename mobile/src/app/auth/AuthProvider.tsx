@@ -12,7 +12,10 @@ import type { AuthContextValue, AuthState, AuthUser } from './authTypes';
 import { authApi } from '../../features/auth/api/authApi';
 import { mapAuthError } from '../../features/auth/errors/authErrorMapper';
 import { secureStorage } from '../../shared/storage/secureStorage';
-import { registerTokenRefreshHandler, registerUnauthorizedHandler } from '../../shared/api/apiClient';
+import {
+  registerTokenRefreshHandler,
+  registerUnauthorizedHandler,
+} from '../../shared/api/apiClient';
 import { refreshAccessToken } from './refreshCoordinator';
 import {
   invalidateSessionCredentials,
@@ -33,7 +36,7 @@ export interface AuthProviderProps {
 export function AuthProvider({ children, initialState }: AuthProviderProps) {
   const [state, dispatch] = useReducer(
     authReducer,
-    initialState ? { ...initialAuthState, ...initialState } : initialAuthState
+    initialState ? { ...initialAuthState, ...initialState } : initialAuthState,
   );
 
   const mountedRef = useRef(true);
@@ -158,7 +161,9 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     const unregisterRefresh = registerTokenRefreshHandler(refreshAccessToken);
 
     // Register 401 unauthorized cleanup handler (ownership protected)
-    const unregisterUnauthorized = registerUnauthorizedHandler(handleTerminalCleanup);
+    const unregisterUnauthorized = registerUnauthorizedHandler(
+      handleTerminalCleanup,
+    );
 
     // Execute cold-start bootstrap if uninitialized
     runBootstrap();
@@ -170,7 +175,11 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     };
   }, [handleTerminalCleanup, runBootstrap]);
 
-  const login = async (loginInput: string, passwordInput: string): Promise<boolean> => {
+  const login = async (
+    loginInput: string,
+    passwordInput: string,
+    mfaCode?: string,
+  ): Promise<boolean> => {
     if (loginInFlightRef.current || state.operationState === 'authenticating') {
       return false;
     }
@@ -187,6 +196,7 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     try {
       const response = await authApi.login({
         login: loginInput,
+        ...(mfaCode ? { mfaCode: mfaCode.trim() } : {}),
         password: passwordInput,
       });
 
@@ -197,7 +207,11 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
 
       // Serialized credential commit through sessionCredentialCoordinator
       try {
-        await commitLoginCredentials(loginGeneration, response.refreshToken, response.accessToken);
+        await commitLoginCredentials(
+          loginGeneration,
+          response.refreshToken,
+          response.accessToken,
+        );
       } catch (storageError) {
         if (mountedRef.current && loginEpoch === sessionEpochRef.current) {
           const mappedStorageError = mapAuthError(storageError);
@@ -366,7 +380,9 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     updateCurrentUser,
   };
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 }
 
 export function useAuth(): AuthContextValue {

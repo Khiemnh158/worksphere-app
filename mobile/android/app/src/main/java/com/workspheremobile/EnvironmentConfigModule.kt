@@ -14,7 +14,8 @@ class EnvironmentConfigModule(reactContext: ReactApplicationContext) :
 
     override fun getConstants(): MutableMap<String, Any?> {
         return mutableMapOf(
-            "API_BASE_URL" to BuildConfig.API_BASE_URL
+            "API_BASE_URL" to BuildConfig.API_BASE_URL,
+            "BUNDLED_LOCAL" to BuildConfig.BUNDLED_LOCAL
         )
     }
 }

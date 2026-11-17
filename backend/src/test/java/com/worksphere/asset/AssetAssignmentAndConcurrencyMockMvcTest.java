@@ -110,6 +110,7 @@ public class AssetAssignmentAndConcurrencyMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -136,14 +137,14 @@ public class AssetAssignmentAndConcurrencyMockMvcTest {
         UUID adminRoleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE code = 'ADMIN'", UUID.class);
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 adminUserId, adminRoleId);
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         employee1Id = UUID.randomUUID();
         insertUser(employee1Id, "emp1_user", "emp1@worksphere.com", "ACTIVE");
         UUID empRoleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE code = 'EMPLOYEE'", UUID.class);
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 employee1Id, empRoleId);
-        employee1Token = jwtService.generateAccessToken(employee1Id, UUID.randomUUID());
+        employee1Token = authorizationAccessToken(employee1Id);
 
         employee2Id = UUID.randomUUID();
         insertUser(employee2Id, "emp2_user", "emp2@worksphere.com", "ACTIVE");
@@ -585,5 +586,15 @@ public class AssetAssignmentAndConcurrencyMockMvcTest {
             jdbcTemplate.execute("DROP TRIGGER IF EXISTS trg_test_return_rollback_asset ON assets;");
             jdbcTemplate.execute("DROP FUNCTION IF EXISTS fail_asset_return_rollback_test();");
         }
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

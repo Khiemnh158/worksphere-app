@@ -1,7 +1,8 @@
 module.exports = {
   preset: '@react-native/jest-preset',
+  setupFilesAfterEnv: ['./jest.setup.js'],
   transformIgnorePatterns: [
-    'node_modules/(?!(@react-native|react-native|@react-navigation|react-native-screens|react-native-safe-area-context)/)',
+    'node_modules/(?!(@react-native|@react-native-async-storage|react-native|@react-navigation|react-native-screens|react-native-safe-area-context)/)',
   ],
   testPathIgnorePatterns: ['/node_modules/', '/__tests__/test-utils/'],
 };
