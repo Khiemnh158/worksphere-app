@@ -1,9 +1,9 @@
 # WorkSphere app - hướng dẫn làm việc
 
 ## Nguồn hiện hành
-- Đọc README.md, STATUS.md, docs/COURSE_SCOPE.md và TODO.md trước khi thay đổi.
-- Ba môn của nhóm: Kỹ năng lập trình nâng cao, An toàn thông tin, Triển khai phần mềm.
-- worksphere-app là nguồn chuẩn duy nhất của business logic; hai repo khác tham chiếu commit cụ thể.
+- Đọc README.md, docs/PROJECT_GUIDE.md, STATUS.md, docs/COURSE_SCOPE.md và TODO.md trước khi thay đổi.
+- Hai môn làm dự án: Kỹ năng lập trình nâng cao và Triển khai phần mềm. Ngày 02/11/2026 người dùng xác nhận An toàn thông tin thi trắc nghiệm, không làm bài tập lớn.
+- worksphere-app là nguồn chuẩn duy nhất của business logic; repo triển khai tham chiếu commit cụ thể.
 - Tài liệu docs/legacy và reports/legacy là lịch sử nguồn kế thừa, không phải yêu cầu hiện hành.
 - Không suy diễn rằng nhóm này học môn Phát triển ứng dụng di động hoặc Quản lý dự án CNTT.
 

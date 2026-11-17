@@ -5,8 +5,9 @@ import { ThemeProvider } from '../../src/app/providers/ThemeProvider';
 import { theme } from '../../src/shared/theme';
 import { authApi } from '../../src/features/auth/api/authApi';
 
-jest.mock('react-native-safe-area-context', () =>
-  require('react-native-safe-area-context/jest/mock').default
+jest.mock(
+  'react-native-safe-area-context',
+  () => require('react-native-safe-area-context/jest/mock').default,
 );
 
 const mockGoBack = jest.fn();
@@ -32,7 +33,7 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     return await render(
       <ThemeProvider theme={theme}>
         <ChangePasswordScreen />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   }
 
@@ -55,7 +56,7 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId, getByText } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
@@ -67,21 +68,29 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     expect(authApi.changePassword).not.toHaveBeenCalled();
   });
 
-  test('validates new password min/max length (8-128 chars)', async () => {
+  test('validates new password minimum length under the current policy', async () => {
     const { getByTestId, getByText } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), 'oldpassword123');
-      fireEvent.changeText(getByTestId('input-new-password'), 'short');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'short');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        'oldpassword123',
+      );
+      await fireEvent.changeText(getByTestId('input-new-password'), 'short');
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'short',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
-      expect(getByText('Mật khẩu phải có từ 8 đến 128 ký tự')).toBeTruthy();
+      expect(
+        getByText('Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8'),
+      ).toBeTruthy();
     });
 
     expect(authApi.changePassword).not.toHaveBeenCalled();
@@ -91,17 +100,28 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId, getByText } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), 'password123');
-      fireEvent.changeText(getByTestId('input-new-password'), 'password123');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'password123');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        'password12345',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-new-password'),
+        'password12345',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'password12345',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
-      expect(getByText('Mật khẩu mới không được trùng mật khẩu hiện tại')).toBeTruthy();
+      expect(
+        getByText('Mật khẩu mới không được trùng mật khẩu hiện tại'),
+      ).toBeTruthy();
     });
 
     expect(authApi.changePassword).not.toHaveBeenCalled();
@@ -111,13 +131,22 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId, getByText } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), 'oldpassword123');
-      fireEvent.changeText(getByTestId('input-new-password'), 'newpassword123');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'differentpassword123');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        'oldpassword123',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-new-password'),
+        'newpassword123',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'differentpassword123',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
@@ -133,13 +162,22 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), '  current password  ');
-      fireEvent.changeText(getByTestId('input-new-password'), '  new password  ');
-      fireEvent.changeText(getByTestId('input-confirm-password'), '  new password  ');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        '  current password  ',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-new-password'),
+        '  new password  ',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        '  new password  ',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
@@ -157,13 +195,22 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId, getByText } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), 'currentPass123');
-      fireEvent.changeText(getByTestId('input-new-password'), 'newSecurePass456');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'newSecurePass456');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        'currentPass123',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-new-password'),
+        'newSecurePass456',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'newSecurePass456',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
@@ -194,13 +241,22 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId, getByText } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), 'wrongPass123');
-      fireEvent.changeText(getByTestId('input-new-password'), 'newSecurePass456');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'newSecurePass456');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        'wrongPass123',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-new-password'),
+        'newSecurePass456',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'newSecurePass456',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
@@ -219,17 +275,28 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId, getByText } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), 'currentPass123');
-      fireEvent.changeText(getByTestId('input-new-password'), 'newSecurePass456');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'newSecurePass456');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        'currentPass123',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-new-password'),
+        'newSecurePass456',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'newSecurePass456',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
+      await fireEvent.press(getByTestId('btn-submit-change-password'));
     });
 
     await waitFor(() => {
-      expect(getByText('Mật khẩu mới không được trùng mật khẩu hiện tại')).toBeTruthy();
+      expect(
+        getByText('Mật khẩu mới không được trùng mật khẩu hiện tại'),
+      ).toBeTruthy();
     });
   });
 
@@ -243,21 +310,31 @@ describe('ChangePasswordScreen Component (SCR-ACC-02)', () => {
     const { getByTestId } = await renderChangePasswordScreen();
 
     await act(async () => {
-      fireEvent.changeText(getByTestId('input-current-password'), 'currentPass123');
-      fireEvent.changeText(getByTestId('input-new-password'), 'newSecurePass456');
-      fireEvent.changeText(getByTestId('input-confirm-password'), 'newSecurePass456');
+      await fireEvent.changeText(
+        getByTestId('input-current-password'),
+        'currentPass123',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-new-password'),
+        'newSecurePass456',
+      );
+      await fireEvent.changeText(
+        getByTestId('input-confirm-password'),
+        'newSecurePass456',
+      );
     });
 
     await act(async () => {
-      fireEvent.press(getByTestId('btn-submit-change-password'));
-      fireEvent.press(getByTestId('btn-submit-change-password'));
-      fireEvent.press(getByTestId('btn-submit-change-password'));
-    });
-
-    expect(authApi.changePassword).toHaveBeenCalledTimes(1);
-
-    await act(async () => {
+      // Start the rapid presses before resolving the simulated server response.
+      const button = getByTestId('btn-submit-change-password');
+      const attempts = [
+        fireEvent.press(button),
+        fireEvent.press(button),
+        fireEvent.press(button),
+      ];
+      expect(authApi.changePassword).toHaveBeenCalledTimes(1);
       resolvePromise();
+      await Promise.all(attempts);
     });
   });
 });

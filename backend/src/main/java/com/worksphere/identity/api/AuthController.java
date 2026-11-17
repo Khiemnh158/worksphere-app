@@ -77,7 +77,7 @@ public class AuthController {
             @Valid @RequestBody LogoutRequest request,
             @AuthenticationPrincipal WorkSphereUserPrincipal principal
     ) {
-        authService.logout(request, principal.userId());
+        authService.logout(request, principal.userId(), principal.sessionId());
         return ResponseEntity.noContent().build();
     }
 

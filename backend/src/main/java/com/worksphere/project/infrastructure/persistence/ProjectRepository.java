@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 import java.util.UUID;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 
 /**
  * Spring Data JPA Repository for Project entity.
@@ -19,6 +21,10 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     @Query("SELECT p FROM Project p WHERE p.id = :id AND p.deleted = false")
     Optional<Project> findActiveById(@Param("id") UUID id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Project p WHERE p.id = :id AND p.deleted = false")
+    Optional<Project> findActiveByIdForUpdate(@Param("id") UUID id);
 
     @Query("SELECT p FROM Project p WHERE p.code = :code AND p.deleted = false")
     Optional<Project> findActiveByCode(@Param("code") String code);

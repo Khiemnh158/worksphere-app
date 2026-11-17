@@ -44,7 +44,9 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
   });
 
   test('valid Keychain refresh token -> refresh succeeds -> loads profile -> transitions to AUTHENTICATED', async () => {
-    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce('valid-stored-refresh-token');
+    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce(
+      'valid-stored-refresh-token',
+    );
     (refreshAccessToken as jest.Mock).mockResolvedValueOnce('new-access-token');
     (authApi.getCurrentUser as jest.Mock).mockResolvedValueOnce(mockUser);
 
@@ -61,7 +63,9 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
   });
 
   test('terminal refresh failure (401/revoked/invalid) -> clears session and transitions to UNAUTHENTICATED', async () => {
-    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce('invalid-token');
+    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce(
+      'invalid-token',
+    );
     (refreshAccessToken as jest.Mock).mockRejectedValueOnce({
       kind: 'UNAUTHORIZED',
       status: 401,
@@ -80,7 +84,9 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
   });
 
   test('recoverable network error -> retains refresh token in Keychain and exposes retry state', async () => {
-    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce('valid-token-offline');
+    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce(
+      'valid-token-offline',
+    );
     (refreshAccessToken as jest.Mock).mockRejectedValueOnce({
       kind: 'NETWORK_ERROR',
       message: 'Không thể kết nối đến máy chủ',
@@ -97,7 +103,9 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
     expect(secureStorage.clearRefreshToken).not.toHaveBeenCalled();
 
     // Now test retryBootstrap succeeds
-    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce('valid-token-offline');
+    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce(
+      'valid-token-offline',
+    );
     (refreshAccessToken as jest.Mock).mockResolvedValueOnce('new-access-token');
     (authApi.getCurrentUser as jest.Mock).mockResolvedValueOnce(mockUser);
 
@@ -111,7 +119,9 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
   });
 
   test('recoverable timeout error -> explicit logoutLocal clears Keychain and transitions to UNAUTHENTICATED', async () => {
-    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce('valid-token-timeout');
+    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce(
+      'valid-token-timeout',
+    );
     (refreshAccessToken as jest.Mock).mockRejectedValueOnce({
       kind: 'TIMEOUT',
       message: 'Timeout error',
@@ -138,7 +148,9 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
       resolveRefresh = resolve;
     });
 
-    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce('token-unmount');
+    (secureStorage.getRefreshToken as jest.Mock).mockResolvedValueOnce(
+      'token-unmount',
+    );
     (refreshAccessToken as jest.Mock).mockReturnValueOnce(pendingRefresh);
 
     const { unmount } = await renderHook(() => useAuth(), {
@@ -163,7 +175,12 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
     // Mount AuthProvider initialized to AUTHENTICATED
     const { result } = await renderHook(() => useAuth(), {
       wrapper: ({ children }) => (
-        <AuthProvider initialState={{ sessionState: 'AUTHENTICATED', currentUser: mockUser }}>
+        <AuthProvider
+          initialState={{
+            sessionState: 'AUTHENTICATED',
+            currentUser: mockUser,
+          }}
+        >
           {children}
         </AuthProvider>
       ),
@@ -188,13 +205,21 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
   });
 
   test('SINGLE CLEANUP OWNER: 3 concurrent protected requests fail refresh terminally -> exactly 1 cleanup execution and 1 state transition', async () => {
-    const { apiClient, registerTokenRefreshHandler } = require('../../src/shared/api/apiClient');
+    const {
+      apiClient,
+      registerTokenRefreshHandler,
+    } = require('../../src/shared/api/apiClient');
     const axios = require('axios');
 
     // Mount AuthProvider initialized to AUTHENTICATED
     const { result } = await renderHook(() => useAuth(), {
       wrapper: ({ children }) => (
-        <AuthProvider initialState={{ sessionState: 'AUTHENTICATED', currentUser: mockUser }}>
+        <AuthProvider
+          initialState={{
+            sessionState: 'AUTHENTICATED',
+            currentUser: mockUser,
+          }}
+        >
           {children}
         </AuthProvider>
       ),
@@ -204,22 +229,33 @@ describe('AuthProvider Session Bootstrap Lifecycle', () => {
 
     // Mock refresh handler to fail terminally (simulating server refresh failure)
     const mockRefresh = jest.fn().mockImplementation(async () => {
-      throw new Error('Refresh token expired or revoked on server');
+      throw {
+        kind: 'UNAUTHORIZED',
+        status: 401,
+        message: 'Refresh token expired or revoked on server',
+      };
     });
     registerTokenRefreshHandler(mockRefresh);
 
-    const responseInterceptorErr = (apiClient.interceptors.response as any).handlers[0].rejected;
+    const responseInterceptorErr = (apiClient.interceptors.response as any)
+      .handlers[0].rejected;
 
     const create401Error = (id: string) => {
       const config = {
         url: `/projects/${id}`,
         method: 'get',
-        headers: new axios.AxiosHeaders({ Authorization: 'Bearer expired-token' }),
+        headers: new axios.AxiosHeaders({
+          Authorization: 'Bearer expired-token',
+        }),
       } as any;
 
       return new axios.AxiosError('Unauthorized', '401', config, {}, {
         status: 401,
-        data: { success: false, code: 'UNAUTHORIZED', timestamp: '2026-10-19T00:00:00Z' },
+        data: {
+          success: false,
+          code: 'UNAUTHORIZED',
+          timestamp: '2026-10-19T00:00:00Z',
+        },
         statusText: 'Unauthorized',
         headers: {},
         config,

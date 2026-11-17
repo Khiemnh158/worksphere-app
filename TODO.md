@@ -1,41 +1,40 @@
-# Backlog hiện hành - làm môn Lập trình nâng cao trước
+# TODO hiện hành - mốc MVP 02/11/2026
 
-Các ô bỏ trống đều CHƯA LÀM, không phải kết quả đã hoàn thành.
+Phạm vi phần mềm Lập trình nâng cao đã chốt: SME, giờ hành chính chung, web quản trị/điều phối và Android nhân viên. Người dùng xác nhận chưa có yêu cầu giảng viên bổ sung. Không dùng số tests để suy ra điểm hoặc phần trăm sản phẩm. Bằng chứng: [nghiệm thu 02/11](reports/COURSEWORK_ACCEPTANCE_2026-11-02.md).
 
-## Đã nhập
-- [x] Snapshot source gốc và nguồn gốc.
-- [x] Hai patch local F01/F02 trong code.
-- [x] Audit, trạng thái kiểm thử thật, phạm vi ba môn và liên kết repo.
+## Cổng hoàn tất phần mềm
 
-## A0 - Chốt hợp đồng trước khi mở rộng UI
-- [ ] Xác nhận rubric môn, yêu cầu web/mobile và phạm vi dùng lại source.
-- [ ] Chốt ma trận actor/resource/state, sitemap và API contract.
-- [ ] Tạo fixture requester/coordinator/agent/admin và hai project/nhóm để test chéo.
+- [x] Tài khoản/CSV PENDING, kích hoạt và reset email local một lần, TOTP tùy chọn, thu hồi phiên; Admin kỹ thuật tách nghiệp vụ.
+- [x] Phòng động, trưởng phòng/lãnh đạo/chuyên trách và người duyệt thay theo phạm vi/thời hạn; chặn tự duyệt; danh bạ phòng 20/trang.
+- [x] Công việc, trao đổi/tệp, nghiệm thu, bàn giao giữ tiến độ và yêu cầu rà soát; hỗ trợ trọn vòng trên web.
+- [x] Hồ sơ HR → lãnh đạo → cutoff và checklist; không xóa lịch sử tác giả; lương dự tính có người lập/duyệt/phát hành độc lập, không tự phạt/chuyển tiền.
+- [x] Công/nghỉ/OT, QR xoay vòng theo điểm, giờ máy chủ, lịch nghỉ cụ thể, cảnh báo mạng phải đối soát, cặp OT riêng; lịch sử punches phân trang cùng phạm vi rows/total.
+- [x] Web sáng/tối và điều hướng; Android công việc/hỗ trợ/tệp/chấm công/QR/hồ sơ/bảo mật/phiếu thu nhập cá nhân.
+- [x] OPPO: mở/lưu tệp mẫu, lịch sử tháng; đủ IN/OUT/OT_IN/OT_OUT qua camera trong môi trường đồng hồ mô phỏng riêng, đối soát công 470 phút và OT 45 phút.
+- [x] OPPO: liên kết OS kích hoạt và reset trọn vòng, người dùng tự đặt mật khẩu và đăng nhập; máy chủ xác nhận token đã dùng.
+- [x] Toàn bộ backend 407 tests bằng JDK 21, Docker/Testcontainers và 59 PostgreSQL opt-in: 0 fail/error/skip; package đạt.
+- [x] Mobile 98 suites/852 tests và TypeScript; web 8 tests đạt; APK localDemo JDK 21 ARM64+x86_64 có bundle.
+- [x] Clone sạch cùng máy/DB mới: build/chạy JDK 21, login/logout, thư reset đúng origin, reuse/Stop/restart; không seed lịch/lương giả.
 
-## A1 - Xác thực và quyền (chặn public)
-- [ ] F03 thu hồi access theo session khi logout/reset, test phiên A/B.
-- [ ] F04 rotation refresh atomic: 2 concurrent refresh chỉ 1 thành công.
-- [ ] F05 ProjectPolicy trên mọi mutation và test PM A không sửa B.
-- [ ] F14/F15 error catalog + lỗi login ngoài thống nhất; rate limit theo phạm vi.
-- [ ] Chẩn đoán 1 Jest timeout/act/open handles, không tăng timeout để che nguyên nhân.
+## Chuẩn bị nộp và trình bày
 
-## A2 - Ticket trọn vòng
-- [ ] F06 requester cancel/confirm; F07 không assign terminal; F08 asset link khi update.
-- [ ] F32 owner team/category + queue scope + coordinator assign đúng team, migration mới.
-- [ ] F17 timestamp reopen; F18 notification reject; audit thao tác chính F23.
-- [ ] Test state, version, permissions và attachment liên quan.
+- [ ] Điền đúng tên/MSSV/phân công thực tế; đối chiếu mẫu báo cáo/slide và rubric khi giảng viên cung cấp.
+- [ ] Nhóm diễn tập demo theo PROJECT_GUIDE, tự kiểm trên máy thành viên trước ngày nộp. Đây là kiểm tra môi trường thứ hai, chưa thực hiện.
+- [ ] Người dùng duyệt trải nghiệm/phạm vi cuối; lỗi tái hiện trong MVP tiếp tục sửa, không mở rộng tùy ý.
 
-## A3 - UI theo từng lát
-- [ ] Login/me và role-aware navigation.
-- [ ] Requester list/create/detail/comment/history/cancel/confirm/reject.
-- [ ] Coordinator queue/assign và agent start/wait/resolve.
-- [ ] Loading/error/empty/forbidden/conflict và allowedActions đồng bộ backend.
-- [ ] Sau khi luồng hỗ trợ xong: cải thiện Project/Task, F09 membership, F19 actions, F20 clear deadline.
+## Giới hạn đã ghi nhận, không kéo dài MVP vì các mục này
 
-## A4 - Sau MVP
-- [ ] Onboarding/reset email F11/F12, avatar F16, session policy F33.
-- [ ] File fail-closed/giao dịch/storage F24-F26; pagination/count F13/F21/F34; race PM F10; leader F22.
-- [ ] Release signing F27, dependency reachability/vá tương thích F28.
-- [ ] Full asset UI, SLA và ticket-task link sau khi phần bắt buộc đủ.
+- Lịch công chung; ca riêng/ca đêm, biểu mẫu giải trình từng punch, push khi app đóng và mobile quản trị ngang web chưa thuộc mốc này.
+- QR/IP không chứng minh hiện diện tuyệt đối; mạng văn phòng thật chưa cung cấp. Không có tự phạt vì muộn hoặc tự cộng OT do quét ra trễ.
+- Chưa camera thật mọi nhánh hết hạn/trùng/mất mạng; chưa file cloud/20 MiB/mọi ứng dụng đọc hoặc nhiều trang lịch sử thực tế OPPO. Có tests liên quan nhưng không thay thử thiết bị.
+- Danh sách hồ sơ/nhật ký còn giới hạn 200, bộ chọn 1000; chưa thử tải/chứng nhận quy mô lớn hoặc xuất snapshot kế toán.
+- Runner backend còn cảnh báo đóng fork Surefire; Jest còn act warnings. Tests đạt không có nghĩa mọi dòng legacy đã được audit.
+- Thuế/BHXH/thực lĩnh/ngân hàng, pháp lý sa thải/bồi thường, vân tay/SSO/iOS chưa triển khai; không cần cho phạm vi môn hiện tại.
 
-Chi tiết F01-F34: docs/audit/findings.json và PDF. Hạ tầng ở repo deployment; test an toàn chuyên đề ở security; mọi fix business code vẫn ở app.
+## Môn Triển khai phần mềm - thực hiện tiếp tại repo riêng
+
+- [ ] Ghim mốc app đã kiểm chứng; build/test/CI theo mẫu môn, cấu hình bí mật và môi trường.
+- [ ] Jenkins/Compose/chất lượng/giám sát theo yêu cầu; backup/restore/rollback, log và hướng dẫn tự chạy.
+- [ ] HTTPS/SMTP thật, ký phát hành/hosting chỉ khi cần và có cấu hình; không gọi localDemo là production.
+
+Đầu mối: [PROJECT_GUIDE](docs/PROJECT_GUIDE.md). Bằng chứng cũ có ngày giữ làm lịch sử; không mở lại các kế hoạch đã được thay thế. An toàn thông tin thi trắc nghiệm, không có repo/chuyên đề riêng. Hạn mức cũ không dùng làm tiêu chí hoàn tất công việc.

@@ -106,6 +106,7 @@ public class AssetRepairHistoryMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -133,20 +134,20 @@ public class AssetRepairHistoryMockMvcTest {
         UUID adminRoleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE code = 'ADMIN'", UUID.class);
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 adminUserId, adminRoleId);
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         employee1Id = UUID.randomUUID();
         insertUser(employee1Id, "emp1_user", "emp1@worksphere.com");
         UUID empRoleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE code = 'EMPLOYEE'", UUID.class);
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 employee1Id, empRoleId);
-        employee1Token = jwtService.generateAccessToken(employee1Id, UUID.randomUUID());
+        employee1Token = authorizationAccessToken(employee1Id);
 
         employee2Id = UUID.randomUUID();
         insertUser(employee2Id, "emp2_user", "emp2@worksphere.com");
         jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                 employee2Id, empRoleId);
-        employee2Token = jwtService.generateAccessToken(employee2Id, UUID.randomUUID());
+        employee2Token = authorizationAccessToken(employee2Id);
 
         testCategory = AssetCategory.create(
                 UUID.randomUUID(), "LAPTOP", "Laptop", "Laptop Category", true, Instant.now()
@@ -446,5 +447,15 @@ public class AssetRepairHistoryMockMvcTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.cost").doesNotExist())
                 .andExpect(jsonPath("$.data.description").value("Kiểm định an toàn định kỳ không tính phí"));
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

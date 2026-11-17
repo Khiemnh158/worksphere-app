@@ -1,0 +1,153 @@
+{
+  "date": "2026-11-01",
+  "scope": "Selected backend tests, not entire legacy Testcontainers suite",
+  "suites": [
+    {
+      "name": "com.worksphere.file.application.FilenameSanitizerTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.278"
+    },
+    {
+      "name": "com.worksphere.file.application.FileValidationServiceTest",
+      "tests": "25",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.458"
+    },
+    {
+      "name": "com.worksphere.file.domain.StoredFileTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.099"
+    },
+    {
+      "name": "com.worksphere.identity.application.TwoFactorServiceTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.037"
+    },
+    {
+      "name": "com.worksphere.identity.AuthorizationPostgresTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "20.698"
+    },
+    {
+      "name": "com.worksphere.identity.dev.E2eUserProvisionerTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.161"
+    },
+    {
+      "name": "com.worksphere.identity.SessionAuthorizationTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.571"
+    },
+    {
+      "name": "com.worksphere.identity.WorkplacePostgresTest",
+      "tests": "50",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "121.822"
+    },
+    {
+      "name": "com.worksphere.project.ProjectAccessPolicyTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.172"
+    },
+    {
+      "name": "com.worksphere.service_request.ServiceRequestAccessPolicyTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.007"
+    },
+    {
+      "name": "com.worksphere.task.TaskTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.016"
+    },
+    {
+      "name": "com.worksphere.task.TaskWorkflowTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.023"
+    },
+    {
+      "name": "com.worksphere.workplace.AttendanceRulesTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.01"
+    }
+  ],
+  "total": {
+    "tests": 152,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "postgresIntegrationTests": 58,
+  "clientSessionTests": {
+    "tests": 5,
+    "pass": 5,
+    "script": "scripts/test-web-session.mjs"
+  },
+  "browserScenarios": [
+    "Admin has management-only navigation",
+    "CSV department-code preview without creating accounts",
+    "department directory scoped to three IT members",
+    "logo/menu, retained navigation position, responsive and light/dark",
+    "forgot-password writes a private local test email",
+    "HR attendance station produces rotating QR",
+    "executive approval workspace and personnel/delegation forms",
+    "Admin and employee work/handover reviewed again; cancel/reopen forms",
+    "Android work comment appears in web with progress still 65%",
+    "Open IN visible before OUT; configured explicit break through web",
+    "Station hours and network settings form present; no real office network assumed"
+  ],
+  "mobile": "Android shared client: files verified with fixture opening/saving on OPPO; paginated punch history implemented. See mobile-validation.json for latest evidence and device acceptance limits.",
+  "browserScenariosEvidenceDate": "2026-10-30",
+  "punchPagination": {
+    "date": "2026-11-01",
+    "syntheticRows": 1116,
+    "allRowsReachable": "PASS",
+    "stableTimestampTieOrder": "PASS",
+    "employeeOwnRowsOnly": "PASS",
+    "otherDepartmentAndTechnicalAdminRowsAndTotalsHidden": "PASS",
+    "pageSizeBoundsAndMalformedParameters": "PASS",
+    "webPagerRaceAndRetryTests": 3,
+    "actualBrowser": "PASS_MONTH_CHANGE_EXISTING_IN_AND_SINGLE_PAGE_BOUNDARY_CONTROLS; multi-page coverage is PostgreSQL and pager tests",
+    "package": "PASS",
+    "migrationRequired": false,
+    "targetJava": 21,
+    "buildRuntimeJvm": 25,
+    "mainRuntimeApi": "PASS_EMPLOYEE_PAGES_AND_OVERVIEW_MATCH; no attendance writes"
+  }
+}

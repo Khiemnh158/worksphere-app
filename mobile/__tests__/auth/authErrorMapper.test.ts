@@ -29,7 +29,8 @@ describe('Auth Error Mapper', () => {
       };
       const result = mapAuthError(err);
       expect(result).toEqual({
-        message: 'Tài khoản chưa được kích hoạt. Vui lòng liên hệ quản trị viên.',
+        message:
+          'Tài khoản chưa được kích hoạt. Vui lòng liên hệ quản trị viên.',
         placement: 'dialog',
         retryable: false,
         clearSession: false,
@@ -130,7 +131,9 @@ describe('Auth Error Mapper', () => {
         message: 'Wrong password',
       };
       expect(mapAuthError(currentErr).placement).toBe('currentPassword');
-      expect(mapAuthError(currentErr).message).toBe('Mật khẩu hiện tại không chính xác');
+      expect(mapAuthError(currentErr).message).toBe(
+        'Mật khẩu hiện tại không chính xác',
+      );
 
       const sameErr: NormalizedApiError = {
         kind: 'VALIDATION_ERROR',
@@ -138,7 +141,9 @@ describe('Auth Error Mapper', () => {
         message: 'Same as old',
       };
       expect(mapAuthError(sameErr).placement).toBe('newPassword');
-      expect(mapAuthError(sameErr).message).toBe('Mật khẩu mới không được trùng mật khẩu hiện tại');
+      expect(mapAuthError(sameErr).message).toBe(
+        'Mật khẩu mới không được trùng mật khẩu hiện tại',
+      );
 
       const mismatchErr: NormalizedApiError = {
         kind: 'VALIDATION_ERROR',
@@ -146,7 +151,9 @@ describe('Auth Error Mapper', () => {
         message: 'Mismatch',
       };
       expect(mapAuthError(mismatchErr).placement).toBe('confirmPassword');
-      expect(mapAuthError(mismatchErr).message).toBe('Mật khẩu xác nhận không khớp');
+      expect(mapAuthError(mismatchErr).message).toBe(
+        'Mật khẩu xác nhận không khớp',
+      );
 
       const policyErr: NormalizedApiError = {
         kind: 'VALIDATION_ERROR',
@@ -154,7 +161,9 @@ describe('Auth Error Mapper', () => {
         message: 'Policy error',
       };
       expect(mapAuthError(policyErr).placement).toBe('newPassword');
-      expect(mapAuthError(policyErr).message).toBe('Mật khẩu phải có từ 8 đến 128 ký tự');
+      expect(mapAuthError(policyErr).message).toBe(
+        'Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8',
+      );
     });
 
     it('maps USER_NOT_FOUND to dialog', () => {
@@ -247,7 +256,9 @@ describe('Auth Error Mapper', () => {
 
     it('never reflects raw credentials, tokens or passwords', () => {
       const sensitivePassword = 'SUPER_SECRET_RAW_PASSWORD_123';
-      const result = mapAuthError(new Error(`Failed with ${sensitivePassword}`));
+      const result = mapAuthError(
+        new Error(`Failed with ${sensitivePassword}`),
+      );
       const serialized = JSON.stringify(result);
       expect(serialized).not.toContain(sensitivePassword);
     });

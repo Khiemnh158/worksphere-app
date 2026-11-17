@@ -204,9 +204,10 @@ public class ProjectController {
     public ResponseEntity<ApiResponse<ProjectMemberResponse>> updateProjectMemberRole(
             @PathVariable UUID projectId,
             @PathVariable UUID memberId,
-            @Valid @RequestBody UpdateProjectMemberRoleRequest request
+            @Valid @RequestBody UpdateProjectMemberRoleRequest request,
+            @AuthenticationPrincipal WorkSphereUserPrincipal principal
     ) {
-        ProjectMemberResponse response = projectMemberApplicationService.updateMemberRole(projectId, memberId, request);
+        ProjectMemberResponse response = projectMemberApplicationService.updateMemberRole(projectId, memberId, request, principal.userId());
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -218,9 +219,10 @@ public class ProjectController {
     @PreAuthorize("hasAuthority('PROJECT_MEMBER_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> removeProjectMember(
             @PathVariable UUID projectId,
-            @PathVariable UUID memberId
+            @PathVariable UUID memberId,
+            @AuthenticationPrincipal WorkSphereUserPrincipal principal
     ) {
-        projectMemberApplicationService.removeMember(projectId, memberId);
+        projectMemberApplicationService.removeMember(projectId, memberId, principal.userId());
         return ResponseEntity.ok(ApiResponse.successNoContent("Thành viên đã được xóa khỏi dự án"));
     }
 

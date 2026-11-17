@@ -87,6 +87,7 @@ public class AdminUserMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -117,7 +118,7 @@ public class AdminUserMockMvcTest {
                     "SELECT ?, id, now() FROM permissions ON CONFLICT DO NOTHING",
                     adminRoleId);
         }
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         // 2. Create Regular Employee
         employeeUserId = UUID.randomUUID();
@@ -129,7 +130,7 @@ public class AdminUserMockMvcTest {
                     "INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())",
                     employeeUserId, empRoleId);
         }
-        employeeToken = jwtService.generateAccessToken(employeeUserId, UUID.randomUUID());
+        employeeToken = authorizationAccessToken(employeeUserId);
     }
 
     private void insertUser(UUID id, String username, String email, String passwordHash, String status) {
@@ -263,5 +264,15 @@ public class AdminUserMockMvcTest {
 
         User unlocked = userRepository.findById(employeeUserId).orElseThrow();
         assertThat(unlocked.getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }

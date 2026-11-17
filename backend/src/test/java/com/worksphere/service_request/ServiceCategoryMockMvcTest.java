@@ -94,6 +94,7 @@ public class ServiceCategoryMockMvcTest {
 
     @BeforeEach
     void setUp() {
+        authorizationTestSessions.deleteAll();
         if (objectMapper == null) {
             objectMapper = new ObjectMapper().findAndRegisterModules();
         }
@@ -124,7 +125,7 @@ public class ServiceCategoryMockMvcTest {
         if (adminRoleId != null) {
             jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())", adminUserId, adminRoleId);
         }
-        adminToken = jwtService.generateAccessToken(adminUserId, UUID.randomUUID());
+        adminToken = authorizationAccessToken(adminUserId);
 
         employeeUserId = UUID.randomUUID();
         insertUser(employeeUserId, "emp_cat_test", "emp_cat@test.com", passwordEncoder.encode("Password123!"));
@@ -132,7 +133,7 @@ public class ServiceCategoryMockMvcTest {
         if (empRoleId != null) {
             jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id, assigned_at) VALUES (?, ?, now())", employeeUserId, empRoleId);
         }
-        employeeToken = jwtService.generateAccessToken(employeeUserId, UUID.randomUUID());
+        employeeToken = authorizationAccessToken(employeeUserId);
     }
 
     private void insertUser(UUID id, String username, String email, String passwordHash) {
@@ -398,5 +399,15 @@ public class ServiceCategoryMockMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.identity.infrastructure.persistence.LoginSessionRepository authorizationTestSessions;
+
+    private String authorizationAccessToken(UUID userId) {
+        UUID sessionId = UUID.randomUUID();
+        authorizationTestSessions.save(com.worksphere.identity.domain.LoginSession.create(
+                sessionId, userId, null, "HTTP test", "127.0.0.1", "JUnit"));
+        return jwtService.generateAccessToken(userId, sessionId);
     }
 }
