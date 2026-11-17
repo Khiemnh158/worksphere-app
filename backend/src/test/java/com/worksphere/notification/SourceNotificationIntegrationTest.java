@@ -208,7 +208,16 @@ public class SourceNotificationIntegrationTest {
         UUID newMemberId = UUID.randomUUID();
         createTestUser(newMemberId, "src_new_mem", "new_mem@test.com", "EMPLOYEE");
 
-        projectMemberService.addMember(projectId, new AddProjectMemberRequest(newMemberId, ProjectRole.MEMBER), adminId);
+        var authentication = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                adminPrincipal, null, List.of(
+                    new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new org.springframework.security.core.authority.SimpleGrantedAuthority("PROJECT_MEMBER_MANAGE")));
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            projectMemberService.addMember(projectId, new AddProjectMemberRequest(newMemberId, ProjectRole.MEMBER), adminId);
+        } finally {
+            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        }
 
         List<Notification> notifs = notificationRepository.findAll().stream()
                 .filter(n -> newMemberId.equals(n.getRecipientId()) && n.getType() == NotificationType.PROJECT_MEMBER_ADDED)

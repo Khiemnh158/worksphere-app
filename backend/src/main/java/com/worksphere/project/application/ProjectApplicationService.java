@@ -56,6 +56,7 @@ public class ProjectApplicationService {
     private final ProjectStatusHistoryRepository statusHistoryRepository;
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
+    private final ProjectAccessPolicy accessPolicy;
 
     public ProjectApplicationService(
             ProjectRepository projectRepository,
@@ -63,7 +64,8 @@ public class ProjectApplicationService {
             MilestoneRepository milestoneRepository,
             ProjectStatusHistoryRepository statusHistoryRepository,
             UserRepository userRepository,
-            DepartmentRepository departmentRepository
+            DepartmentRepository departmentRepository,
+            ProjectAccessPolicy accessPolicy
     ) {
         this.projectRepository = projectRepository;
         this.projectMemberRepository = projectMemberRepository;
@@ -71,6 +73,7 @@ public class ProjectApplicationService {
         this.statusHistoryRepository = statusHistoryRepository;
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
+        this.accessPolicy = accessPolicy;
     }
 
     @Transactional(readOnly = true)
@@ -95,7 +98,11 @@ public class ProjectApplicationService {
             Pageable pageable,
             WorkSphereUserPrincipal principal
     ) {
-        UUID memberUserId = hasSystemAdminRole(principal) ? null : (principal != null ? principal.userId() : null);
+        WorkSphereUserPrincipal actor = accessPolicy.currentPrincipal();
+        if (principal != null) {
+            accessPolicy.requireActor(principal.userId());
+        }
+        UUID memberUserId = accessPolicy.isAdmin() ? null : actor.userId();
 
         Page<Project> page = projectRepository.searchProjects(
                 search,
@@ -121,6 +128,10 @@ public class ProjectApplicationService {
 
     @Transactional
     public ProjectDetailResponse createProject(CreateProjectRequest request, UUID currentUserId) {
+        accessPolicy.requireActor(currentUserId);
+        if (!accessPolicy.hasAuthority("PROJECT_CREATE")) {
+            throw new AccessDeniedException("Bạn không có quyền tạo dự án");
+        }
         if (projectRepository.existsByCodeAndDeletedFalse(request.code())) {
             throw new BusinessRuleException("PROJECT_CODE_ALREADY_EXISTS", "Mã dự án đã tồn tại");
         }
@@ -192,7 +203,7 @@ public class ProjectApplicationService {
         Project project = projectRepository.findActiveById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
 
-        verifyProjectReadAccess(project.getId(), principal);
+        accessPolicy.requireRead(project.getId(), principal != null ? principal.userId() : null);
 
         return buildProjectDetailResponse(project, principal != null ? principal.userId() : null);
     }
@@ -202,6 +213,7 @@ public class ProjectApplicationService {
         Project project = projectRepository.findActiveById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
 
+        accessPolicy.requireRead(projectId, currentUserId);
         return buildProjectDetailResponse(project, currentUserId);
     }
 
@@ -237,8 +249,10 @@ public class ProjectApplicationService {
 
     @Transactional
     public ProjectDetailResponse updateProject(UUID projectId, UpdateProjectRequest request, UUID currentUserId) {
-        Project project = projectRepository.findActiveById(projectId)
+        Project project = projectRepository.findActiveByIdForUpdate(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
+
+        accessPolicy.requireManage(projectId, currentUserId, "PROJECT_UPDATE");
 
         if (!Objects.equals(project.getVersion(), request.version())) {
             throw new ObjectOptimisticLockingFailureException(Project.class, projectId);
@@ -260,8 +274,10 @@ public class ProjectApplicationService {
 
     @Transactional
     public ProjectDetailResponse changeProjectStatus(UUID projectId, ChangeProjectStatusRequest request, UUID currentUserId) {
-        Project project = projectRepository.findActiveById(projectId)
+        Project project = projectRepository.findActiveByIdForUpdate(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("PROJECT_NOT_FOUND", "Dự án không tồn tại"));
+
+        accessPolicy.requireManage(projectId, currentUserId, "PROJECT_UPDATE");
 
         if (!Objects.equals(project.getVersion(), request.version())) {
             throw new ObjectOptimisticLockingFailureException(Project.class, projectId);
@@ -287,58 +303,24 @@ public class ProjectApplicationService {
     }
 
     private Set<String> computeAllowedActions(Project project, UUID currentUserId) {
+        accessPolicy.requireActor(currentUserId);
         Set<String> actions = new HashSet<>();
-        boolean isManager = project.getManagerId().equals(currentUserId);
-        ProjectMember currentMember = projectMemberRepository.findActiveByProjectIdAndUserId(project.getId(), currentUserId).orElse(null);
-
-        if (isManager || (currentMember != null && currentMember.getProjectRole() == ProjectRole.PROJECT_MANAGER)) {
+        if (accessPolicy.canManage(project.getId(), "PROJECT_UPDATE")) {
             actions.add("UPDATE");
-            actions.add("MANAGE_MEMBERS");
             actions.add("CHANGE_STATUS");
             if (project.getStatus() == ProjectStatus.ACTIVE) {
-                actions.add("CREATE_TASK");
                 actions.add("CREATE_MILESTONE");
             }
-        } else if (currentMember != null && currentMember.getProjectRole() == ProjectRole.TEAM_LEADER) {
-            if (project.getStatus() == ProjectStatus.ACTIVE) {
-                actions.add("CREATE_TASK");
-            }
+        }
+        if (accessPolicy.canManage(project.getId(), "PROJECT_MEMBER_MANAGE")) {
+            actions.add("MANAGE_MEMBERS");
+        }
+        ProjectMember member = projectMemberRepository.findActiveByProjectIdAndUserId(project.getId(), currentUserId).orElse(null);
+        if (project.getStatus() == ProjectStatus.ACTIVE && accessPolicy.hasAuthority("TASK_CREATE")
+                && (accessPolicy.isAdmin() || (member != null && (member.getProjectRole() == ProjectRole.PROJECT_MANAGER
+                || member.getProjectRole() == ProjectRole.TEAM_LEADER)))) {
+            actions.add("CREATE_TASK");
         }
         return actions;
-    }
-
-    private void verifyProjectReadAccess(UUID projectId, WorkSphereUserPrincipal principal) {
-        if (principal == null) {
-            throw new AccessDeniedException("Yêu cầu xác thực");
-        }
-        if (hasSystemAdminRole(principal)) {
-            return;
-        }
-        boolean isMember = projectMemberRepository.existsByProjectIdAndUserIdAndActiveTrue(projectId, principal.userId());
-        if (!isMember) {
-            throw new AccessDeniedException("Bạn không có quyền truy cập dự án này");
-        }
-    }
-
-    private boolean hasSystemAdminRole(WorkSphereUserPrincipal principal) {
-        if (principal == null) {
-            return false;
-        }
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getAuthorities() != null) {
-            boolean hasAdminAuthority = auth.getAuthorities().stream()
-                    .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()) || "ADMIN".equals(a.getAuthority()));
-            if (hasAdminAuthority) {
-                return true;
-            }
-        }
-        if (principal.user() != null && principal.user().getRoles() != null) {
-            try {
-                return principal.user().getRoles().stream()
-                        .anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getCode()));
-            } catch (Exception ignored) {
-            }
-        }
-        return false;
     }
 }

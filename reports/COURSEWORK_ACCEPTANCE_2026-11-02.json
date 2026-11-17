@@ -1,0 +1,99 @@
+{
+  "date": "2026-11-02",
+  "scope": "Advanced Programming office-hours SME MVP; not production or a grade guarantee",
+  "sourceCommit": "1d51b0793427d839bf6cfbe7bb942bc794929fb9",
+  "backend": {
+    "tests": 407,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 41,
+    "java": "Temurin 21.0.13+9",
+    "classMajor": 65,
+    "migrations": 27,
+    "mavenExitCode": 0,
+    "package": "PASS",
+    "dockerTestcontainers": "executed",
+    "runnerCaveat": "Surefire forced fork shutdown after System.exit(0) timeout; all tests passed and Maven exited 0. Test fixture/context shutdown remains a maintenance item."
+  },
+  "web": {
+    "tests": 8,
+    "passed": 8,
+    "node": "24",
+    "command": "node --experimental-vm-modules --test scripts/test-web-session.mjs scripts/test-web-punch-history.mjs"
+  },
+  "mobile": {
+    "suites": 98,
+    "tests": 852,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 42.168,
+    "typecheck": "PASS",
+    "jestWarnings": "Inherited act warnings remain"
+  },
+  "android": {
+    "variant": "localDemo",
+    "package": "com.workspheremobile",
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "jdk": "21",
+    "buildSeconds": 132,
+    "apkSha256": "59371275e2a6d8871f72a8c0de45026d1d84d358ca33dece0889b2151afb7dda",
+    "requiresBackendUsb": true,
+    "releaseSigning": false,
+    "oppoUpdate": "installed, launched, user confirmed normal session preserved"
+  },
+  "physicalQr": {
+    "date": "2026-11-02",
+    "environment": "ISOLATED_SYNTHETIC_CLOCK",
+    "regularMinutes": 470,
+    "lateMinutes": 10,
+    "lateCheckoutDidNotCreateOvertime": true,
+    "measuredOvertimeMinutes": 45,
+    "claimBeyondMeasuredRejected": true,
+    "employeeSelfReviewRejected": true,
+    "networkWarningRequiresAcknowledgement": true,
+    "allFourScanTypesPersisted": true,
+    "attendanceApproved": true,
+    "overtimeConfirmed": true
+  },
+  "physicalRecovery": {
+    "environment": "isolated test package/database",
+    "activation": "user completed and server event verified",
+    "reset": "user completed and server event verified",
+    "tokensUsed": 2,
+    "realEmailSent": false
+  },
+  "cleanClone": {
+    "sourceCommit": "1d51b0793427d839bf6cfbe7bb942bc794929fb9",
+    "sameComputer": true,
+    "dependencyCacheUsed": true,
+    "jdk": "21",
+    "database": "new dedicated database",
+    "loginLogout": "PASS",
+    "resetMailCorrectOrigin": "PASS",
+    "reuseStopRestart": "PASS",
+    "calendarAndPunchesNotInvented": true,
+    "secondComputer": "NOT_TESTED"
+  },
+  "jarSha256": "bf005b017a063b2ec3a039a4353de62ba130a96c813f4d1a117b51584f4d36ac",
+  "notRequiredForCurrentMvp": [
+    "tax/BHXH/net salary",
+    "night shifts",
+    "per-person shift calendars",
+    "fingerprint hardware",
+    "SSO",
+    "iOS",
+    "background push",
+    "mobile administrator parity",
+    "production hosting/signing/SMTP",
+    "load certification"
+  ],
+  "remainingCourseWork": [
+    "Adapt report/slides to lecturer template and actual group contributions",
+    "Rehearse presentation",
+    "Software Deployment coursework in worksphere-deployment"
+  ]
+}

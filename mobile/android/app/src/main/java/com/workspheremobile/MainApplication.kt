@@ -12,6 +12,7 @@ class MainApplication : Application(), ReactApplication {
   override val reactHost: ReactHost by lazy {
     getDefaultReactHost(
       context = applicationContext,
+      useDevSupport = BuildConfig.DEBUG && !BuildConfig.BUNDLED_LOCAL,
       packageList =
         PackageList(this).packages.apply {
           add(EnvironmentConfigPackage())

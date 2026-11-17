@@ -52,7 +52,8 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
       case 'ACCOUNT_PENDING':
         return {
-          message: 'Tài khoản chưa được kích hoạt. Vui lòng liên hệ quản trị viên.',
+          message:
+            'Tài khoản chưa được kích hoạt. Vui lòng liên hệ quản trị viên.',
           placement: 'dialog',
           retryable: false,
           clearSession: false,
@@ -72,7 +73,8 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
       case 'ACCOUNT_DISABLED':
         return {
-          message: 'Tài khoản đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.',
+          message:
+            'Tài khoản đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.',
           placement: 'dialog',
           retryable: false,
           clearSession: false,
@@ -162,7 +164,7 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
       case 'PASSWORD_POLICY_VIOLATION':
         return {
-          message: 'Mật khẩu phải có từ 8 đến 128 ký tự',
+          message: 'Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8',
           placement: 'newPassword',
           retryable: false,
           clearSession: false,
@@ -172,7 +174,9 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
       case 'VALIDATION_ERROR':
         return {
-          message: normalized.message || 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.',
+          message:
+            normalized.message ||
+            'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.',
           placement: 'form',
           retryable: false,
           clearSession: false,
@@ -216,7 +220,8 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
     case 'NETWORK_ERROR':
       return {
-        message: 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.',
+        message:
+          'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.',
         placement: 'form',
         retryable: true,
         clearSession: false,
@@ -226,7 +231,8 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
     case 'TIMEOUT':
       return {
-        message: 'Kết nối mạng quá thời gian chờ. Vui lòng kiểm tra lại đường truyền và thử lại.',
+        message:
+          'Kết nối mạng quá thời gian chờ. Vui lòng kiểm tra lại đường truyền và thử lại.',
         placement: 'form',
         retryable: true,
         clearSession: false,
@@ -256,7 +262,8 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
     case 'CONFLICT':
       return {
-        message: 'Dữ liệu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.',
+        message:
+          'Dữ liệu đã bị thay đổi bởi giao dịch khác. Vui lòng tải lại trang.',
         placement: 'dialog',
         retryable: false,
         clearSession: false,
@@ -266,7 +273,8 @@ export function mapAuthError(error: unknown): AuthPresentationError {
 
     case 'VALIDATION_ERROR':
       return {
-        message: normalized.message || 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.',
+        message:
+          normalized.message || 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.',
         placement: 'form',
         retryable: false,
         clearSession: false,

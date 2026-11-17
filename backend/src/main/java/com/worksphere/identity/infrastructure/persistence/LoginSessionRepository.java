@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 import java.util.UUID;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 
 /**
  * Spring Data JPA repository for LoginSession entity.
@@ -15,6 +17,14 @@ import java.util.UUID;
 public interface LoginSessionRepository extends JpaRepository<LoginSession, UUID> {
 
     Optional<LoginSession> findByRefreshTokenId(UUID refreshTokenId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT ls FROM LoginSession ls WHERE ls.id = :sessionId")
+    Optional<LoginSession> findByIdForUpdate(@Param("sessionId") UUID sessionId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT ls FROM LoginSession ls WHERE ls.refreshTokenId = :refreshTokenId")
+    Optional<LoginSession> findByRefreshTokenIdForUpdate(@Param("refreshTokenId") UUID refreshTokenId);
 
     @Modifying
     @Query("UPDATE LoginSession ls SET ls.status = 'REVOKED', ls.updatedAt = :now WHERE ls.userId = :userId AND ls.status = 'ACTIVE'")

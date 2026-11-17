@@ -17,6 +17,7 @@ import com.worksphere.organization.infrastructure.persistence.DepartmentReposito
 import com.worksphere.shared.exception.BusinessRuleException;
 import com.worksphere.shared.exception.ResourceNotFoundException;
 import com.worksphere.shared.response.PagedData;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,11 @@ import java.util.stream.Collectors;
 @Service
 public class UserManagementApplicationService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserManagementApplicationService.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(UserManagementApplicationService.class);
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.worksphere.workplace.WorkplaceService governance;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -50,8 +55,7 @@ public class UserManagementApplicationService {
             DepartmentRepository departmentRepository,
             RefreshTokenRepository refreshTokenRepository,
             LoginSessionRepository loginSessionRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
@@ -67,53 +71,65 @@ public class UserManagementApplicationService {
             UUID departmentId,
             String roleCode,
             UserStatus status,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         Page<User> page = userRepository.searchUsers(search, departmentId, status, pageable);
 
-        List<UserSummaryResponse> items = page.getContent().stream()
-                .filter(u -> {
-                    if (roleCode == null || roleCode.isBlank()) {
-                        return true;
-                    }
-                    return u.getRoles().stream().anyMatch(r -> r.getCode().equalsIgnoreCase(roleCode));
-                })
-                .map(UserSummaryResponse::from)
-                .toList();
+        List<UserSummaryResponse> items =
+                page.getContent().stream()
+                        .filter(
+                                u -> {
+                                    if (roleCode == null || roleCode.isBlank()) {
+                                        return true;
+                                    }
+                                    return u.getRoles().stream()
+                                            .anyMatch(r -> r.getCode().equalsIgnoreCase(roleCode));
+                                })
+                        .map(UserSummaryResponse::from)
+                        .toList();
 
         return PagedData.from(page, items);
     }
 
     @Transactional(readOnly = true)
     public PagedData<UserDirectoryItemResponse> searchDirectory(
-            String search,
-            UUID departmentId,
-            Pageable pageable
-    ) {
-        String normalizedSearch = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+            String search, UUID departmentId, Pageable pageable) {
+        String normalizedSearch =
+                (search != null && !search.trim().isEmpty()) ? search.trim() : null;
 
-        Page<User> page = userRepository.searchUsers(normalizedSearch, departmentId, UserStatus.ACTIVE, pageable);
+        Page<User> page =
+                userRepository.searchUsers(
+                        normalizedSearch, departmentId, UserStatus.ACTIVE, pageable);
 
-        Set<UUID> departmentIds = page.getContent().stream()
-                .map(User::getDepartmentId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        Set<UUID> departmentIds =
+                page.getContent().stream()
+                        .map(User::getDepartmentId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
 
-        Map<UUID, String> departmentNames = departmentIds.isEmpty()
-                ? Collections.emptyMap()
-                : departmentRepository.findAllById(departmentIds).stream()
-                        .collect(Collectors.toMap(Department::getId, Department::getName));
+        Map<UUID, String> departmentNames =
+                departmentIds.isEmpty()
+                        ? Collections.emptyMap()
+                        : departmentRepository.findAllById(departmentIds).stream()
+                                .collect(Collectors.toMap(Department::getId, Department::getName));
 
-        List<UserDirectoryItemResponse> items = page.getContent().stream()
-                .map(u -> new UserDirectoryItemResponse(
-                        u.getId(),
-                        u.getUsername(),
-                        u.getFullName(),
-                        u.getEmail(),
-                        u.getAvatarFileId() != null ? "/api/v1/files/" + u.getAvatarFileId() + "/download" : null,
-                        u.getDepartmentId() != null ? departmentNames.get(u.getDepartmentId()) : null
-                ))
-                .toList();
+        List<UserDirectoryItemResponse> items =
+                page.getContent().stream()
+                        .map(
+                                u ->
+                                        new UserDirectoryItemResponse(
+                                                u.getId(),
+                                                u.getUsername(),
+                                                u.getFullName(),
+                                                u.getEmail(),
+                                                u.getAvatarFileId() != null
+                                                        ? "/api/v1/files/"
+                                                                + u.getAvatarFileId()
+                                                                + "/download"
+                                                        : null,
+                                                u.getDepartmentId() != null
+                                                        ? departmentNames.get(u.getDepartmentId())
+                                                        : null))
+                        .toList();
 
         return PagedData.from(page, items);
     }
@@ -128,15 +144,20 @@ public class UserManagementApplicationService {
         }
 
         if (request.departmentId() != null) {
-            departmentRepository.findActiveById(request.departmentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("DEPARTMENT_NOT_FOUND", "Phòng ban không tồn tại"));
+            departmentRepository
+                    .findActiveById(request.departmentId())
+                    .orElseThrow(
+                            () ->
+                                    new ResourceNotFoundException(
+                                            "DEPARTMENT_NOT_FOUND", "Phòng ban không tồn tại"));
         }
 
         Set<Role> roles = new HashSet<>();
         if (request.roleCodes() != null && !request.roleCodes().isEmpty()) {
             roles = roleRepository.findByCodeIn(request.roleCodes());
             if (roles.size() != request.roleCodes().size()) {
-                throw new BusinessRuleException("ROLE_NOT_FOUND", "Một hoặc nhiều vai trò không tồn tại");
+                throw new BusinessRuleException(
+                        "ROLE_NOT_FOUND", "Một hoặc nhiều vai trò không tồn tại");
             }
         } else {
             // Default role EMPLOYEE
@@ -147,13 +168,13 @@ public class UserManagementApplicationService {
         String temporaryPassword = generateSecureRandomPassword();
         String passwordHash = passwordEncoder.encode(temporaryPassword);
 
-        User user = User.create(
-                UUID.randomUUID(),
-                request.username(),
-                request.email(),
-                passwordHash,
-                request.fullName()
-        );
+        User user =
+                User.create(
+                        UUID.randomUUID(),
+                        request.username(),
+                        request.email(),
+                        passwordHash,
+                        request.fullName());
 
         if (request.phoneNumber() != null) {
             user.updateProfile(request.fullName(), request.phoneNumber());
@@ -166,45 +187,55 @@ public class UserManagementApplicationService {
 
         // Persist UserRole records
         for (Role role : roles) {
-            userRoleRepository.save(new com.worksphere.identity.domain.UserRole(
-                    saved.getId(),
-                    role.getId(),
-                    Instant.now(),
-                    null
-            ));
+            userRoleRepository.save(
+                    new com.worksphere.identity.domain.UserRole(
+                            saved.getId(), role.getId(), Instant.now(), null));
         }
 
         user.setRoles(roles);
-        log.info("User created by admin. userId={}, username={}", saved.getId(), saved.getUsername());
+        log.info(
+                "User created by admin. userId={}, username={}",
+                saved.getId(),
+                saved.getUsername());
         return UserSummaryResponse.from(user);
     }
 
     @Transactional
     public UserSummaryResponse updateUser(UUID userId, AdminUpdateUserRequest request) {
-        User user = userRepository.findActiveById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", "Người dùng không tồn tại"));
+        User user =
+                userRepository
+                        .findActiveById(userId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "USER_NOT_FOUND", "Người dùng không tồn tại"));
 
         if (request.departmentId() != null) {
-            departmentRepository.findActiveById(request.departmentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("DEPARTMENT_NOT_FOUND", "Phòng ban không tồn tại"));
+            departmentRepository
+                    .findActiveById(request.departmentId())
+                    .orElseThrow(
+                            () ->
+                                    new ResourceNotFoundException(
+                                            "DEPARTMENT_NOT_FOUND", "Phòng ban không tồn tại"));
         }
 
+        if (governance != null && !Objects.equals(user.getDepartmentId(), request.departmentId()))
+            governance.validateStaffTransfer(userId);
         user.adminUpdate(request.fullName(), request.phoneNumber(), request.departmentId());
 
         if (request.roleCodes() != null) {
+            if (governance != null) governance.validateLegacyRoles(userId, request.roleCodes());
             Set<Role> roles = roleRepository.findByCodeIn(request.roleCodes());
             if (roles.size() != request.roleCodes().size()) {
-                throw new BusinessRuleException("ROLE_NOT_FOUND", "Một hoặc nhiều vai trò không tồn tại");
+                throw new BusinessRuleException(
+                        "ROLE_NOT_FOUND", "Một hoặc nhiều vai trò không tồn tại");
             }
             userRoleRepository.deleteByUserId(user.getId());
             userRoleRepository.flush();
             for (Role role : roles) {
-                userRoleRepository.save(new com.worksphere.identity.domain.UserRole(
-                        user.getId(),
-                        role.getId(),
-                        Instant.now(),
-                        null
-                ));
+                userRoleRepository.save(
+                        new com.worksphere.identity.domain.UserRole(
+                                user.getId(), role.getId(), Instant.now(), null));
             }
             user.setRoles(roles);
         }
@@ -215,23 +246,34 @@ public class UserManagementApplicationService {
 
     @Transactional
     public void lockUser(UUID userId, String reason) {
-        User user = userRepository.findActiveById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", "Người dùng không tồn tại"));
+        User user =
+                userRepository
+                        .findActiveById(userId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "USER_NOT_FOUND", "Người dùng không tồn tại"));
 
+        if (governance != null) governance.validateLegacyLock(userId);
         user.lock();
         userRepository.save(user);
 
         // Revoke active sessions and refresh tokens per security rules
-        refreshTokenRepository.revokeAllByUserId(userId, Instant.now());
         loginSessionRepository.revokeAllActiveByUserId(userId, Instant.now());
+        refreshTokenRepository.revokeAllByUserId(userId, Instant.now());
 
         log.info("User locked by admin. userId={}, reason={}", userId, reason);
     }
 
     @Transactional
     public void unlockUser(UUID userId) {
-        User user = userRepository.findActiveById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", "Người dùng không tồn tại"));
+        User user =
+                userRepository
+                        .findActiveById(userId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "USER_NOT_FOUND", "Người dùng không tồn tại"));
 
         user.unlock();
         userRepository.save(user);

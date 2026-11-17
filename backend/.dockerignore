@@ -1,0 +1,8 @@
+**
+!.mvn/
+!.mvn/**
+!mvnw
+!pom.xml
+!checkstyle.xml
+!src/
+!src/**
