@@ -4,6 +4,8 @@ Nền tảng quản lý yêu cầu hỗ trợ và công việc nội bộ cho do
 
 **Bắt đầu tại [Hướng dẫn dự án và giao việc](docs/PROJECT_GUIDE.md).** Tài liệu này chỉ đường để chạy, hiểu nghiệp vụ, chia việc và chuẩn bị báo cáo/slide.
 
+Bản vá ngày 25/11/2026 đã qua Jenkins #10 với 411 test backend, 8 test web và quality gate OK. [Kết quả và các cảnh báo còn ghi nhận](STATUS.md).
+
 | Bạn cần | Đọc |
 |---|---|
 | Chạy bản clone và Android | [Hướng dẫn chạy](docs/FRESH_CLONE_RUNNING.md) |

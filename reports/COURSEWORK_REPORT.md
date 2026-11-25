@@ -4,7 +4,8 @@ Báo cáo WorkSphere của nhóm 5 sinh viên lớp 24IT1 trình bày thiết k�
 
 - [Bản Word](WorkSphere-Lap-trinh-nang-cao.docx)
 - [Bản PDF](WorkSphere-Lap-trinh-nang-cao.pdf)
-- [Mã nguồn WorkSphere dùng cho bản triển khai](https://github.com/Khiemnh158/worksphere-app/tree/4273f1ed907eb49ae0023ab1cacff7c25de8a691)
+- [Mã nguồn WorkSphere đã kiểm ngày 25/11/2026](https://github.com/Khiemnh158/worksphere-app/tree/2ae3b83e07ac88ebe7b88e3b6c422fb8492ce290)
+- [Kết quả kiểm tra bản vá ngày 25/11/2026](https://github.com/Khiemnh158/worksphere-deployment/blob/docs/coursework-reports-20261117/evidence/LOCAL_2026-11-25.md)
 - [Hồ sơ nghiệm thu Lập trình nâng cao](https://github.com/Khiemnh158/worksphere-app/blob/coursework-mvp-2026-11-02/reports/COURSEWORK_ACCEPTANCE_2026-11-02.md)
 
 Bản chia sẻ công khai để trống cột mã sinh viên. Bảng phân công ghi nhiệm vụ đề xuất cho buổi trình bày để nhóm xác nhận.

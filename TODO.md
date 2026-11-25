@@ -3,7 +3,8 @@
 Cập nhật 25/11/2026. Bản vá trước buổi kiểm tra sửa giao dịch metadata tệp,
 khóa giao dịch của tác vụ nhắc hạn, rollback hộp thư khi ghi lỗi, kiểm tra dữ liệu
 thời gian thiếu và chạy web bằng tài khoản nginx. Test tập trung đạt 9 ca.
-Kết quả toàn bộ và mã triển khai được xác nhận riêng trong lượt Jenkins mới.
+Jenkins #10 xác nhận 411 test backend và 8 test web đạt, quality gate OK,
+coverage phần mới 86,1% và issue mới 0. Mã ứng dụng được chạy là `2ae3b83`.
 Các cảnh báo Sonar còn lại tiếp tục theo dõi theo từng rule.
 
 Phạm vi phần mềm Lập trình nâng cao đã chốt: SME, giờ hành chính chung, web quản trị/điều phối và Android nhân viên. Người dùng xác nhận chưa có yêu cầu giảng viên bổ sung. Không dùng số tests để suy ra điểm hoặc phần trăm sản phẩm. Bằng chứng: [nghiệm thu 02/11](reports/COURSEWORK_ACCEPTANCE_2026-11-02.md).

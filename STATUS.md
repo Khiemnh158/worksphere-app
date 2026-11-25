@@ -1,5 +1,16 @@
 # Hiện trạng WorkSphere - 02/11/2026
 
+## Bản vá đã kiểm tra ngày 25/11/2026
+
+App commit `2ae3b83` đã chạy qua Jenkins #10 của môn Triển khai phần mềm.
+411 test backend và 8 test web đạt. Quality gate OK, coverage phần mới 86,1%,
+issue mới 0. Metadata tệp được lưu qua giao dịch riêng, nhắc hạn theo lịch giữ
+advisory lock trong giao dịch, hộp thư rollback khi ghi lỗi và web chạy bằng nginx.
+Image đang chạy đã đối chiếu với artifact Jenkins. Tệp cũ và mới đều kiểm lại đạt.
+Sonar toàn bộ mã vẫn ghi 9 cảnh báo security, 44 reliability và coverage 70,0%.
+
+[Minh chứng ngày 25/11](https://github.com/Khiemnh158/worksphere-deployment/blob/docs/coursework-reports-20261117/evidence/LOCAL_2026-11-25.md).
+
 Đã chốt mốc phần mềm MVP cho Kỹ năng lập trình nâng cao theo phạm vi giờ hành chính SME đã thống nhất. Web và Android dùng chung API Java/Spring Boot/PostgreSQL. Chưa phải production hoặc bảo đảm điểm số; nhóm còn hoàn thiện báo cáo/slide theo mẫu và diễn tập.
 
 ## Đã có
