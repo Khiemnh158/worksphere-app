@@ -163,6 +163,7 @@ public class FileValidationService {
     private final long maxTotalUncompressedSize;
     private final double maxCompressionRatio;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public FileValidationService() {
         this(
                 DEFAULT_MAX_ZIP_ENTRIES,

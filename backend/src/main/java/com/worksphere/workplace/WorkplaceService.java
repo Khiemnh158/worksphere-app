@@ -837,7 +837,7 @@ public class WorkplaceService {
         String username = text(input.username(), 50, "Tên đăng nhập");
         String email = text(input.email(), 255, "Email").toLowerCase(Locale.ROOT);
         if (!username.matches("[a-zA-Z0-9._-]{3,50}")
-                || !email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+"))
+                || !email.matches("[^@\\s]++@[^@\\s.]++(?:\\.[^@\\s.]++)++"))
             throw invalid("Tên đăng nhập hoặc email không hợp lệ");
 
         if (!db.queryForList(

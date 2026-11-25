@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserManagementApplicationService {
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private static final Logger log =
             LoggerFactory.getLogger(UserManagementApplicationService.class);
@@ -282,9 +283,8 @@ public class UserManagementApplicationService {
     }
 
     private String generateSecureRandomPassword() {
-        SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[16];
-        random.nextBytes(bytes);
+        RANDOM.nextBytes(bytes);
         return HexFormat.of().formatHex(bytes) + "Aa1!";
     }
 }

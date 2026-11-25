@@ -63,7 +63,8 @@ class FileApplicationServiceTest {
                 taskAttachmentRepository,
                 taskRepository,
                 projectMemberRepository,
-                jdbcTemplate
+                jdbcTemplate,
+                new FileMetadataWriter(storedFileRepository)
         );
     }
 

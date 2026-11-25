@@ -120,7 +120,10 @@ public class TimeIncomeService {
     }
 
     private Instant instant(Object value) {
-        return ((java.sql.Timestamp) value).toInstant();
+        if (!(value instanceof java.sql.Timestamp timestamp)) {
+            throw new BusinessRuleException("TIME_CONFIGURATION_REQUIRED", "Dữ liệu thời gian công chưa đầy đủ");
+        }
+        return timestamp.toInstant();
     }
 
     private void audit(UUID actor, UUID subject, String type) {

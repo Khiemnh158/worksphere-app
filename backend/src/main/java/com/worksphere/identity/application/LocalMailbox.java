@@ -29,7 +29,7 @@ public class LocalMailbox {
     }
 
     @Scheduled(fixedDelay = 3000)
-    @Transactional
+    @Transactional(rollbackFor = java.io.IOException.class)
     public void deliver() throws Exception {
         Files.createDirectories(folder);
         for (var row :

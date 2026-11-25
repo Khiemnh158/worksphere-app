@@ -64,7 +64,7 @@ public class EnrollmentController {
             if (!username.matches("[A-Za-z0-9._-]{3,50}")
                     || !names.add(username.toLowerCase(Locale.ROOT)))
                 errors.add("Tên đăng nhập sai hoặc trùng trong tệp");
-            if (!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+") || !emails.add(email))
+            if (!email.matches("[^@\\s]++@[^@\\s.]++(?:\\.[^@\\s.]++)++") || !emails.add(email))
                 errors.add("Email sai hoặc trùng trong tệp");
             if (r.fullName() == null || r.fullName().isBlank() || r.fullName().length() > 150)
                 errors.add("Họ tên chưa hợp lệ");

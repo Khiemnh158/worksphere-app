@@ -19,6 +19,7 @@ public class WorkSphereAuthEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public WorkSphereAuthEntryPoint() {
         this.objectMapper = createDefaultObjectMapper();
     }

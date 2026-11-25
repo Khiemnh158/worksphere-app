@@ -24,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -34,6 +35,8 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 
 @SpringBootTest
 @Testcontainers
@@ -64,7 +67,7 @@ public class NotificationIdempotencyAndScannerTest {
         }
     }
 
-    @Autowired
+    @MockitoSpyBean
     private NotificationApplicationService notificationService;
 
     @Autowired
@@ -173,6 +176,34 @@ public class NotificationIdempotencyAndScannerTest {
                 .filter(n -> eventKey.equals(n.getEventKey()))
                 .count();
         assertThat(count).isEqualTo(0L);
+    }
+
+    @Test
+    void scheduledScanStartsTransactionBeforeTakingAdvisoryLock() {
+        UUID taskId = UUID.randomUUID();
+        Instant due = FIXED_NOW.minusSeconds(7200);
+        createTaskWithAssignment(taskId, "Scheduled overdue task", TaskStatus.IN_PROGRESS, due, userId1);
+
+        doAnswer(invocation -> {
+            try (var connection = java.sql.DriverManager.getConnection(
+                    postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword());
+                 var statement = connection.createStatement();
+                 var result = statement.executeQuery("SELECT pg_try_advisory_xact_lock(1101, 1)")) {
+                assertThat(result.next()).isTrue();
+                assertThat(result.getBoolean(1))
+                        .as("Another scanner must not acquire the lock during notification delivery")
+                        .isFalse();
+            }
+            return invocation.callRealMethod();
+        }).when(notificationService).deliverInAppNotification(any(), any(), any(), any(), any(), any(), any());
+
+        scanner.scheduledScan();
+        scanner.scheduledScan();
+
+        String eventKey = "TASK_OVERDUE:" + taskId + ":" + due.toEpochMilli();
+        assertThat(notificationRepository.findAll().stream()
+                .filter(notification -> eventKey.equals(notification.getEventKey())))
+                .hasSize(1);
     }
 
     @Test

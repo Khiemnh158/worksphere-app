@@ -64,6 +64,7 @@ public class TaskDeadlineScanner {
 
     @Scheduled(fixedDelayString = "${worksphere.notification.task-deadline-scan-delay:PT15M}")
     @ConditionalOnProperty(name = "worksphere.notification.scheduling.enabled", havingValue = "true", matchIfMissing = true)
+    @Transactional
     public void scheduledScan() {
         scanDeadlines();
     }

@@ -21,7 +21,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,6 +54,7 @@ public class FileApplicationService {
     private final TaskRepository taskRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final FileMetadataWriter metadataWriter;
 
     public FileApplicationService(
             StoredFileRepository storedFileRepository,
@@ -63,7 +63,8 @@ public class FileApplicationService {
             TaskAttachmentRepository taskAttachmentRepository,
             TaskRepository taskRepository,
             ProjectMemberRepository projectMemberRepository,
-            JdbcTemplate jdbcTemplate) {
+            JdbcTemplate jdbcTemplate,
+            FileMetadataWriter metadataWriter) {
         this.storedFileRepository = storedFileRepository;
         this.fileStorageService = fileStorageService;
         this.fileValidationService = fileValidationService;
@@ -71,6 +72,7 @@ public class FileApplicationService {
         this.taskRepository = taskRepository;
         this.projectMemberRepository = projectMemberRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.metadataWriter = metadataWriter;
     }
 
     /**
@@ -207,7 +209,6 @@ public class FileApplicationService {
     }
 
     /** Short transaction strictly for metadata persistence. */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public StoredFile saveMetadata(
             UUID fileId,
             String originalName,
@@ -229,7 +230,7 @@ public class FileApplicationService {
                         sizeBytes,
                         checksumSha256,
                         uploadedBy);
-        return storedFileRepository.save(storedFile);
+        return metadataWriter.save(storedFile);
     }
 
     /** Downloads an active file after validating caller permissions. */

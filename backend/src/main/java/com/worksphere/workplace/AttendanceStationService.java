@@ -22,6 +22,7 @@ public class AttendanceStationService {
     private final WorkplaceService access;
     private final RecoveryService secrets;
     private static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public AttendanceStationService(
             JdbcTemplate db, WorkplaceService access, RecoveryService secrets) {
@@ -59,7 +60,10 @@ public class AttendanceStationService {
     }
 
     private Instant stamp(Object value) {
-        return ((java.sql.Timestamp) value).toInstant();
+        if (!(value instanceof java.sql.Timestamp timestamp)) {
+            throw bad("Dữ liệu thời gian chấm công chưa đầy đủ");
+        }
+        return timestamp.toInstant();
     }
 
     private void stationHours(Map<String, Object> station, Instant now) {
@@ -85,7 +89,7 @@ public class AttendanceStationService {
         } catch (Exception ex) {
             throw bad("Giờ mở điểm chưa hợp lệ");
         }
-        if (opens.isBefore(LocalTime.of(6, 0))
+        if (opens == null || closes == null || opens.isBefore(LocalTime.of(6, 0))
                 || closes.isAfter(LocalTime.of(22, 0))
                 || !closes.isAfter(opens))
             throw bad("Giờ mở điểm trong 06:00–22:00, kết thúc sau bắt đầu");
@@ -147,7 +151,7 @@ public class AttendanceStationService {
                         station);
         stationHours(s, Instant.now(clock));
         byte[] bytes = new byte[32];
-        new SecureRandom().nextBytes(bytes);
+        RANDOM.nextBytes(bytes);
         String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
         Instant expires = Instant.now(clock).plusSeconds(40);
         UUID id = UUID.randomUUID();

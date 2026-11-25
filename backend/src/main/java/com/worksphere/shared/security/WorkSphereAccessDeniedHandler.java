@@ -19,6 +19,7 @@ public class WorkSphereAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public WorkSphereAccessDeniedHandler() {
         this.objectMapper = createDefaultObjectMapper();
     }
