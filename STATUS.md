@@ -9,7 +9,7 @@ advisory lock trong giao dịch, hộp thư rollback khi ghi lỗi và web chạ
 Image đang chạy đã đối chiếu với artifact Jenkins. Tệp cũ và mới đều kiểm lại đạt.
 Sonar toàn bộ mã vẫn ghi 9 cảnh báo security, 44 reliability và coverage 70,0%.
 
-[Minh chứng ngày 25/11](https://github.com/Khiemnh158/worksphere-deployment/blob/docs/coursework-reports-20261117/evidence/LOCAL_2026-11-25.md).
+[Minh chứng ngày 25/11](https://github.com/Khiemnh158/worksphere-deployment/blob/main/evidence/LOCAL_2026-11-25.md).
 
 Đã chốt mốc phần mềm MVP cho Kỹ năng lập trình nâng cao theo phạm vi giờ hành chính SME đã thống nhất. Web và Android dùng chung API Java/Spring Boot/PostgreSQL. Chưa phải production hoặc bảo đảm điểm số; nhóm còn hoàn thiện báo cáo/slide theo mẫu và diễn tập.
 

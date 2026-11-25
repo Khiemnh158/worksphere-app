@@ -1,6 +1,6 @@
 # Thành viên khác chạy từ source
 
-Lấy đúng nhánh feat/authorization-foundation cho đến khi PR được merge. Không copy database hoặc tệp mật khẩu trên máy người khác. Hướng dẫn Windows; chưa xác minh launcher trên Linux/macOS.
+Mã nguồn bàn giao nằm trên nhánh `main`. Không copy database hoặc tệp mật khẩu trên máy người khác. Hướng dẫn Windows; chưa xác minh launcher trên Linux/macOS.
 
 ## Chuẩn bị
 
@@ -9,7 +9,7 @@ Lấy đúng nhánh feat/authorization-foundation cho đến khi PR được mer
 - Internet cho Maven Wrapper tải Maven/dependencies ở lượt đầu. Backend có mvnw.cmd và cấu hình Wrapper. Android thêm Android Studio/SDK, ANDROID_HOME và USB debugging được chính người dùng cho phép.
 
 ```powershell
-git clone --branch feat/authorization-foundation https://github.com/Khiemnh158/worksphere-app.git
+git clone --branch main https://github.com/Khiemnh158/worksphere-app.git
 cd worksphere-app
 .\scripts\run-local.ps1 -PgBinPath 'C:\Program Files\PostgreSQL\16\bin'
 ```

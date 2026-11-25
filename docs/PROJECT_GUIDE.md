@@ -42,7 +42,7 @@ Ba phòng là dữ liệu mẫu, thêm được phòng. Trưởng phòng theo ma
 
 Lịch thử chung đã được chọn 08–17 T2–T6, nghỉ 11:30–12:30. Chưa lịch cá nhân/ca đêm. Mạng văn phòng chưa cấu hình; QR/IP không chứng minh hiện diện tuyệt đối, USB chỉ là đường thử. Xem [ATTENDANCE_POLICY](ATTENDANCE_POLICY.md) trước khi viết công thức/chính sách.
 
-## 5. Bảng giao việc cho nhóm bốn người
+## 5. Bảng giao việc cho nhóm năm người
 
 Điền người nhận thực tế, không giả định thành viên đã làm. Mỗi người bàn giao đầu ra và bằng chứng, người phụ trách tích hợp kiểm tra lại.
 
