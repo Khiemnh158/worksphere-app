@@ -25,7 +25,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,7 +36,7 @@ class AttendanceStationConfigurationTest {
     @Mock private RecoveryService recovery;
     private final UUID actor = UUID.randomUUID();
     private final UUID station = UUID.randomUUID();
-    private final WorkSphereUserPrincipal principal = mock(WorkSphereUserPrincipal.class);
+    @Mock private WorkSphereUserPrincipal principal;
     private AttendanceStationService service;
 
     @BeforeEach
@@ -52,8 +51,8 @@ class AttendanceStationConfigurationTest {
     void stationUpdateRejectsMissingOpeningTimeBeforeWriting() {
         when(db.queryForMap(anyString(), eq(station))).thenReturn(Map.of(
                 "closes_at", Time.valueOf("17:00:00")));
-        assertThatThrownBy(() -> service.state(station,
-                new AttendanceStationService.StationInput("Office", true), principal))
+        var input = new AttendanceStationService.StationInput("Office", true);
+        assertThatThrownBy(() -> service.state(station, input, principal))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("Giờ mở điểm");
         verify(db, never()).update(anyString(), any(Object[].class));
@@ -63,8 +62,8 @@ class AttendanceStationConfigurationTest {
     void stationUpdateRejectsMissingClosingTimeBeforeWriting() {
         when(db.queryForMap(anyString(), eq(station))).thenReturn(Map.of(
                 "opens_at", Time.valueOf("08:00:00")));
-        assertThatThrownBy(() -> service.state(station,
-                new AttendanceStationService.StationInput("Office", true), principal))
+        var input = new AttendanceStationService.StationInput("Office", true);
+        assertThatThrownBy(() -> service.state(station, input, principal))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("Giờ mở điểm");
         verify(db, never()).update(anyString(), any(Object[].class));
