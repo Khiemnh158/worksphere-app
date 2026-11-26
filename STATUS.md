@@ -1,5 +1,25 @@
 # Hiện trạng WorkSphere - 02/11/2026
 
+## Bàn giao source ngày 26/11/2026
+
+Bản cập nhật gồm Swagger, kiểm tra đăng nhập, Gradle Sync Windows và tuyến tài liệu
+API qua Nginx. Checkout bàn giao riêng đã package bằng JDK 21 với 20 test tập trung
+đạt; web 8 test và Android 36 test đăng nhập đạt. Không đặt mật khẩu demo chung
+hoặc đưa database/APK/cache vào Git. [Chi tiết và giới hạn](docs/UPDATE_2026-11-26.md).
+Docker/Jenkins chưa chạy lại cho bản cập nhật này; kết quả #10 là mốc trước đó.
+
+## Swagger local đã sửa ngày 26/11/2026
+
+Backend local phục vụ thi đã thay springdoc 2.6.0 bằng 3.1.1, phù hợp dòng
+Spring Boot 4.1; giữ Java 21. Có cấu hình mô tả JWT bearer và các API auth công khai,
+không thay chính sách phân quyền hoặc migration database.
+
+17 kiểm thử tập trung đạt, gồm 2 ca OpenAPI chạy với PostgreSQL riêng.
+Bản thử đạt 56 kiểm tra, có luồng tạo việc → nhận → gửi kết quả → nghiệm thu.
+Sau cập nhật bản local chính, 45 kiểm tra đạt; Swagger JSON trả HTTP 200 với
+117 đường dẫn / 150 thao tác HTTP. Đây không phải một lượt chạy lại toàn bộ bộ test.
+Chi tiết: [minh chứng Swagger local](docs/OPENAPI_LOCAL_2026-11-26.md).
+
 ## Bản vá đã kiểm tra ngày 25/11/2026
 
 App commit `2ae3b83` đã chạy qua Jenkins #10 của môn Triển khai phần mềm.

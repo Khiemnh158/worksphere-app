@@ -1,5 +1,18 @@
 # TODO hiện hành - mốc MVP 02/11/2026
 
+## Bổ sung trước buổi thi ngày 26/11/2026
+
+- [x] Chuẩn bị bản bàn giao Swagger/auth/Gradle trên checkout riêng; package 20 test backend tập trung, 36 test Android auth và 8 test web đạt.
+- [x] Bổ sung tuyến Swagger qua Nginx và bước kiểm tra tại repo triển khai.
+- [ ] Chạy lại Docker/Jenkins cho commit bàn giao, xác nhận tuyến Swagger qua cổng web Docker và quality gate mới.
+
+- [x] Sửa `/v3/api-docs` HTTP 500 do springdoc 2.6.0 không tương thích với Spring hiện tại.
+- [x] Swagger hiển thị API, có JWT Authorize và mô tả đúng các API auth công khai.
+- [x] 17 kiểm thử tập trung đạt; 56 kiểm tra trên bản thử riêng và 45 kiểm tra sau cập nhật local đạt.
+- [x] Giữ JDK 21 và chính sách quyền hiện tại; không thay migration hoặc xóa dữ liệu demo.
+
+Minh chứng và giới hạn: [OPENAPI_LOCAL_2026-11-26](docs/OPENAPI_LOCAL_2026-11-26.md).
+
 Cập nhật 25/11/2026. Bản vá trước buổi kiểm tra sửa giao dịch metadata tệp,
 khóa giao dịch của tác vụ nhắc hạn, rollback hộp thư khi ghi lỗi, kiểm tra dữ liệu
 thời gian thiếu và chạy web bằng tài khoản nginx. Test tập trung đạt 9 ca.

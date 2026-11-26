@@ -1,6 +1,9 @@
-pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+pluginManagement {
+    // Resolve Windows junctions as well as symlinks before Gradle/IDE model import.
+    includeBuild(file("../node_modules/@react-native/gradle-plugin").toPath().toRealPath().toString())
+}
 plugins { id("com.facebook.react.settings") }
 extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
 rootProject.name = 'WorkSphereMobile'
 include ':app'
-includeBuild('../node_modules/@react-native/gradle-plugin')
+includeBuild(file('../node_modules/@react-native/gradle-plugin').toPath().toRealPath().toString())

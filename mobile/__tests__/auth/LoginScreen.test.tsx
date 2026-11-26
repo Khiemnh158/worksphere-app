@@ -77,7 +77,7 @@ describe('LoginScreen Component', () => {
     expect(defaultMockAuthContext.login).not.toHaveBeenCalled();
   });
 
-  test('validates password length constraint (min 8 chars)', async () => {
+  test('validates password maximum length before submitting', async () => {
     const { getByTestId, getByText, getByPlaceholderText } = await renderLoginScreen();
 
     await act(async () => {
@@ -85,7 +85,7 @@ describe('LoginScreen Component', () => {
     });
 
     await act(async () => {
-      fireEvent.changeText(getByPlaceholderText('Nhập mật khẩu'), 'short');
+      fireEvent.changeText(getByPlaceholderText('Nhập mật khẩu'), 'p'.repeat(129));
     });
 
     await act(async () => {
@@ -93,7 +93,7 @@ describe('LoginScreen Component', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Mật khẩu phải có từ 8 đến 128 ký tự')).toBeTruthy();
+      expect(getByText('Mật khẩu không được vượt quá 128 ký tự')).toBeTruthy();
     });
 
     expect(defaultMockAuthContext.login).not.toHaveBeenCalled();

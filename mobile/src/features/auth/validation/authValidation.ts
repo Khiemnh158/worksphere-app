@@ -69,7 +69,7 @@ export interface LoginFormData {
 /**
  * Validates Login form data.
  * - login: required after trim, max 255 chars
- * - password: required, 8-128 chars (never trimmed)
+ * - password: required, max 128 chars (never trimmed); creation policy is separate.
  */
 export function validateLogin(
   data: LoginFormData,
@@ -86,8 +86,8 @@ export function validateLogin(
   const password = data.password ?? '';
   if (!password) {
     errors.password = 'Vui lòng nhập mật khẩu';
-  } else if (password.length < 8 || password.length > 128) {
-    errors.password = 'Mật khẩu phải có từ 8 đến 128 ký tự';
+  } else if (password.length > 128) {
+    errors.password = 'Mật khẩu không được vượt quá 128 ký tự';
   }
 
   return errors;

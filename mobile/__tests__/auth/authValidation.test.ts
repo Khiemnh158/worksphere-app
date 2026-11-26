@@ -73,15 +73,15 @@ describe('Auth Form Validators and Normalizers', () => {
       expect(errors.login).toBeUndefined();
     });
 
-    it('returns error when password is shorter than 8 characters', () => {
-      const errors = validateLogin({ login: 'user1', password: '1234567' });
-      expect(errors.password).toBe('Mật khẩu phải có từ 8 đến 128 ký tự');
+    it('submits existing short passwords to the server without applying creation policy', () => {
+      const errors = validateLogin({ login: 'user1', password: '123' });
+      expect(errors.password).toBeUndefined();
     });
 
     it('returns error when password exceeds 128 characters', () => {
       const longPass = 'p'.repeat(129);
       const errors = validateLogin({ login: 'user1', password: longPass });
-      expect(errors.password).toBe('Mật khẩu phải có từ 8 đến 128 ký tự');
+      expect(errors.password).toBe('Mật khẩu không được vượt quá 128 ký tự');
     });
 
     it('accepts boundary passwords (8 and 128 characters)', () => {
